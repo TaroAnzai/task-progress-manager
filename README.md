@@ -16,6 +16,110 @@
 - スタイリング: CSS Modules または Tailwind（任意）
 - バックエンドAPI: Flask（別リポジトリ）
 
+
+## 🔗 API呼び出し方針
+
+本アプリケーションでは、**Flask-Smorest が生成する OpenAPI 仕様**を利用し、
+型安全かつメンテナンス性の高い API 呼び出しを実現しています。
+
+### **方針概要**
+
+* **OpenAPI仕様**：Flask-Smorestの `/openapi.json` を利用
+* **コード生成**：[orval](https://orval.dev/) により **React Query Hooks** および TypeScript 型定義を自動生成
+* **HTTPクライアント**：Axios（共通インスタンスを利用、認証ヘッダーやエラーハンドリングを一元化）
+* **service層**：初期段階から導入し、API呼び出しロジックをUIから分離
+
+---
+
+## 🏗 **ディレクトリ構成（API関連）**
+
+```
+src/
+ ├── api/
+ │    ├── generated/          # orval自動生成（Hooks & 型定義）
+ │    ├── axiosInstance.ts    # 共通Axiosインスタンス
+ │    ├── queryClient.ts      # React Query用QueryClient
+ │    └── service/            # 機能別ラッパー層（例：taskService.ts）
+```
+
+---
+
+## ⚡ **開発フロー**
+
+### **1. バックエンド更新時（型定義・Hooksの更新）**
+
+以下を実行するだけで、最新のAPI仕様が反映されます。
+
+```bash
+npm run generate:api
+```
+
+* **処理内容**：
+
+  1. `/openapi.json` をダウンロード
+  2. orval により `src/api/generated/` を自動生成（Hooks & 型定義更新）
+
+---
+
+### **2. フロント実装時**
+
+* **service層を通じて呼び出すのが基本方針です。**
+  UI側は `useTasks()` のように呼ぶだけで、状態管理（ローディング、エラー、再取得）は自動化されています。
+
+#### ✅ 例：タスク取得と更新
+
+```tsx
+// pages/TaskList.tsx
+import { useTasks } from '@/api/service/taskService';
+
+export const TaskList = () => {
+  const { data: tasks, isLoading, error, updateTask } = useTasks();
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error loading tasks</p>;
+
+  return (
+    <ul>
+      {tasks?.map((task) => (
+        <li key={task.id}>
+          {task.title}
+          <button onClick={() => updateTask({ id: task.id, title: '更新済み' })}>
+            更新
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+};
+```
+
+---
+
+### **3. 将来拡張**
+
+* **サーバー切替対応**：環境変数（`.env`）を切り替えるだけで対応可能
+* **キャッシュ制御や楽観的UI更新が必要になった場合**：
+  service層内の修正のみで対応可能（UI側は変更不要）
+
+---
+
+### **4. 環境変数（例）**
+
+```
+VITE_API_BASE_URL=https://api.anzai-home.com/progress
+VITE_OPENAPI_URL=https://api.anzai-home.com/openapi.json
+```
+
+---
+
+### **5. 利点まとめ**
+
+* ✅ **型安全・メンテナンス性が高い**（OpenAPI→orval→自動生成）
+* ✅ **状態管理の自動化**（React Query活用）
+* ✅ **保守性向上**（service層にロジック集約）
+* ✅ **将来の拡張・サーバー移行も容易**（環境変数とservice層で吸収）
+
+
 ## 🔧 セットアップ手順
 
 ```bash
