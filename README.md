@@ -28,3 +28,70 @@ npm install
 
 # 開発サーバーを起動
 npm run dev
+````
+
+---
+
+## 🔗 バックエンドAPIとの連携
+
+このプロジェクトは、バックエンド（Flask API）との通信に以下の仕組みを採用しています。
+
+### **API呼び出し構成**
+
+* **OpenAPI仕様**: Flask-Smorestが自動生成する `/openapi.json` を利用
+* **[orval](https://orval.dev/)**: OpenAPI仕様から **React Query Hooks** と **TypeScript型定義**を自動生成
+* **Axios（カスタムインスタンス）**: 認証ヘッダーやエラーハンドリングを一元管理
+
+### **メリット**
+
+1. **型安全** – API型はバックエンドと常に同期
+2. **開発効率向上** – 生成されたHooks（例：`useGetTasks()`）を直接利用可能
+3. **状態管理自動化** – React Queryがローディング・キャッシュ・エラー管理を自動化
+4. **簡単な保守** – バックエンドが更新された際は以下のコマンドを実行するだけ
+
+```bash
+npx orval
+```
+
+### **実装例**
+
+```tsx
+import { useGetTasks } from '@/api/progressApi';
+
+const TaskList = () => {
+  const { data: tasks, isLoading, error } = useGetTasks();
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error!</p>;
+
+  return (
+    <ul>
+      {tasks?.map(task => (
+        <li key={task.id}>{task.title}</li>
+      ))}
+    </ul>
+  );
+};
+```
+
+### **orval 設定ファイル例（`orval.config.ts`）**
+
+```ts
+export default {
+  progressApi: {
+    input: 'http://localhost:5000/openapi.json',
+    output: {
+      target: './src/api/progressApi.ts',
+      client: 'react-query',
+      override: {
+        mutator: {
+          path: './src/api/customAxios.ts', // 認証などを付与する場合
+          name: 'customInstance',
+        },
+      },
+    },
+  },
+};
+```
+
+
