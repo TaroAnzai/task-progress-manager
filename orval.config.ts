@@ -15,7 +15,7 @@ export default {
       override: {
         mutator: {
           path: './src/api/axiosInstance.ts',
-          name: 'default', // axiosInstance.tsがexport defaultの場合
+          name: 'customInstance',  
         },
 
       },
