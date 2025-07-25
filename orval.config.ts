@@ -7,8 +7,8 @@ export default {
   progressApi: {
     input: process.env.VITE_OPENAPI_URL,
     output: {
-      target: './src/api/generated/progressApi.ts',
-      schemas: './src/api/generated/model',
+      mode: 'split', // ← ここが重要
+      target: './src/api/generated/',
       client: 'react-query',
       clean: true,
       httpClient: 'axios',
