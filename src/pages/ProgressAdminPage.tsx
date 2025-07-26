@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
 import { UserProvider, useUser } from "../context/UserContext";
 
-function AdminPageContent() {
-  const { user, isLoading, refetchUser} = useUser();
+const AdminPageContent = () => {
+  const { user, isLoading, hasAdminScope } = useUser();
 
     if (isLoading) {
         return <p className="text-gray-500">読み込み中...</p>;
@@ -16,13 +15,11 @@ function AdminPageContent() {
     );
   }
 
-  const isAdmin = user.scopes?.some((s: any) => ["system_admin", "admin"].includes(s.role));
-
   return (
     <div className="p-4">
       <p className="font-bold text-lg mb-4">👤 {user.name} (ID: {user.id})</p>
 
-      {isAdmin ? (
+      {hasAdminScope() ? (
         <div className="space-y-6">
           {/* ✅ 後でOrganizationAdmin, UserAdminコンポーネントを追加予定 */}
           <div className="p-4 border rounded bg-white shadow">

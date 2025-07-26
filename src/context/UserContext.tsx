@@ -1,113 +1,53 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import type { ReactNode } from "react";
-import {
-  useGetProgressSessionsCurrent,
-  useGetProgressAccessScopesUsersUserId,
-} from "@/api/generated/taskProgressAPI.ts";
-import type { User, AccessScope as DtoAccessScope } from "@/api/generated/taskProgressAPI.schemas.ts";
+import type{ ReactNode } from "react";
+import { useGetProgressSessionsCurrent } from "@/api/generated/taskProgressAPI.ts";
+import type { User } from "@/api/generated/taskProgressAPI.schemas.ts";
 
-// ✅ UI用に変換したAccessScope型（Context内だけで完結）
-interface UiAccessScope {
-  organization_code: string;
-  role: "system_admin" | "admin" | "member";
-}
-
-// ✅ Contextが提供する型
+// Contextが提供する型（現状方針に沿って最小限に）
 interface UserContextType {
-  user: User | null;
-  isLoading: boolean;
-  refetchUser: () => void;
-  scope: string[];
-  accessScopes: UiAccessScope[];
-  hasAdminScope: () => boolean;
-  hasSystemAdminScope: () => boolean;
-  hasRoleInOrg: (role: string, orgCode: string) => boolean;
-  getAccessibleOrgCodesByRole: (role: string) => string[];
+  user: User | null;                  // 現在ログイン中のユーザー情報
+  isLoading: boolean;                 // ユーザー情報取得中フラグ
+  refetchUser: () => void;            // ユーザー情報再取得
+  scopes: string[];                    // ログインユーザーのロール一覧
+  hasAdminScope: () => boolean;       // 管理者権限を持つか
+  hasSystemAdminScope: () => boolean; // システム管理者か
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  // ✅ ユーザー情報取得
   const {
     data: sessionData,
-    isLoading: isUserLoading,
-    refetch: refetchUser,
+    isLoading,
+    refetch,
   } = useGetProgressSessionsCurrent();
 
   const [user, setUser] = useState<User | null>(null);
+  const [scopes, setScope] = useState<string[]>([]);
 
-  // ✅ ユーザーが確定した後にスコープ取得
-  const {
-    data: rawAccessScopes,
-    isLoading: isScopeLoading,
-  } = useGetProgressAccessScopesUsersUserId(user?.id ?? 0, {
-    query: { enabled: !!user?.id }, // user.idが確定してから実行
-  });
-
-  const [scope, setScope] = useState<string[]>([]);
-  const [accessScopes, setAccessScopes] = useState<UiAccessScope[]>([]);
-
-  // ✅ DTO → UI型への変換関数（このファイル内で完結）
-  const convertAccessScope = (dto: DtoAccessScope): UiAccessScope => {
-    return {
-      organization_code: mapOrganizationIdToCode(dto.organization_id),
-      role: (dto.role as "system_admin" | "admin" | "member") ?? "member",
-    };
-  };
-
-  // ✅ 組織ID→コード変換（簡易版）
-  const mapOrganizationIdToCode = (orgId: number): string => {
-    // 本来は組織テーブルのキャッシュなどから取得すべき
-    // 暫定的にIDを文字列化
-    return `ORG-${orgId}`;
-  };
-
-  // ✅ ユーザー情報更新
+  // ユーザー情報更新
   useEffect(() => {
     if (sessionData) {
-      const userData = (sessionData as any).data ?? sessionData;
+      const userData = (sessionData as any).data ?? sessionData; // AxiosResponse対応
       setUser(userData);
-      setScope(userData.scope || []);
+      setScope(userData.scope || []); // APIレスポンスに合わせて
     }
   }, [sessionData]);
 
-  // ✅ アクセススコープ更新
-  useEffect(() => {
-    if (rawAccessScopes) {
-      const converted = rawAccessScopes.map(convertAccessScope);
-      setAccessScopes(converted);
-    }
-  }, [rawAccessScopes]);
-
-  // ✅ 権限判定系関数
   const hasAdminScope = () =>
-    scope.includes("system_admin") || scope.includes("admin");
+    scopes.includes("system_admin") || scopes.includes("admin");
 
-  const hasSystemAdminScope = () => scope.includes("system_admin");
-
-  const hasRoleInOrg = (role: string, orgCode: string) =>
-    accessScopes.some(
-      (s) => s.organization_code === orgCode && s.role === role
-    );
-
-  const getAccessibleOrgCodesByRole = (role: string) =>
-    accessScopes
-      .filter((s) => s.role === role)
-      .map((s) => s.organization_code);
+  const hasSystemAdminScope = () => scopes.includes("system_admin");
 
   return (
     <UserContext.Provider
       value={{
         user,
-        isLoading: isUserLoading || isScopeLoading,
-        refetchUser,
-        scope,
-        accessScopes,
+        isLoading,
+        refetchUser: refetch,
+        scopes,
         hasAdminScope,
         hasSystemAdminScope,
-        hasRoleInOrg,
-        getAccessibleOrgCodesByRole,
       }}
     >
       {children}
