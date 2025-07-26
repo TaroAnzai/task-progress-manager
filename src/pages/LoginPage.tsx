@@ -1,14 +1,19 @@
 import { useState } from "react";
-import { usePostProgressSessions } from "../api/generated/taskProgressAPI";
-import type { Login } from "../api/generated/taskProgressAPI.schemas";
+import { usePostProgressSessions } from "@/api/generated/taskProgressAPI.ts";
+import { useLocation, useNavigate } from "react-router-dom";
+import type { Login } from "@/api/generated/taskProgressAPI.schemas";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string })?.from || "/";
   const mutation = usePostProgressSessions({
     mutation: {
       onSuccess: (res) => {
-        alert(`ログイン成功: ${res.data.user?.name}`);
+        alert(`ログイン成功: ${res.user?.name}`);
+        navigate(from, { replace: true });
         // 例: トークンやユーザー情報を保存し、リダイレクト
         // localStorage.setItem("token", res.data.token);
       },

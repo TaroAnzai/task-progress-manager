@@ -7,7 +7,7 @@ export default {
   progressApi: {
     input: process.env.VITE_OPENAPI_URL,
     output: {
-      mode: 'split', // ← ここが重要
+      mode: 'split',                 
       target: './src/api/generated/',
       client: 'react-query',
       clean: true,

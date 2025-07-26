@@ -22,8 +22,9 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 // ✅ orvalが要求する「mutator形式」の関数をexport
-export const customInstance = <T = unknown>(config: AxiosRequestConfig ) => {
-  return axiosInstance.request<T>(config);
+export const customInstance = async<T = unknown>(config: AxiosRequestConfig ) => {
+  const responsee = await axiosInstance.request<T>(config);
+  return responsee.data;
 };
 
 
