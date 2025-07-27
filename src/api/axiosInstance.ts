@@ -8,6 +8,7 @@ const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,  // ← これが必須
 });
 
 // ✅ 認証トークン付与などはここで一元管理

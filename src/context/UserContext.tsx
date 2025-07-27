@@ -5,37 +5,54 @@ import type { User } from "@/api/generated/taskProgressAPI.schemas.ts";
 
 // Contextが提供する型（現状方針に沿って最小限に）
 interface UserContextType {
-  user: User | null;                  // 現在ログイン中のユーザー情報
-  isLoading: boolean;                 // ユーザー情報取得中フラグ
+  user: User | null;                 // 現在ログイン中のユーザー情報
+  loading: boolean;                 // ユーザー情報取得中フラグ
   refetchUser: () => void;            // ユーザー情報再取得
   scopes: string[];                    // ログインユーザーのロール一覧
   hasAdminScope: () => boolean;       // 管理者権限を持つか
   hasSystemAdminScope: () => boolean; // システム管理者か
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType>({
+   user: null,
+   loading: true,
+   scopes: [],
+   hasAdminScope: () => false,
+   hasSystemAdminScope: () => false,
+   refetchUser: () => {}
+ });
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const {
     data: sessionData,
-    isLoading,
+    isLoading: queryLoading,
+    isFetching,
+    isSuccess,
     refetch,
   } = useGetProgressSessionsCurrent();
 
   const [user, setUser] = useState<User | null>(null);
-  const [scopes, setScope] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true); // ✅ 完全確定までtrue
+  const [scopes, setScopes] = useState<string[]>([]);
 
   // ユーザー情報更新
   useEffect(() => {
-    if (sessionData) {
-      const userData = (sessionData as any).data ?? sessionData; // AxiosResponse対応
-      setUser(userData);
-      setScope(userData.scope || []); // APIレスポンスに合わせて
+    // ✅ isSuccessで結果確定後にのみユーザー情報を更新
+    if (!queryLoading && !isFetching && isSuccess) {
+      if (sessionData && (sessionData as any).id) {
+        const userData = (sessionData as any).data ?? sessionData;
+        setUser(userData);
+        setScopes(userData.scope || []);
+      } else {
+        setUser(null);
+        setScopes([]);
+      }
+      setLoading(false); // ✅ 完全確定
     }
-  }, [sessionData]);
+  }, [queryLoading, isFetching, isSuccess, sessionData]);
 
   const hasAdminScope = () =>
-    scopes.includes("system_admin") || scopes.includes("admin");
+    user?.is_superuser || scopes.includes("system_admin") || scopes.includes("admin") ;
 
   const hasSystemAdminScope = () => scopes.includes("system_admin");
 
@@ -43,7 +60,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     <UserContext.Provider
       value={{
         user,
-        isLoading,
+        loading,
         refetchUser: refetch,
         scopes,
         hasAdminScope,

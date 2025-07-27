@@ -1,20 +1,27 @@
+import { useEffect, useState } from "react";
 import { UserProvider, useUser } from "../context/UserContext";
+import { useNavigate, useLocation } from "react-router-dom"; 
 
 const AdminPageContent = () => {
-  const { user, isLoading, hasAdminScope } = useUser();
+  const { user, loading, hasAdminScope } = useUser();
+  console.log("AdminPage user:", user);
+  const navigate = useNavigate(); // ← ★追加
+  const location = useLocation(); // 現在のパスを取得するために必要
+  useEffect(() => {
+    if (loading) return; 
+    if (!user){
+      // 未ログイン時にログインページへ遷移
+      navigate("/login", { state: { from: location.pathname } });
+    }
+  }, [loading, user, navigate]);
 
-    if (isLoading) {
+    if (loading) {
         return <p className="text-gray-500">読み込み中...</p>;
     }
-
-  if (!user) {
-    return (
-      <div className="p-4">
-        <p className="text-red-600 font-boldPending mb-2">⚠ ログインしてください。</p>
-      </div>
-    );
-  }
-
+    if (!user) {
+      // レンダリングせず、リダイレクトが完了するまで何も表示しない
+      return null;
+    }
   return (
     <div className="p-4">
       <p className="font-bold text-lg mb-4">👤 {user.name} (ID: {user.id})</p>
