@@ -9,12 +9,16 @@
 
 ## 🚀 技術スタック
 
-- Frontend: [React](https://react.dev/)
-- Build Tool: [Vite](https://vitejs.dev/)
-- HTTP通信: [Axios](https://axios-http.com/)
-- 状態管理: React Hooks（`useState`, `useEffect` など）
-- スタイリング: CSS Modules または Tailwind（任意）
-- バックエンドAPI: Flask（別リポジトリ）
+| 分類                      | 使用技術                             | 補足                                      |
+| ----------------------- | -------------------------------- | --------------------------------------- |
+| **Frontend**            | **React**                        | Viteを用いたSPA構成                           |
+| **Build Tool**          | **Vite**                         | 高速ビルド・ホットリロード対応                         |
+| **HTTP通信**              | **Axios**                        | 認証トークン付与や共通エラーハンドリングをカスタムインスタンスで管理      |
+| **データフェッチング & キャッシュ管理** | **React Query**                  | サーバー状態管理、キャッシュ、自動リフェッチを担う               |
+| **APIクライアント自動生成**       | **Orval**                        | OpenAPI仕様からReact Query Hooks & 型定義を自動生成 |
+| **状態管理（ローカル）**          | **React Hooks**                  | useState, useEffectなどでUIローカル状態を管理       |
+| **スタイリング**              | **Tailwind CSS** ＋ **shadcn/ui** | シンプルかつ拡張性の高いUI構築                        |
+| **バックエンドAPI**           | **Flask**                        | 別リポジトリで運用                               |
 
 
 ## 🔗 API呼び出し方針
@@ -35,11 +39,20 @@
 
 ```
 src/
- ├── api/
- │    ├── generated/          # orval自動生成（Hooks & 型定義）
- │    ├── axiosInstance.ts    # 共通Axiosインスタンス
- │    ├── queryClient.ts      # React Query用QueryClient
- │    └── service/            # 機能別ラッパー層（例：taskService.ts）
+├── api/
+│   ├── generated/
+│   │   ├── progressApi.ts        # Orval自動生成のReact Query Hooks
+│   │   └── model/                # Orval自動生成の型定義
+│   ├── service/                  # サービス層（UI用の型変換・ラップ関数）
+│   │   ├── taskService.ts
+│   │   ├── authService.ts
+│   │   └── ...
+│   └── axiosInstance.ts          # Axiosカスタムインスタンス
+├── components/                    # shadcnベースのUIコンポーネント
+├── pages/                         # 各ページ単位のコンポーネント
+├── hooks/                         # カスタムフック（必要に応じて）
+├── App.tsx
+└── main.tsx
 ```
 
 ---
