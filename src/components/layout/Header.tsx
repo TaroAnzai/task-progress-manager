@@ -6,7 +6,7 @@ export default function Header() {
       <nav className="flex gap-4">
         <a href="/" className="hover:underline">タスク一覧</a>
         <a href="/objectives" className="hover:underline">オブジェクティブ</a>
-        <a href="/settings" className="hover:underline">設定</a>
+        <a href="/admin" className="hover:underline">設定</a>
       </nav>
     </header>
   );

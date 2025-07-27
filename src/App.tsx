@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import TaskPage from "@/pages/TaskPage";
 import LoginPage from "@/pages/LoginPage"; // ✅ ログインページを追加
+import ProgressAdminPage from "@/pages/ProgressAdminPage.tsx";
 import "./index.css"; // ✅ Tailwindを有効にする
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
 
             {/* ✅ ログインページ */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/admin" element={<ProgressAdminPage />} />
           </Routes>
         </main>
       </div>
