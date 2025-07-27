@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import type { Organization } from "@/api/generated/taskProgressAPI.schemas";
+import { toast } from "sonner";
+import type { Organization, OrganizationInput } from "@/api/generated/taskProgressAPI.schemas";
 import {
-  useDeleteTaskProgressOrganization,
-  useUpdateTaskProgressOrganizationParent,
-  useCreateTaskProgressOrganization,
+  useDeleteProgressOrganizationsOrgId,
+  usePutProgressOrganizationsOrgId,
+  usePostProgressOrganizations,
 } from "@/api/generated/taskProgressAPI";
-import { useToast } from "@/components/ui/use-toast";
 
 interface TreeNodeProps {
   node: Organization & { children?: Organization[] };
@@ -17,60 +17,43 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ node, onRefresh }) => {
   const [adding, setAdding] = useState(false);
   const [childName, setChildName] = useState("");
   const [childCode, setChildCode] = useState("");
-  const { toast } = useToast();
 
-  const deleteOrgMutation = useDeleteTaskProgressOrganization();
-  const updateParentMutation = useUpdateTaskProgressOrganizationParent();
-  const createOrgMutation = useCreateTaskProgressOrganization();
+  const deleteOrgMutation = useDeleteProgressOrganizationsOrgId();
+  const updateParentMutation = usePutProgressOrganizationsOrgId();
+  const createOrgMutation = usePostProgressOrganizations();
 
   const handleAddChild = async () => {
     if (!childName || !childCode) {
-      toast({
-        variant: "destructive",
-        title: "エラー",
-        description: "組織名とコードは必須です",
-      });
+      toast.error("組織名とコードは必須です");
       return;
     }
+ 
+    const input: OrganizationInput = {
+          name: childName,
+          org_code: childCode,
+          parent_id: node.id,
+          company_id: node.company_id,
+    };
     try {
-      await createOrgMutation.mutateAsync({
-        name: childName,
-        org_code: childCode,
-        parent_code: node.org_code,
-        company_code: node.company_code,
-      });
-      toast({
-        title: "登録成功",
-        description: `${childName} を追加しました`,
-      });
+      await createOrgMutation.mutateAsync({data: input});
+      toast.success("組織を登録しました");
       setAdding(false);
       setChildName("");
       setChildCode("");
       onRefresh();
     } catch (e: any) {
-      toast({
-        variant: "destructive",
-        title: "登録失敗",
-        description: e.message,
-      });
+      console.error("登録失敗:", e);
     }
   };
 
   const handleDelete = async () => {
     if (!confirm(`「${node.name}」を削除しますか？`)) return;
     try {
-      await deleteOrgMutation.mutateAsync(node.org_code);
-      toast({
-        title: "削除成功",
-        description: `${node.name} を削除しました`,
-      });
+      await deleteOrgMutation.mutateAsync({ orgId: node.id!}); //!を取れるか
+      toast.success(`${node.name} を削除しました`);
       onRefresh();
     } catch (e: any) {
-      toast({
-        variant: "destructive",
-        title: "削除失敗",
-        description: e.message,
-      });
+      toast.error(`削除に失敗しました: ${e.message || "不明なエラー"}`);
     }
   };
 
@@ -78,12 +61,14 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ node, onRefresh }) => {
     e.preventDefault();
     const dragged = e.dataTransfer.getData("text/plain");
     if (dragged === node.org_code) return;
-
+    
+    const payload = {
+      orgId: dragged,
+      organizationUpdate:{parent_id:node.org_code}
+    };
     try {
-      await updateParentMutation.mutateAsync({
-        org_code: dragged,
-        new_parent_code: node.org_code,
-      });
+      await updateParentMutation.mutateAsync(payload);
+
       toast({
         title: "更新成功",
         description: "親組織を更新しました",

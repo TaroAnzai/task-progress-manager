@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
-  useGetTaskProgressOrganizations,
-  useCreateTaskProgressOrganization,
+  useGetProgressOrganizations,
+  usePostProgressOrganizations,
 } from "@/api/generated/taskProgressAPI";
 import type {
   Organization,
   OrganizationInput,
 } from "@/api/generated/taskProgressAPI.schemas";
-import { useToast } from "@/components/ui/use-toast";
 import { TreeNode } from "./TreeNode";
 
 interface OrganizationTreeProps {
-  companyCode: string;
+  companyId: number;
   userContext: {
     hasAdminScope: () => boolean;
     scope?: string[];
@@ -19,20 +19,20 @@ interface OrganizationTreeProps {
 }
 
 export const OrganizationTree: React.FC<OrganizationTreeProps> = ({
-  companyCode,
+  companyId,
   userContext,
 }) => {
   const [parentCode, setParentCode] = useState("");
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
-  const { toast } = useToast();
+
 
   // React Query で組織一覧取得
-  const { data: orgs, refetch } = useGetTaskProgressOrganizations({
+  const { data: orgs, refetch } = useGetProgressOrganizations({
     query: { staleTime: 1000 * 60 }, // キャッシュ1分
   });
 
-  const createOrgMutation = useCreateTaskProgressOrganization();
+  const createOrgMutation = usePostProgressOrganizations();
 
   const buildTree = (
     orgs: Organization[]
@@ -46,8 +46,8 @@ export const OrganizationTree: React.FC<OrganizationTreeProps> = ({
       map[o.org_code] = { ...o, children: [] };
     });
     orgs.forEach((o) => {
-      if (o.parent_code && map[o.parent_code]) {
-        map[o.parent_code].children.push(map[o.org_code]);
+      if (o.parent_id && map[o.parent_id]) {
+        map[o.parent_id].children.push(map[o.org_code]);
       } else {
         roots.push(map[o.org_code]);
       }
@@ -60,35 +60,25 @@ export const OrganizationTree: React.FC<OrganizationTreeProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !code) {
-      toast({
-        variant: "destructive",
-        title: "エラー",
-        description: "組織名とコードは必須です",
-      });
+      toast.error("組織名とコードは必須です");
       return;
     }
+    const parentId = Number(parentCode) || null; //後で変換関数作成
     const input: OrganizationInput = {
       name,
       org_code: code,
-      parent_code: parentCode || null,
-      company_code: companyCode,
+      parent_id: parentId || null,
+      company_id: companyId,
     };
     try {
-      await createOrgMutation.mutateAsync(input);
-      toast({
-        title: "登録成功",
-        description: `${name} を追加しました`,
-      });
+      await createOrgMutation.mutateAsync({data:input});
+      toast.success("組織を登録しました");
       setName("");
       setCode("");
       setParentCode("");
       refetch();
     } catch (e: any) {
-      toast({
-        variant: "destructive",
-        title: "登録失敗",
-        description: e.message,
-      });
+      toast.error(`登録に失敗しました: ${e.message || "不明なエラー"}`);
     }
   };
 
@@ -121,7 +111,7 @@ export const OrganizationTree: React.FC<OrganizationTreeProps> = ({
           />
           <input
             className="border rounded p-1"
-            value={parentCode}
+            value={parentCode || ""}
             onChange={(e) => setParentCode(e.target.value)}
             placeholder="親コード"
           />

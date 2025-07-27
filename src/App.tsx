@@ -1,6 +1,7 @@
 // src/App.tsx
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 import Header from "@/components/layout/Header";
 import TaskPage from "@/pages/TaskPage";
 import LoginPage from "@/pages/LoginPage"; // ✅ ログインページを追加
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/admin" element={<ProgressAdminPage />} />
           </Routes>
+          <Toaster richColors position="top-center" />
         </main>
       </div>
     </Router>
