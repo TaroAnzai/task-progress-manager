@@ -1,18 +1,17 @@
 import React from "react";
-import { OrgNode } from "./OrganizationTree";
-import { TreeNode } from "./TreeNode";
+import { OrganizationTreeView } from "./OrganizationTreeView";
 
+/**
+ * 外部からは <TreeView companyId={...} /> で使用する
+ */
 interface TreeViewProps {
-  nodes: OrgNode[];
-  onRefresh: () => void;
+  companyId: number;
 }
 
-export const TreeView: React.FC<TreeViewProps> = ({ nodes, onRefresh }) => {
+export const TreeView: React.FC<TreeViewProps> = ({ companyId }) => {
   return (
-    <ul style={{ listStyle: "none" }}>
-      {nodes.map((n) => (
-        <TreeNode key={n.org_code} node={n} onRefresh={onRefresh} />
-      ))}
-    </ul>
+    <OrganizationTreeView
+      companyId={companyId}
+    />
   );
 };

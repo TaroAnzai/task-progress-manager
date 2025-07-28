@@ -1,77 +1,73 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
-  useGetProgressOrganizations,
+  useGetProgressOrganizationsTree,
   usePostProgressOrganizations,
 } from "@/api/generated/taskProgressAPI";
 import type {
-  Organization,
   OrganizationInput,
+  OrganizationTree,
 } from "@/api/generated/taskProgressAPI.schemas";
 import { TreeNode } from "./TreeNode";
-
+import { UserProvider, useUser } from "@/context/UserContext";
 interface OrganizationTreeProps {
   companyId: number;
-  userContext: {
-    hasAdminScope: () => boolean;
-    scope?: string[];
-  };
 }
 
-export const OrganizationTree: React.FC<OrganizationTreeProps> = ({
+export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
   companyId,
-  userContext,
 }) => {
-  const [parentCode, setParentCode] = useState("");
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
-
-
-  // React Query で組織一覧取得
-  const { data: orgs, refetch } = useGetProgressOrganizations({
-    query: { staleTime: 1000 * 60 }, // キャッシュ1分
+  const [parentCode, setParentCode] = useState("");
+  const [codeToIdMap, setCodeToIdMap] = useState<Record<string, number>>({});
+ 
+  // ✅ ツリー取得（ユーザー権限 & company_id に応じてフィルタ済み）
+  const { data: orgs, refetch } = useGetProgressOrganizationsTree({
+    company_id: companyId,
   });
 
   const createOrgMutation = usePostProgressOrganizations();
 
-  const buildTree = (
-    orgs: Organization[]
-  ): (Organization & { children: Organization[] })[] => {
-    const map: Record<
-      string,
-      Organization & { children: Organization[] }
-    > = {};
-    const roots: (Organization & { children: Organization[] })[] = [];
-    orgs.forEach((o) => {
-      map[o.org_code] = { ...o, children: [] };
-    });
-    orgs.forEach((o) => {
-      if (o.parent_id && map[o.parent_id]) {
-        map[o.parent_id].children.push(map[o.org_code]);
-      } else {
-        roots.push(map[o.org_code]);
-      }
-    });
-    return roots;
-  };
+  // ✅ コード → ID マッピング作成
+  useEffect(() => {
+    if (!orgs) return;
+    const newMap: Record<string, number> = {};
 
-  const tree = orgs ? buildTree(orgs) : [];
+    const traverse = (nodes: OrganizationTree[]) => {
+      nodes.forEach((node) => {
+        if (node.org_code && node.id !== undefined) {
+          newMap[node.org_code] = node.id;
+        }
+        if (node.children && node.children.length > 0) {
+          traverse(node.children);
+        }
+      });
+    };
 
+    traverse(orgs);
+    setCodeToIdMap(newMap);
+  }, [orgs]);
+
+  // ✅ フォーム送信
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !code) {
       toast.error("組織名とコードは必須です");
       return;
     }
-    const parentId = Number(parentCode) || null; //後で変換関数作成
+
+    const parentId = parentCode ? codeToIdMap[parentCode] ?? null : null;
+
     const input: OrganizationInput = {
       name,
       org_code: code,
-      parent_id: parentId || null,
+      parent_id: parentId,
       company_id: companyId,
     };
+
     try {
-      await createOrgMutation.mutateAsync({data:input});
+      await createOrgMutation.mutateAsync({ data: input });
       toast.success("組織を登録しました");
       setName("");
       setCode("");
@@ -82,7 +78,7 @@ export const OrganizationTree: React.FC<OrganizationTreeProps> = ({
     }
   };
 
-  if (!userContext.hasAdminScope()) {
+  if (!useUser().hasAdminScope()) {
     return (
       <p className="text-sm text-gray-500">
         このユーザーは組織管理の権限がありません
@@ -92,7 +88,9 @@ export const OrganizationTree: React.FC<OrganizationTreeProps> = ({
 
   return (
     <div className="p-4">
-      {userContext.scope?.includes("system_admin") && (
+      <p>組織ツリー（{companyId}）</p>
+      {/* 登録フォーム（システム管理者のみ） */}
+      {useUser().scopes?.includes("system_admin") || useUser().scopes?.includes("admin") || useUser().user?.is_superuser && (
         <form
           onSubmit={handleSubmit}
           className="flex gap-2 mb-4 items-center flex-wrap"
@@ -111,9 +109,9 @@ export const OrganizationTree: React.FC<OrganizationTreeProps> = ({
           />
           <input
             className="border rounded p-1"
-            value={parentCode || ""}
+            value={parentCode}
             onChange={(e) => setParentCode(e.target.value)}
-            placeholder="親コード"
+            placeholder="親組織コード"
           />
           <button
             type="submit"
@@ -123,9 +121,16 @@ export const OrganizationTree: React.FC<OrganizationTreeProps> = ({
           </button>
         </form>
       )}
+
+      {/* 組織ツリー */}
       <ul className="list-none">
-        {tree.map((node) => (
-          <TreeNode key={node.org_code} node={node} onRefresh={refetch} />
+        {(orgs ?? []).map((node) => (
+          <TreeNode
+            key={node.org_code}
+            node={node}
+            onRefresh={refetch}
+            codeToIdMap={codeToIdMap}
+          />
         ))}
       </ul>
     </div>

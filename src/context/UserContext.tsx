@@ -14,12 +14,12 @@ interface UserContextType {
 }
 
 const UserContext = createContext<UserContextType>({
-   user: null,
-   loading: true,
-   scopes: [],
-   hasAdminScope: () => false,
-   hasSystemAdminScope: () => false,
-   refetchUser: () => {}
+  user: null,
+  loading: true,
+  refetchUser: () => {},
+  scopes: [],
+  hasAdminScope: () => false,
+  hasSystemAdminScope: () => false,
  });
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
