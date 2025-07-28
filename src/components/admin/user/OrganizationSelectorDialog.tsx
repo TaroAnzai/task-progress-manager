@@ -8,24 +8,26 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useGetProgressOrganizationsTree } from '@/api/generated/taskProgressAPI';
-import type { OrganizationTreeNode } from '@/api/generated/taskProgressAPI.schemas';
+import type { OrganizationTree } from '@/api/generated/taskProgressAPI.schemas';
 import type { OrganizationSelectResult } from './types';
 import { Button } from '@/components/ui/button';
 
 interface Props {
+  companyId: number;
   open: boolean;
   onClose: () => void;
   onSelect: (org: OrganizationSelectResult) => void;
 }
 
-const OrganizationSelectorDialog: React.FC<Props> = ({ open, onClose, onSelect }) => {
-  const { data: treeData, isLoading, error } = useGetProgressOrganizationsTree();
+const OrganizationSelectorDialog: React.FC<Props> = ({ companyId, open, onClose, onSelect }) => {
+  const { data: treeData, isLoading, error } = useGetProgressOrganizationsTree({ company_id: companyId});
 
-  const handleClick = (node: OrganizationTreeNode) => {
+  const handleClick = (node: OrganizationTree) => {
+    if(!node.org_code || !node.name) return;
     onSelect({ org_code: node.org_code, org_name: node.name });
   };
 
-  const renderTree = (nodes: OrganizationTreeNode[]) => (
+  const renderTree = (nodes: OrganizationTree[]) => (
     <ul className="ml-4 space-y-1">
       {nodes.map(node => (
         <li key={node.org_code}>

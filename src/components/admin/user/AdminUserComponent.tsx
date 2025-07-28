@@ -9,7 +9,11 @@ import { Separator } from '@/components/ui/separator';
 import UserForm from './UserForm';
 import UserTable from './UserTable';
 
-const AdminUserComponent: React.FC = () => {
+interface AdminUserComponentProps {
+  companyId: number;
+}
+
+const AdminUserComponent: React.FC <AdminUserComponentProps> = () => {
   const { user, hasAdminScope } = useUser();
   const [editingUser, setEditingUser] = useState<UserFormState | null>(null);
 
@@ -51,6 +55,7 @@ const AdminUserComponent: React.FC = () => {
           <h2 className="text-xl font-bold mb-4">👤 ユーザー登録・編集</h2>
           <UserForm
             initialData={editingUser}
+            companyId={company_id}
             onSubmitted={handleFormSubmitted}
             onCancel={() => setEditingUser(null)}
           />
