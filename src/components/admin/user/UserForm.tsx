@@ -10,6 +10,7 @@ import OrganizationSelectorDialog from './OrganizationSelectorDialog';
 
 interface UserFormProps {
   initialData: UserFormState | null;
+  companyId: number;
   onSubmitted: () => void;
   onCancel: () => void;
 }
@@ -136,6 +137,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSubmitted, onCancel 
       </div>
 
       <OrganizationSelectorDialog
+        companyId={companyId}
         open={orgDialogOpen}
         onClose={() => setOrgDialogOpen(false)}
         onSelect={handleOrgSelect}

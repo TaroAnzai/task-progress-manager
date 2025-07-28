@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import type { UserWithScopes } from './types';
-import { useGetProgressAccessScopesUserId, useDeleteProgressUsersUserId } from '@/api/generated/taskProgressAPI';
+import { useGetProgressAccessScopesUsersUserId, useDeleteProgressUsersUserId } from '@/api/generated/taskProgressAPI';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import UserTableRow from './UserTableRow';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -23,7 +23,7 @@ const UserTable: React.FC<Props> = ({ users, isLoading, error, onEditUser, onRef
       const enrichedUsers = await Promise.all(
         users.map(async (user) => {
           try {
-            const { data: scopes } = await useGetProgressAccessScopesUserId().queryFn({ userId: user.id! });
+            const { data: scopes } = await useGetProgressAccessScopesUsersUserId().queryFn({ userId: user.id! });
             return { ...user, scopes };
           } catch (err) {
             console.warn(`スコープ取得失敗: userId=${user.id}`, err);

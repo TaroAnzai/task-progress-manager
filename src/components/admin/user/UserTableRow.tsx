@@ -18,7 +18,7 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const UserTableRow: React.FC<Props> = ({ user, onEdit, onDelete }) => {
-  const visibleScopes = user.scopes?.filter(s => s.organization_code === user.organization_id?.toString()) || [];
+  const visibleScopes = user.scopes?.filter(s => s.organization_id === user.organization_id) || [];
   const scopeDisplay = visibleScopes.length > 0
     ? visibleScopes.map(s => ROLE_LABELS[s.role] ?? s.role).join(', ')
     : '未設定';
