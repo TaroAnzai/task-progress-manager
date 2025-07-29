@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { useCreateProgressUsers, useUpdateProgressUsersUserId, useCreateProgressAccessScopes } from '@/api/generated/taskProgressAPI';
-import { UserFormState, OrganizationSelectResult } from './types';
+import { usePostProgressUsers, usePutProgressUsersUserId, usePostProgressAccessScopesUsersUserId } from '@/api/generated/taskProgressAPI';
+import type { UserFormState, OrganizationSelectResult } from './types';
 import OrganizationSelectorDialog from './OrganizationSelectorDialog';
 
 interface UserFormProps {
@@ -16,25 +16,27 @@ interface UserFormProps {
 }
 
 const emptyForm: UserFormState = {
+  id: 0,
   name: '',
   email: '',
-  organization_code: '',
+  //organization_code: '',
+  organization_id: 0,
   role: 'member',
 };
 
-const UserForm: React.FC<UserFormProps> = ({ initialData, onSubmitted, onCancel }) => {
+const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted, onCancel }) => {
   const [form, setForm] = useState<UserFormState>(emptyForm);
   const [orgDialogOpen, setOrgDialogOpen] = useState(false);
   const [orgDisplayName, setOrgDisplayName] = useState<string>('組織を選択');
 
-  const createUserMutation = useCreateProgressUsers();
-  const updateUserMutation = useUpdateProgressUsersUserId();
-  const addScopeMutation = useCreateProgressAccessScopes();
+  const createUserMutation = usePostProgressUsers();
+  const updateUserMutation = usePutProgressUsersUserId();
+  const addScopeMutation = usePostProgressAccessScopesUsersUserId();
 
   useEffect(() => {
     if (initialData) {
       setForm(initialData);
-      setOrgDisplayName(initialData.organization_code ? `(${initialData.organization_code})` : '組織を選択');
+      setOrgDisplayName('組織を選択');
     } else {
       setForm(emptyForm);
       setOrgDisplayName('組織を選択');
@@ -46,7 +48,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSubmitted, onCancel 
   };
 
   const handleOrgSelect = (org: OrganizationSelectResult) => {
-    setForm(prev => ({ ...prev, organization_code: org.org_code }));
+    setForm(prev => ({ ...prev, organization_code: org.org_code, organization_id: org.org_id }));
     setOrgDisplayName(`${org.org_name} (${org.org_code})`);
     setOrgDialogOpen(false);
   };
@@ -54,7 +56,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSubmitted, onCancel 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!form.name || !form.email || !form.organization_code) {
+    if (!form.name || !form.email || !form.organization_id) {
       alert('名前、メール、組織コードは必須です');
       return;
     }
@@ -66,14 +68,15 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSubmitted, onCancel 
           data: {
             name: form.name,
             email: form.email,
-            organization_code: form.organization_code,
+            organization_id: form.organization_id,
           },
         });
         await addScopeMutation.mutateAsync({
+          userId: form.id,
           data: {
-            user_id: form.id,
-            organization_code: form.organization_code,
+            organization_id: form.organization_id,
             role: form.role,
+            user_id: form.id,
           },
         });
       } else {
@@ -81,14 +84,16 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSubmitted, onCancel 
           data: {
             name: form.name,
             email: form.email,
-            organization_code: form.organization_code,
+            password: form.email, // 仮にメールアドレスをパスワードとして使用
+            organization_id: form.organization_id,
           },
         });
 
         await addScopeMutation.mutateAsync({
+          userId: result.user.id,
           data: {
             user_id: result.user.id,
-            organization_code: form.organization_code,
+            organization_id: form.organization_id,
             role: form.role,
           },
         });
@@ -125,7 +130,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, onSubmitted, onCancel 
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="system_admin">システム管理者</SelectItem>
-            <SelectItem value="admin">組織管理者</SelectItem>
+            <SelectItem value="org_admin">組織管理者</SelectItem>
             <SelectItem value="member">メンバー</SelectItem>
           </SelectContent>
         </Select>

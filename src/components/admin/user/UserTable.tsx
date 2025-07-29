@@ -23,7 +23,7 @@ const UserTable: React.FC<Props> = ({ users, isLoading, error, onEditUser, onRef
       const enrichedUsers = await Promise.all(
         users.map(async (user) => {
           try {
-            const { data: scopes } = await useGetProgressAccessScopesUsersUserId().queryFn({ userId: user.id! });
+            const { data: scopes } = await useGetProgressAccessScopesUsersUserId(user.id);
             return { ...user, scopes };
           } catch (err) {
             console.warn(`スコープ取得失敗: userId=${user.id}`, err);

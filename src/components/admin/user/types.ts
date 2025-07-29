@@ -7,11 +7,12 @@ import type { User, AccessScope } from '@/api/generated/taskProgressAPI.schemas'
  * UI用のユーザーフォーム状態
  */
 export interface UserFormState {
-  id?: number;
+  id: number;
   name: string;
   email: string;
-  organization_code: string;
-  role: 'system_admin' | 'admin' | 'member';
+  //organization_code: string;
+  organization_id: number;
+  role: 'system_admin' | 'org_admin' | 'member';
 }
 
 /**
@@ -20,6 +21,7 @@ export interface UserFormState {
 export interface OrganizationSelectResult {
   org_code: string;
   org_name: string;
+  org_id: number;
 }
 
 /**

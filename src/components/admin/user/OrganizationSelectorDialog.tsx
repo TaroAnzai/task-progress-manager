@@ -24,7 +24,7 @@ const OrganizationSelectorDialog: React.FC<Props> = ({ companyId, open, onClose,
 
   const handleClick = (node: OrganizationTree) => {
     if(!node.org_code || !node.name) return;
-    onSelect({ org_code: node.org_code, org_name: node.name });
+    onSelect({ org_code: node.org_code, org_name: node.name, org_id: node.id });
   };
 
   const renderTree = (nodes: OrganizationTree[]) => (
