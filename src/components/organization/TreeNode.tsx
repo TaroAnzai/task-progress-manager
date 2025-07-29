@@ -10,13 +10,11 @@ import { toast } from "sonner";
 interface TreeNodeProps {
   node: OrganizationTree;
   onRefresh: () => void;
-  codeToIdMap: Record<string, number>;
 }
 
 export const TreeNode: React.FC<TreeNodeProps> = ({
   node,
   onRefresh,
-  codeToIdMap,
 }) => {
   const [open, setOpen] = useState(false);
   const [adding, setAdding] = useState(false);
@@ -38,7 +36,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
         data: {
           name: childName,
           org_code: childCode,
-          parent_id: codeToIdMap[node.org_code!] ?? null,
+          parent_id: node.id,
           company_id: node.company_id!,
         },
       });
@@ -55,14 +53,13 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
   const handleDelete = async () => {
     if (!confirm(`「${node.name}」を削除しますか？`)) return;
 
-    const id = codeToIdMap[node.org_code!];
-    if (!id) {
+    if (!node.id) {
       toast.error("IDが見つかりません");
       return;
     }
 
     try {
-      await deleteOrgMutation.mutateAsync({orgId:id});
+      await deleteOrgMutation.mutateAsync({orgId: node.id});
       toast.success(`${node.name} を削除しました`);
       onRefresh();
     } catch (e: any) {
@@ -72,21 +69,20 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
-    const draggedCode = e.dataTransfer.getData("text/plain");
-    if (!draggedCode || draggedCode === node.org_code) return;
+    const draggedIdStr = e.dataTransfer.getData("text/plain");
+    const draggedId = parseInt(draggedIdStr, 10);
+    
+    if (!draggedIdStr || isNaN(draggedId) || draggedId === node.id) return;
 
-    const draggedId = codeToIdMap[draggedCode];
-    const newParentId = codeToIdMap[node.org_code!];
-
-    if (!draggedId || !newParentId) {
-      toast.error("ID変換に失敗しました");
+    if (!node.id) {
+      toast.error("ドロップ先のIDが見つかりません");
       return;
     }
 
     try {
       await updateParentMutation.mutateAsync({
         orgId: draggedId,
-        data: { parent_id: newParentId },
+        data: { parent_id: node.id },
       });
       toast.success("親組織を更新しました");
       onRefresh();
@@ -98,7 +94,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
   return (
     <li
       draggable
-      onDragStart={(e) => e.dataTransfer.setData("text/plain", node.org_code!)}
+      onDragStart={(e) => e.dataTransfer.setData("text/plain", String(node.id))}
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
       className="pl-2"
@@ -167,7 +163,6 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
               key={child.org_code}
               node={child}
               onRefresh={onRefresh}
-              codeToIdMap={codeToIdMap}
             />
           ))}
         </ul>
