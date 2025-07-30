@@ -10,6 +10,7 @@ import type {
 } from "@/api/generated/taskProgressAPI.schemas";
 import { TreeNode } from "./TreeNode";
 import { UserProvider, useUser } from "@/context/UserContext";
+import { extractErrorMessage } from "@/utils/errorHandler";
 interface OrganizationTreeProps {
   companyId: number;
 }
@@ -74,7 +75,7 @@ export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
       setParentCode("");
       refetch();
     } catch (e: any) {
-      toast.error(`登録に失敗しました: ${e.message || "不明なエラー"}`);
+      toast.error(`${extractErrorMessage(e)}`);
     }
   };
 
@@ -129,7 +130,6 @@ export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
             key={node.org_code}
             node={node}
             onRefresh={refetch}
-            codeToIdMap={codeToIdMap}
           />
         ))}
       </ul>

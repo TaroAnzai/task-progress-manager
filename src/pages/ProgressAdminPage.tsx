@@ -39,6 +39,7 @@ const AdminPageContent = () => {
               </div>
           </div>
           {selectedCompany && (
+            <>
             <div className="space-y-6">
               {/* ✅ 後でOrganizationAdmin, UserAdminコンポーネントを追加予定 */}
               <div className="p-4 border rounded bg-white shadow">
@@ -48,6 +49,16 @@ const AdminPageContent = () => {
                 </div>
               </div>
             </div>
+            <div className="space-y-6">
+              {/* ✅ 後でOrganizationAdmin, UserAdminコンポーネントを追加予定 */}
+              <div className="p-4 border rounded bg-white shadow">
+                <p className="text-gray-700">管理者用コンテンツはここに表示されます。</p>
+                <div className="mt-4 space-y-2">
+                  <TreeView companyId={selectedCompany.id!} />
+                </div>
+              </div>
+            </div>
+            </>
           )}
         </>
       ) : (
