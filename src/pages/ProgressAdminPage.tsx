@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CompanySelectorDialog } from "@/components/admin/CompanySelectorDialog";
 import type { Company } from "@/api/generated/taskProgressAPI.schemas";
-import { TreeView } from "@/components/admin/organization/TreeView";
+import { AdminOrganizationComponent } from "@/components/admin/organization/AdminOrganizationComponent";
 import AdminUserComponent from "@/components/admin/user/AdminUserComponent";
 
 const AdminPageContent = () => {
@@ -46,7 +46,7 @@ const AdminPageContent = () => {
               <div className="p-4 border rounded bg-white shadow">
                 <p className="text-gray-700">管理者用コンテンツはここに表示されます。</p>
                 <div className="mt-4 space-y-2">
-                  <TreeView companyId={selectedCompany.id!} />
+                  <AdminOrganizationComponent companyId={selectedCompany.id!} />
                 </div>
               </div>
             </div>
