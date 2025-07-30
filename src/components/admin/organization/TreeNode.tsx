@@ -38,7 +38,6 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
           name: childName,
           org_code: childCode,
           parent_id: node.id,
-          parent_id: node.id,
           company_id: node.company_id!,
         },
       });
@@ -56,7 +55,6 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
     if (!confirm(`「${node.name}」を削除しますか？`)) return;
 
     if (!node.id) {
-    if (!node.id) {
       toast.error("IDが見つかりません");
       return;
     }
@@ -70,6 +68,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
       toast.error(`削除失敗: ${extractErrorMessage(e)}`);
     }
   };
+  
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
@@ -81,15 +80,12 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
 
     if (!node.id) {
       toast.error("ドロップ先のIDが見つかりません");
-    if (!node.id) {
-      toast.error("ドロップ先のIDが見つかりません");
       return;
     }
 
     try {
       await updateParentMutation.mutateAsync({
         orgId: draggedId,
-        data: { parent_id: node.id },
         data: { parent_id: node.id },
       });
       console.log(`node.name:${node.name}`);

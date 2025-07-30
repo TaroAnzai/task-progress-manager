@@ -11,7 +11,6 @@ import type {
 import { TreeNode } from "./TreeNode";
 import { UserProvider, useUser } from "@/context/UserContext";
 import { extractErrorMessage } from "@/utils/errorHandler";
-import { extractErrorMessage } from "@/utils/errorHandler";
 interface OrganizationTreeProps {
   companyId: number;
 }

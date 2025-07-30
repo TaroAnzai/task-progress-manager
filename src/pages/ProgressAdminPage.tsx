@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { CompanySelectorDialog } from "@/components/admin/CompanySelectorDialog";
 import type { Company } from "@/api/generated/taskProgressAPI.schemas";
 import { TreeView } from "@/components/admin/organization/TreeView";
+import AdminUserComponent from "@/components/admin/user/AdminUserComponent";
 
 const AdminPageContent = () => {
   const { user, loading, hasAdminScope } = useUser();
