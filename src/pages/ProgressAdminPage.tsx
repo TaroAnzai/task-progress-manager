@@ -60,6 +60,28 @@ const AdminPageContent = () => {
             </div>
             </>
           )}
+          {selectedCompany && (
+            <div className="space-y-6">
+              {/* ✅ 後でOrganizationAdmin, UserAdminコンポーネントを追加予定 */}
+              <div className="p-4 border rounded bg-white shadow">
+                <p className="text-gray-700">管理者用コンテンツはここに表示されます。</p>
+                <div className="mt-4 space-y-2">
+                  <AdminUserComponent companyId={selectedCompany.id!} />
+                </div>
+              </div>
+            </div>
+          )}
+          {selectedCompany && (
+            <div className="space-y-6">
+              {/* ✅ 後でOrganizationAdmin, UserAdminコンポーネントを追加予定 */}
+              <div className="p-4 border rounded bg-white shadow">
+                <p className="text-gray-700">管理者用コンテンツはここに表示されます。</p>
+                <div className="mt-4 space-y-2">
+                  <AdminUserComponent companyId={selectedCompany.id!} />
+                </div>
+              </div>
+            </div>
+          )}
         </>
       ) : (
         <p className="text-red-600 font-bold">⚠ このページは管理者専用です。</p>

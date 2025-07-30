@@ -11,6 +11,7 @@ import type {
 import { TreeNode } from "./TreeNode";
 import { UserProvider, useUser } from "@/context/UserContext";
 import { extractErrorMessage } from "@/utils/errorHandler";
+import { extractErrorMessage } from "@/utils/errorHandler";
 interface OrganizationTreeProps {
   companyId: number;
 }
@@ -32,6 +33,7 @@ export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
 
   // ✅ コード → ID マッピング作成
   useEffect(() => {
+    console.log("再マッピング");
     if (!orgs) return;
     const newMap: Record<string, number> = {};
 
@@ -57,9 +59,9 @@ export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
       toast.error("組織名とコードは必須です");
       return;
     }
-
+    console.log("登録データ:", { name, code, parentCode, companyId });
     const parentId = parentCode ? codeToIdMap[parentCode] ?? null : null;
-
+    console.log("登録データ後:", { name, code, parentCode, parentId,companyId });
     const input: OrganizationInput = {
       name,
       org_code: code,
@@ -75,7 +77,8 @@ export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
       setParentCode("");
       refetch();
     } catch (e: any) {
-      toast.error(`${extractErrorMessage(e)}`);
+      console.error("登録エラー:", e);
+      toast.error(`登録に失敗しました: ${extractErrorMessage(e)}`);
     }
   };
 
