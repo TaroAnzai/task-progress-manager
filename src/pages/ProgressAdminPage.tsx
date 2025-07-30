@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CompanySelectorDialog } from "@/components/admin/CompanySelectorDialog";
 import type { Company } from "@/api/generated/taskProgressAPI.schemas";
-import { TreeView } from "@/components/organization/TreeView";
+import { TreeView } from "@/components/admin/organization/TreeView";
 
 const AdminPageContent = () => {
   const { user, loading, hasAdminScope } = useUser();
