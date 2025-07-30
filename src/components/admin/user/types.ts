@@ -24,9 +24,3 @@ export interface OrganizationSelectResult {
   org_id: number;
 }
 
-/**
- * テーブル行で扱うユーザー情報（アクセススコープ付）
- */
-export interface UserWithScopes extends User {
-  scopes?: AccessScope[];
-}

@@ -7,6 +7,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { usePostProgressUsers, usePutProgressUsersUserId, usePostProgressAccessScopesUsersUserId } from '@/api/generated/taskProgressAPI';
 import type { UserFormState, OrganizationSelectResult } from './types';
 import OrganizationSelectorDialog from './OrganizationSelectorDialog';
+import { toast } from "sonner";
+import { extractErrorMessage } from "@/utils/errorHandler";
 
 interface UserFormProps {
   initialData: UserFormState | null;
@@ -101,7 +103,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted
 
       onSubmitted();
     } catch (err) {
-      alert('ユーザー登録に失敗しました');
+      toast.error(`${extractErrorMessage(err)}`);
       console.error(err);
     }
   };

@@ -1,7 +1,7 @@
 // src/components/admin/user/UserTableRow.tsx
 
 import React from 'react';
-import type { UserWithScopes } from './types';
+import type { UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 
@@ -18,7 +18,7 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const UserTableRow: React.FC<Props> = ({ user, onEdit, onDelete }) => {
-  const visibleScopes = user.scopes?.filter(s => s.organization_id === user.organization_id) || [];
+  const visibleScopes = user.access_scopes?.filter(s => s.organization_id === user.organization_id) || [];
   const scopeDisplay = visibleScopes.length > 0
     ? visibleScopes.map(s => ROLE_LABELS[s.role] ?? s.role).join(', ')
     : '未設定';

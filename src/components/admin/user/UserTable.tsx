@@ -1,11 +1,13 @@
 // src/components/admin/user/UserTable.tsx
 
 import React, { useEffect, useState } from 'react';
-import type { UserWithScopes } from './types';
+import type { UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
 import { useGetProgressAccessScopesUsersUserId, useDeleteProgressUsersUserId } from '@/api/generated/taskProgressAPI';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import UserTableRow from './UserTableRow';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from "sonner";
+import { extractErrorMessage } from "@/utils/errorHandler";
 
 interface Props {
   users: UserWithScopes[];
@@ -16,39 +18,14 @@ interface Props {
 }
 
 const UserTable: React.FC<Props> = ({ users, isLoading, error, onEditUser, onRefresh }) => {
-  const [usersWithScopes, setUsersWithScopes] = useState<UserWithScopes[]>([]);
-
-  useEffect(() => {
-    const fetchScopes = async () => {
-      const enrichedUsers = await Promise.all(
-        users.map(async (user) => {
-          try {
-            const { data: scopes } = await useGetProgressAccessScopesUsersUserId(user.id);
-            return { ...user, scopes };
-          } catch (err) {
-            console.warn(`スコープ取得失敗: userId=${user.id}`, err);
-            return { ...user, scopes: [] };
-          }
-        })
-      );
-      setUsersWithScopes(enrichedUsers);
-    };
-
-    if (users.length > 0) {
-      fetchScopes();
-    } else {
-      setUsersWithScopes([]);
-    }
-  }, [users]);
 
   const handleDelete = async (userId: number) => {
     if (!confirm('本当にこのユーザーを削除しますか？')) return;
-
     try {
       await useDeleteProgressUsersUserId().mutateAsync({ userId });
       onRefresh();
     } catch (err) {
-      alert('削除に失敗しました');
+      toast.error(`${extractErrorMessage(err)}`);
       console.error(err);
     }
   };
@@ -67,7 +44,7 @@ const UserTable: React.FC<Props> = ({ users, isLoading, error, onEditUser, onRef
     return <div className="text-red-600">ユーザー一覧の取得に失敗しました</div>;
   }
 
-  if (usersWithScopes.length === 0) {
+  if (users.length === 0) {
     return <div className="text-gray-600">ユーザーが存在しません</div>;
   }
 
@@ -84,7 +61,7 @@ const UserTable: React.FC<Props> = ({ users, isLoading, error, onEditUser, onRef
         </TableRow>
       </TableHeader>
       <TableBody>
-        {usersWithScopes.map(user => (
+        {users.map(user => (
           <UserTableRow
             key={user.id}
             user={user}

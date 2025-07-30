@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { useGetProgressOrganizationsTree } from '@/api/generated/taskProgressAPI';
 import type { OrganizationTree } from '@/api/generated/taskProgressAPI.schemas';
@@ -51,6 +52,9 @@ const OrganizationSelectorDialog: React.FC<Props> = ({ companyId, open, onClose,
         <DialogHeader>
           <DialogTitle>組織を選択</DialogTitle>
         </DialogHeader>
+        <DialogDescription>
+          組織を選択してください。選択後、登録フォームに反映されます。
+        </DialogDescription>
         <div className="py-2">
           {isLoading && <p>読み込み中...</p>}
           {error && <p className="text-red-600">組織の取得に失敗しました</p>}

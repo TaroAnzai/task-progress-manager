@@ -2,8 +2,9 @@
 
 import React, { useState, useCallback } from 'react';
 import { useUser } from '@/context/UserContext';
-import type { UserFormState, UserWithScopes } from './types';
+import type { UserFormState} from './types';
 import { useGetProgressUsers } from '@/api/generated/taskProgressAPI';
+import type { UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import UserForm from './UserForm';
@@ -26,7 +27,7 @@ const AdminUserComponent: React.FC <AdminUserComponentProps> = ({ companyId }) =
   } = useGetProgressUsers();
 
   const handleEditUser = useCallback((user: UserWithScopes) => {
-    const matchedScope = user.scopes?.find(s => s.organization_id === user.organization_id);
+    const matchedScope = user.access_scopes?.find(s => s.organization_id === user.organization_id);
     setEditingUser({
       id: user.id,
       name: user.name,
