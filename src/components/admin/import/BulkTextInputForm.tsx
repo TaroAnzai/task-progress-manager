@@ -23,6 +23,7 @@ export default function BulkTextInputForm({
       .replace(/\t/g, ",")
       .split("\n")
       .map((line) => line.trim())
+
       .filter((line) => line !== "")
 
     await onSubmit(lines)

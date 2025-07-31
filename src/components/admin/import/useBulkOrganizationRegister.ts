@@ -1,30 +1,18 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import {
-  usePostProgressOrganizations,
   useGetProgressOrganizations,
-  useGetProgressOrganizationsOrgId,
 } from "@/api/generated/taskProgressAPI"
-import { useUser } from '@/context/UserContext';
 
-export function useBulkOrganizationRegister() {
+
+export function useBulkOrganizationRegister(company_id: number) {
   const [loading, setLoading] = useState(false)
-  const createOrg = usePostProgressOrganizations()
-  const { user } = useUser()
+  const [errors, setErrors] = useState<string[]>([])
+  const {data: orgs} = useGetProgressOrganizations({ company_id: company_id })
 
-  // ✅ Hookは必ずトップレベルで呼び出す
-  if (user) {
-    if (!user.is_superuser) {
-    const { data: currentOrg } = useGetProgressOrganizationsOrgId(user.organization_id)
-    if (currentOrg) {
-    const { data: orgs } = useGetProgressOrganizations({ company_id: currentOrg.company_id })
-  }}
 
   const registerFromLines = async (lines: string[]) => {
     setLoading(true)
-    
-
-
     const nameToCode: Record<string, string> = {}
     const orgCodeToOrgId: Record<string, number> = {}
     const codeSet = new Set<string>()
@@ -81,10 +69,10 @@ export function useBulkOrganizationRegister() {
     }
 
     if (success > 0) toast.success(`登録成功：${success} 件`)
-    if (errors.length > 0) toast.error(`エラー：\n${errors.join("\n")}`)
 
     setLoading(false)
+    setErrors(errors)
   }
 
-  return { registerFromLines, loading }
+  return { registerFromLines, loading, errors}
 }
