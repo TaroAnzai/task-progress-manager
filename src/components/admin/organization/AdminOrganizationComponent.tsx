@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import { OrganizationTreeView } from "./OrganizationTreeView";
 import  BulkTextInputForm  from "../import/BulkTextInputForm"
 import { useBulkOrganizationRegister } from "../import/useBulkOrganizationRegister";
-import { ReusableAlertDialog } from "@/components/utils/ReusableAlertDialog";
+import { useDialog} from "@/context/AlertDialogContext.tsx"
 
 /**
  * 外部からは <TreeView companyId={...} /> で使用する
@@ -12,14 +12,20 @@ interface TreeViewProps {
 }
 
 export const AdminOrganizationComponent: React.FC<TreeViewProps> = ({ companyId }) => {
-  const { registerFromLines, loading, errors } = useBulkOrganizationRegister(companyId)
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const { registerFromLines:orgRegister, loading, errors } = useBulkOrganizationRegister(companyId)
+  const { openDialog } = useDialog();
 
   useEffect(() => {
     if (errors.length > 0) {
-      setDialogOpen(true);
+      openDialog({
+        title: "エラー",
+        description: errors.join("\n"),
+        confirmText: "閉じる",
+        showCancel: false,
+      });
     }
   },[errors])
+
   return (
     <>
     <OrganizationTreeView
@@ -30,18 +36,9 @@ export const AdminOrganizationComponent: React.FC<TreeViewProps> = ({ companyId 
       placeholder="
       組織名, 組織コード, 親組織コード
       商品部, dev01, root"
-      onSubmit={registerFromLines}
+      onSubmit={orgRegister}
       loading={loading}
     />
-    <ReusableAlertDialog
-      open={dialogOpen}
-      onOpenChange={setDialogOpen}
-      title="登録エラー"
-      description={errors.join("\n")}
-      onConfirm={() => setDialogOpen(false)}
-      showCancel={false}
-    />
-
     </>
       
   );

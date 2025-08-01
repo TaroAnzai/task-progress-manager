@@ -69,6 +69,7 @@ const AdminPageContent = () => {
         onClose={() => setDialogOpen(false)}
         onSelect={(company) => setSelectedCompany(company)}
       />
+      
     </div>
   );
 }

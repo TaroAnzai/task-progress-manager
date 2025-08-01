@@ -1,6 +1,6 @@
 // src/admin/components/user/AdminUserComponent.tsx
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useUser } from '@/context/UserContext';
 import type { UserFormState} from './types';
 import { useGetProgressUsers } from '@/api/generated/taskProgressAPI';
@@ -9,6 +9,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import UserForm from './UserForm';
 import UserTable from './UserTable';
+import  BulkTextInputForm  from "../import/BulkTextInputForm"
+import { useBulkUserRegistration } from "../import/useBulkUserRegister.ts"
+import { useDialog} from "@/context/AlertDialogContext.tsx"
 
 interface AdminUserComponentProps {
   companyId: number;
@@ -18,7 +21,20 @@ interface AdminUserComponentProps {
 const AdminUserComponent: React.FC <AdminUserComponentProps> = ({ companyId }) => {
   const { user, hasAdminScope } = useUser();
   const [editingUser, setEditingUser] = useState<UserFormState | null>(null);
+  const { registerFromLines:userRegister, loading, errors } = useBulkUserRegistration(companyId)
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const { openDialog } = useDialog();
 
+  useEffect(() => {
+    if (errors.length > 0) {
+      openDialog({
+        title: "エラー",
+        description: errors.join("\n"),
+        confirmText: "閉じる",
+        showCancel: false,
+      });
+    }
+  },[errors])
   const {
     data: users,
     isLoading,
@@ -64,7 +80,16 @@ const AdminUserComponent: React.FC <AdminUserComponentProps> = ({ companyId }) =
           />
         </CardContent>
       </Card>
-
+      <Card>
+        <BulkTextInputForm
+        title="ユーザーの一括登録"
+          placeholder="
+          名前, メールアドレス, 組織コード,権限
+          山田太郎, taro@foo.com, root, member"
+          onSubmit={userRegister}
+          loading={loading}
+        />
+      </Card>
       <Separator />
 
       <Card>
