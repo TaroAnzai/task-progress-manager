@@ -2,10 +2,12 @@ import { useState } from "react"
 import { toast } from "sonner"
 import {
   useGetProgressOrganizations,
+  usePostProgressOrganizations,
 } from "@/api/generated/taskProgressAPI"
 
 
 export function useBulkOrganizationRegister(company_id: number) {
+  const createOrg = usePostProgressOrganizations()
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<string[]>([])
   const {data: orgs} = useGetProgressOrganizations({ company_id: company_id })
@@ -54,13 +56,13 @@ export function useBulkOrganizationRegister(company_id: number) {
       }
 
       try {
-/*         await createOrg.mutateAsync({
+        await createOrg.mutateAsync({
           data: {
             name,
             org_code: org_code,
             parent_id: orgCodeToOrgId[parent_code],
           },
-        }) */
+        })
        console.log("Creating organization:", {name, org_code, parent_code})
         success++
       } catch (err: any) {

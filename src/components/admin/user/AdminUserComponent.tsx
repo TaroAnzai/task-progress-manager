@@ -19,10 +19,9 @@ interface AdminUserComponentProps {
 
 
 const AdminUserComponent: React.FC <AdminUserComponentProps> = ({ companyId }) => {
-  const { user, hasAdminScope } = useUser();
+  const { hasAdminScope } = useUser();
   const [editingUser, setEditingUser] = useState<UserFormState | null>(null);
   const { registerFromLines:userRegister, loading, errors } = useBulkUserRegistration(companyId)
-  const [dialogOpen, setDialogOpen] = useState(false);
   const { openDialog } = useDialog();
 
   useEffect(() => {

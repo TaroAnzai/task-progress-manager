@@ -3,7 +3,7 @@ import { OrganizationTreeView } from "./OrganizationTreeView";
 import  BulkTextInputForm  from "../import/BulkTextInputForm"
 import { useBulkOrganizationRegister } from "../import/useBulkOrganizationRegister";
 import { useDialog} from "@/context/AlertDialogContext.tsx"
-
+import { Card, CardContent } from '@/components/ui/card';
 /**
  * 外部からは <TreeView companyId={...} /> で使用する
  */
@@ -28,9 +28,14 @@ export const AdminOrganizationComponent: React.FC<TreeViewProps> = ({ companyId 
 
   return (
     <>
-    <OrganizationTreeView
-      companyId={companyId}
-    />
+    <Card>
+      <CardContent>
+        <OrganizationTreeView
+          companyId={companyId}
+        />
+      </CardContent>
+    </Card>
+    <Card>
     <BulkTextInputForm
      title="組織の一括登録"
       placeholder="
@@ -39,6 +44,7 @@ export const AdminOrganizationComponent: React.FC<TreeViewProps> = ({ companyId 
       onSubmit={orgRegister}
       loading={loading}
     />
+    </Card>
     </>
       
   );

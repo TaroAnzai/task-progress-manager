@@ -21,6 +21,7 @@ const AdminPageContent = () => {
     }
   }, [loading, user, navigate, location.pathname]);
 
+  
     if (loading) {
         return <p className="text-gray-500">読み込み中...</p>;
     }
@@ -44,7 +45,6 @@ const AdminPageContent = () => {
             <div className="space-y-6">
               {/* ✅ 後でOrganizationAdmin, UserAdminコンポーネントを追加予定 */}
               <div className="p-4 border rounded bg-white shadow">
-                <p className="text-gray-700">管理者用コンテンツはここに表示されます。</p>
                 <div className="mt-4 space-y-2">
                   <AdminOrganizationComponent companyId={selectedCompany.id!} />
                 </div>
@@ -52,7 +52,6 @@ const AdminPageContent = () => {
             </div>
             <div className="space-y-6">
               <div className="p-4 border rounded bg-white shadow">
-                <p className="text-gray-700">管理者用コンテンツはここに表示されます。</p>
                 <div className="mt-4 space-y-2">
                   <AdminUserComponent companyId={selectedCompany.id!} />
                 </div>
