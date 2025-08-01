@@ -2,7 +2,7 @@ import React, {useEffect} from "react";
 import { OrganizationTreeView } from "./OrganizationTreeView";
 import  BulkTextInputForm  from "../import/BulkTextInputForm"
 import { useBulkOrganizationRegister } from "../import/useBulkOrganizationRegister";
-import { useDialog} from "@/context/AlertDialogContext.tsx"
+import { useAlertDialog} from "@/context/AlertDialogContext.tsx"
 import { Card, CardContent } from '@/components/ui/card';
 /**
  * 外部からは <TreeView companyId={...} /> で使用する
@@ -13,11 +13,11 @@ interface TreeViewProps {
 
 export const AdminOrganizationComponent: React.FC<TreeViewProps> = ({ companyId }) => {
   const { registerFromLines:orgRegister, loading, errors } = useBulkOrganizationRegister(companyId)
-  const { openDialog } = useDialog();
+  const { openAlertDialog } = useAlertDialog();
 
   useEffect(() => {
     if (errors.length > 0) {
-      openDialog({
+      openAlertDialog({
         title: "エラー",
         description: errors.join("\n"),
         confirmText: "閉じる",

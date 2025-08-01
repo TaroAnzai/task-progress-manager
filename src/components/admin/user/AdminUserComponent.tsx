@@ -11,7 +11,7 @@ import UserForm from './UserForm';
 import UserTable from './UserTable';
 import  BulkTextInputForm  from "../import/BulkTextInputForm"
 import { useBulkUserRegistration } from "../import/useBulkUserRegister.ts"
-import { useDialog} from "@/context/AlertDialogContext.tsx"
+import { useAlertDialog} from "@/context/AlertDialogContext.tsx"
 
 interface AdminUserComponentProps {
   companyId: number;
@@ -22,11 +22,11 @@ const AdminUserComponent: React.FC <AdminUserComponentProps> = ({ companyId }) =
   const { hasAdminScope } = useUser();
   const [editingUser, setEditingUser] = useState<UserFormState | null>(null);
   const { registerFromLines:userRegister, loading, errors } = useBulkUserRegistration(companyId)
-  const { openDialog } = useDialog();
+  const { openAlertDialog } = useAlertDialog();
 
   useEffect(() => {
     if (errors.length > 0) {
-      openDialog({
+      openAlertDialog({
         title: "エラー",
         description: errors.join("\n"),
         confirmText: "閉じる",
@@ -39,7 +39,7 @@ const AdminUserComponent: React.FC <AdminUserComponentProps> = ({ companyId }) =
     isLoading,
     error,
     refetch,
-  } = useGetProgressUsers();
+  } = useGetProgressUsers({company_id: companyId });
 
   const handleEditUser = useCallback((user: UserWithScopes) => {
     const matchedScope = user.access_scopes?.find(s => s.organization_id === user.organization_id);

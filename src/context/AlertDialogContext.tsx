@@ -24,7 +24,7 @@ type DialogOptions = {
 };
 
 type DialogContextType = {
-  openDialog: (options: DialogOptions) => void;
+  openAlertDialog: (options: DialogOptions) => void;
 };
 
 const AlertDialogContext = createContext<DialogContextType | undefined>(undefined);
@@ -40,7 +40,7 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
   const [cancelText, setCancelText] = useState("キャンセル");
   const [showCancel, setShowCancel] = useState(true);
 
-  const openDialog = ({
+  const openAlertDialog = ({
     title = "確認",
     description = "",
     descriptionNode = null,
@@ -76,7 +76,7 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [open]);
   return (
-    <AlertDialogContext.Provider value={{ openDialog }}>
+    <AlertDialogContext.Provider value={{ openAlertDialog }}>
       {children}
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogContent>
@@ -105,7 +105,7 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useDialog = (): DialogContextType => {
+export const useAlertDialog = (): DialogContextType => {
   const context = useContext(AlertDialogContext);
   if (!context) {
     throw new Error("useDialog must be used within a AlertDialogProvider");
