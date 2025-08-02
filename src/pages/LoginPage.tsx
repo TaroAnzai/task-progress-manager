@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import type { Login } from "@/api/generated/taskProgressAPI.schemas";
 import {useAlertDialog} from "@/context/AlertDialogContext.tsx";
 import { extractErrorMessage } from "@/utils/errorHandler.ts";
+import { useUser } from "@/context/UserContext"; 
 
 // 定数の定義
 const MESSAGES = {
@@ -26,14 +27,13 @@ function useLogin() {
   const location = useLocation();
   const from = (location.state as { from?: string })?.from || ROUTES.DEFAULT;
   const { openAlertDialog } = useAlertDialog();
+  const { refetchUser } = useUser(); 
 
   const mutation = usePostProgressSessions({
     mutation: {
-      onSuccess: () => {
+      onSuccess: async () => {
+        await refetchUser(); 
         navigate(from, { replace: true });
-        
-        // TODO: より適切な状態管理（Redux、Zustand等）への移行を検討
-        // localStorage.setItem("token", response.data.token);
       },
       onError: (error) => {
         const errorMessage = extractErrorMessage(error);

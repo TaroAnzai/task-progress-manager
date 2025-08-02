@@ -12,8 +12,8 @@ import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { useAlertDialog } from "@/context/AlertDialogContext"
 import { extractErrorMessage } from "@/utils/errorHandler" 
-import { useGetProgressCompanies, usePostProgressCompanies } from "@/api/generated/taskProgressAPI";
-import type { CompanyInput } from "@/api/generated/taskProgressAPI.schemas";
+import { useGetProgressCompanies, usePostProgressCompanies, usePostProgressOrganizations, usePostProgressUsers } from "@/api/generated/taskProgressAPI";
+import {UserInputRole} from "@/api/generated/taskProgressAPI.schemas"
 
 interface CompanyRegisterDialogProps {
   open: boolean
@@ -21,36 +21,59 @@ interface CompanyRegisterDialogProps {
   onSuccess?: () => void
 }
 
-export function CompanyRegisterDialog({ open, onClose, onSuccess }: CompanyRegisterDialogProps) {
+export function CompanyRegisterDialog({ open, onClose}: CompanyRegisterDialogProps) {
   const [name, setName] = useState("")
   const [rootOrgName, setRootOrgName] = useState("")
   const [systemAdminName, setSystemAdminName] = useState("")
   const [systemAdminEmail, setSystemAdminEmail] = useState("")
   const { refetch } = useGetProgressCompanies() 
-  const [submitting, setSubmitting] = useState(false)
-  const createCompanyMutation = usePostProgressCompanies()
   const { openAlertDialog } = useAlertDialog()
+
+  const createCompanyMutation = usePostProgressCompanies()
+  const createRootOrgMutation = usePostProgressOrganizations()
+  const createUserMutation = usePostProgressUsers()
+
 
   const handleSubmit = async () => {
     if (!name.trim()) return;
-    const payload: CompanyInput = { name: name.trim() };
-    createCompanyMutation.mutate({ data: payload },
-      {
-        onSuccess: () => {
-          refetch(); // 会社一覧を再取得""
-          setName(""); // 入力フィールドをクリア
-          onClose();
-        },
-        onError: (error) => {
-          const errorMessage = extractErrorMessage(error);
-          openAlertDialog({
-            title: "登録エラー",
-            description: errorMessage || "会社の登録に失敗しました。",
-            showCancel: false,
-          });
-        },
+    const registerCompanyName = name.trim();
+    const registeRootOrgName = rootOrgName.trim();
+    const registerSystemAdminName = systemAdminName.trim();
+    const registerSystemAdminEmail = systemAdminEmail.trim();
+    if (!registerCompanyName || !registeRootOrgName || !registerSystemAdminName || !registerSystemAdminEmail) {
+      openAlertDialog({
+        title: "登録エラー",
+        description: "会社名、ルート組織名、システム管理者名、システム管理者メールアドレスを入力してください。",
+        showCancel: false,
+      });
+      return;
+    }
+    try{
+      const createCompany = await createCompanyMutation.mutateAsync({data:{name:registerCompanyName}})
+      const createOrgData ={
+        name:registeRootOrgName,
+        org_code:"ROOT",
+        company_id:createCompany.id
       }
-    );
+      const createRootOrg = await createRootOrgMutation.mutateAsync({data:createOrgData})
+      const createUserData = {
+          name: registerSystemAdminName,
+          email: registerSystemAdminEmail,
+          password: registerSystemAdminEmail,
+          role: UserInputRole.system_admin,
+          organization_id: createRootOrg.id,
+      }
+      await createUserMutation.mutateAsync({data:createUserData})
+      onClose()
+      refetch()
+    }catch(error){
+      const errorMessage = extractErrorMessage(error);
+      openAlertDialog({
+        title: "登録エラー",
+        description: errorMessage || "会社の登録に失敗しました。",
+        showCancel: false,
+      });
+    }
   }
 
   return (
@@ -94,7 +117,7 @@ export function CompanyRegisterDialog({ open, onClose, onSuccess }: CompanyRegis
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button onClick={handleSubmit} disabled={submitting}>
+            <Button onClick={handleSubmit}>
               登録
             </Button>
           </DialogFooter>

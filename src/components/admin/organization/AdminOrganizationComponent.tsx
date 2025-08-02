@@ -27,15 +27,15 @@ export const AdminOrganizationComponent: React.FC<TreeViewProps> = ({ companyId 
   },[errors])
 
   return (
-    <>
-    <Card>
+    <div className="flex gap-4">
+    <Card className="w-1/2">
       <CardContent>
         <OrganizationTreeView
           companyId={companyId}
         />
       </CardContent>
     </Card>
-    <Card>
+    <Card className="w-1/2">
     <BulkTextInputForm
      title="組織の一括登録"
       placeholder="
@@ -45,7 +45,7 @@ export const AdminOrganizationComponent: React.FC<TreeViewProps> = ({ companyId 
       loading={loading}
     />
     </Card>
-    </>
+    </div>
       
   );
 };

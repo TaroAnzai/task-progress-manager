@@ -103,8 +103,6 @@ const AdminPageContent = () => {
 
 export default function ProgressAdminPage() {
   return (
-    <UserProvider>
       <AdminPageContent />
-    </UserProvider>
   );
 }

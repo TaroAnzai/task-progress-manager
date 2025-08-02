@@ -22,6 +22,7 @@ export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
   const [code, setCode] = useState("");
   const [parentCode, setParentCode] = useState("");
   const [codeToIdMap, setCodeToIdMap] = useState<Record<string, number>>({});
+  const { user, hasAdminScope, getUserRole } = useUser();
  
   // ✅ ツリー取得（ユーザー権限 & company_id に応じてフィルタ済み）
   const { data: orgs, refetch } = useGetProgressOrganizationsTree({
@@ -57,9 +58,7 @@ export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
       toast.error("組織名とコードは必須です");
       return;
     }
-    console.log("登録データ:", { name, code, parentCode, companyId });
     const parentId = parentCode ? codeToIdMap[parentCode] ?? null : null;
-    console.log("登録データ後:", { name, code, parentCode, parentId,companyId });
     const input: OrganizationInput = {
       name,
       org_code: code,
@@ -80,19 +79,19 @@ export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
     }
   };
 
-  if (!useUser().hasAdminScope()) {
+  if (!hasAdminScope()) {
     return (
       <p className="text-sm text-gray-500">
         このユーザーは組織管理の権限がありません
       </p>
     );
   }
-
+  if (!user)  return null;
   return (
     <div className="p-4">
       <p>組織ツリー（{companyId}）</p>
       {/* 登録フォーム（システム管理者のみ） */}
-      {useUser().scopes?.includes("system_admin") || useUser().scopes?.includes("admin") || useUser().user?.is_superuser && (
+      {hasAdminScope() && (
         <form
           onSubmit={handleSubmit}
           className="flex gap-2 mb-4 items-center flex-wrap"

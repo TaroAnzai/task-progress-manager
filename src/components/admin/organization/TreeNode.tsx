@@ -88,8 +88,6 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
         orgId: draggedId,
         data: { parent_id: node.id },
       });
-      console.log(`node.name:${node.name}`);
-      console.log(`draggedId:${draggedId}, node.id:${node.id}`);
       toast.success("親組織を更新しました");
       onRefresh();
     } catch (e: any) {

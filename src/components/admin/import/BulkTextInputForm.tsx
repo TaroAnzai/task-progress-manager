@@ -31,7 +31,7 @@ export default function BulkTextInputForm({
   }
 
   return (
-    <div className="border rounded-xl p-6 shadow-md bg-white space-y-4">
+    <div className=" p-6">
       <h2 className="text-lg font-bold">{title}</h2>
       <Textarea
         placeholder={placeholder}

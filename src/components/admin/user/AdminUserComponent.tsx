@@ -67,30 +67,32 @@ const AdminUserComponent: React.FC <AdminUserComponentProps> = ({ companyId }) =
   }
 
   return (
-    <div className="p-4 space-y-4">
-      <Card>
-        <CardContent className="p-4">
-          <h2 className="text-xl font-bold mb-4">👤 ユーザー登録・編集</h2>
-          <UserForm
-            initialData={editingUser}
-            companyId={companyId}
-            onSubmitted={handleFormSubmitted}
-            onCancel={() => setEditingUser(null)}
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">👤 ユーザー登録・編集</h2>
+      <div className="p-4 space-y-4 flex gap-4">
+        <Card className="w-1/2">
+          <CardContent className="p-4">
+            <UserForm
+              initialData={editingUser}
+              companyId={companyId}
+              onSubmitted={handleFormSubmitted}
+              onCancel={() => setEditingUser(null)}
+            />
+          </CardContent>
+        </Card>
+        <Card className="w-1/2">
+          <BulkTextInputForm
+          title="ユーザーの一括登録"
+            placeholder="
+            名前, メールアドレス, 組織コード,権限
+            山田太郎, taro@foo.com, root, member"
+            onSubmit={userRegister}
+            loading={loading}
           />
-        </CardContent>
-      </Card>
-      <Card>
-        <BulkTextInputForm
-        title="ユーザーの一括登録"
-          placeholder="
-          名前, メールアドレス, 組織コード,権限
-          山田太郎, taro@foo.com, root, member"
-          onSubmit={userRegister}
-          loading={loading}
-        />
-      </Card>
+        </Card>
+      </div>
       <Separator />
-
+      <div>
       <Card>
         <CardContent className="p-4">
           <h2 className="text-xl font-bold mb-4">📋 ユーザー一覧</h2>
@@ -103,6 +105,7 @@ const AdminUserComponent: React.FC <AdminUserComponentProps> = ({ companyId }) =
           />
         </CardContent>
       </Card>
+    </div>
     </div>
   );
 };
