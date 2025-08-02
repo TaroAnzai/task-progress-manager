@@ -32,7 +32,6 @@ export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
 
   // ✅ コード → ID マッピング作成
   useEffect(() => {
-    console.log("再マッピング");
     if (!orgs) return;
     const newMap: Record<string, number> = {};
 

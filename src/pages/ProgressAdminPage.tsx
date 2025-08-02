@@ -1,18 +1,20 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { UserProvider, useUser } from "@/context/UserContext";
 import { useNavigate, useLocation } from "react-router-dom"; 
 import { Button } from "@/components/ui/button";
 import { CompanySelectorDialog } from "@/components/admin/CompanySelectorDialog";
-import {useGetProgressOrganizationsOrgId, useGetProgressCompaniesCompanyId} from "@/api/generated/taskProgressAPI";
+import { CompanyRegisterDialog } from "@/components/admin/CompanyRegisterDialog";
+import { useGetProgressCompaniesCompanyId} from "@/api/generated/taskProgressAPI";
 import type { Company } from "@/api/generated/taskProgressAPI.schemas";
 import { AdminOrganizationComponent } from "@/components/admin/organization/AdminOrganizationComponent";
 import AdminUserComponent from "@/components/admin/user/AdminUserComponent";
 
 const AdminPageContent = () => {
   const { user, loading, hasAdminScope, getUserRole } = useUser();
-  const navigate = useNavigate(); // ← ★追加
-  const location = useLocation(); // 現在のパスを取得するために必要
+  const navigate = useNavigate();
+  const location = useLocation();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [registerOpen, setRegisterOpen] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 
   const companyId = user?.company_id ?? null;
@@ -55,6 +57,7 @@ const AdminPageContent = () => {
                 <div className="p-4 border rounded bg-white shadow">
                     <Button onClick={() => setDialogOpen(true)}>会社を選択</Button>
                     <Button onClick={() => setSelectedCompany(null)}>会社選択解除</Button>
+                    <Button onClick={() => setRegisterOpen(true)}>会社を登録</Button>
                     {selectedCompany && <p>選択中: {selectedCompany.name}</p>}
                 </div>
             </div>
@@ -89,7 +92,11 @@ const AdminPageContent = () => {
         onClose={() => setDialogOpen(false)}
         onSelect={(company) => setSelectedCompany(company)}
       />
-      
+      <CompanyRegisterDialog
+        open={registerOpen}
+        onClose={() => setRegisterOpen(false)}
+        onSuccess={() => setSelectedCompany(null)} // useGetCompanies などで再取得
+      />
     </div>
   );
 }
