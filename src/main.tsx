@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.tsx'
 import { UserProvider } from "./context/UserContext";
 import {AlertDialogProvider} from "./context/AlertDialogContext";
+import { TaskProvider } from "./context/TaskContext";
 
 const queryClient = new QueryClient();
 
@@ -12,9 +13,11 @@ createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <UserProvider>
-        <AlertDialogProvider>
-          <App />
-        </AlertDialogProvider>
+        <TaskProvider>
+          <AlertDialogProvider>
+            <App />
+          </AlertDialogProvider>
+        </TaskProvider>
       </UserProvider>
     </QueryClientProvider>
   </React.StrictMode>
