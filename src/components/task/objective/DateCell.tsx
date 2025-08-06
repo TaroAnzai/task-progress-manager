@@ -6,7 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 type DateCellProps = {
   value?: string | null;
-  onSave: (newDate: string | null) => void;
+  onSave: (newDate: string | undefined) => void;
 };
 
 export function DateCell({ value, onSave }: DateCellProps) {
@@ -27,8 +27,9 @@ export function DateCell({ value, onSave }: DateCellProps) {
       const formatted = format(date, "yyyy-MM-dd");
       setInputValue(formatted);
       onSave(formatted);
+      setOpen(false);
     }
-    setOpen(false);
+
   };
 
   return (
@@ -39,7 +40,7 @@ export function DateCell({ value, onSave }: DateCellProps) {
           className="border px-1 rounded w-32"
           value={inputValue}
           onChange={handleInputChange}
-          onFocus={() => setOpen(true)}
+          onClick={() => setOpen(true)}
           placeholder="YYYY-MM-DD"
         />
       </PopoverTrigger>

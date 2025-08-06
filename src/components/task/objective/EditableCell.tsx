@@ -37,7 +37,7 @@ export function EditableCell({ value, onSave }: EditableCellProps) {
     />
   ) : (
     <div onClick={() => setEditing(true)} className="cursor-pointer text-left w-full min-h-[1.5rem]">
-      {value || "（未入力）"}
+      {value || "+"}
     </div>
   );
 }
