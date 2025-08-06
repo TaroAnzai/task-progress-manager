@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -81,6 +82,7 @@ export default function TaskSettingModal({ open, onClose, task }: TaskSettingMod
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>{isEditMode ? "タスクの編集" : "新規タスク作成"}</DialogTitle>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
