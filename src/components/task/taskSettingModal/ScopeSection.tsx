@@ -12,10 +12,10 @@ interface ScopeSectionProps {
   isEditable: boolean;
   users: AccessUser[];
   orgs: OrgAccess[];
-  onAddUser: () => void;
+  onAddUser: (user: AccessUser) => void;
   onRemoveUser: (userId: number) => void;
-  onAddOrg: () => void;
-  onRemoveOrg: (orgCode: number) => void;
+  onAddOrg: (org: OrgAccess) => void;
+  onRemoveOrg: (orgId: number) => void;
 }
 
 export function ScopeSection({
@@ -34,20 +34,20 @@ export function ScopeSection({
         <div className="flex flex-wrap gap-2">
           {users.map((user) => (
             <Badge
-              key={user.id}
+              key={user.user_id}
               className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1"
             >
               {user.name}
               {isEditable && (
                 <X
                   className="w-3 h-3 cursor-pointer"
-                  onClick={() => onRemoveUser(user.id)}
+                  onClick={() => onRemoveUser(user.user_id)}
                 />
               )}
             </Badge>
           ))}
           {isEditable && (
-            <Button size="sm" variant="outline" onClick={onAddUser}>
+            <Button size="sm" variant="outline" onClick={()=>{}}>
               <Plus className="w-4 h-4 mr-1" /> 追加
             </Button>
           )}
@@ -72,7 +72,7 @@ export function ScopeSection({
             </Badge>
           ))}
           {isEditable && (
-            <Button size="sm" variant="outline" onClick={onAddOrg}>
+            <Button size="sm" variant="outline" onClick={()=>{}}>
               <Plus className="w-4 h-4 mr-1" /> 追加
             </Button>
           )}

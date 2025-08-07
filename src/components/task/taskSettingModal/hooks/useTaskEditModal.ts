@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
-import { useTask } from "@/context/TaskContext";
 import {
   usePutProgressTasksTaskId,
   useGetProgressObjectivesTasksTaskId,
   useDeleteProgressObjectivesObjectiveId,
+  useGetProgressTasksTaskIdAuthorizedUsers,
   useGetProgressTasksTaskIdAccessUsers,
   useGetProgressTasksTaskIdAccessOrganizations,
   usePutProgressTasksTaskIdAccessLevels,
@@ -21,7 +21,6 @@ import type {
 
 export function useTaskEditModal(task: Task, onClose: () => void) {
   const { user } = useUser();
-  const { canEditTask } = useTask();
 
   const [formState, setFormState] = useState({
     title: task.title || "",
@@ -32,14 +31,19 @@ export function useTaskEditModal(task: Task, onClose: () => void) {
   const [objectives, setObjectives] = useState<Objective[]>([]);
   const [scopeUsers, setScopeUsers] = useState<AccessUser[]>([]);
   const [scopeOrgs, setScopeOrgs] = useState<OrgAccess[]>([]);
+  const [isEditable, setIsEditable] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
-  const isEditable = canEditTask(task.id);
 
   const updateTask = usePutProgressTasksTaskId();
   const { data: objData } = useGetProgressObjectivesTasksTaskId(task.id);
+  const { data:authorized_users} = useGetProgressTasksTaskIdAuthorizedUsers(task.id);
   const { data: userScopes } = useGetProgressTasksTaskIdAccessUsers(task.id);
   const { data: orgScopes } = useGetProgressTasksTaskIdAccessOrganizations(task.id);
+
+  useEffect(() => {
+    const editable = (authorized_users ?? []).some((u) => u.user_id === user?.id);
+    setIsEditable(editable);
+  }, [user, task, authorized_users]);
 
   useEffect(() => {
     if (objData?.objectives) setObjectives(objData.objectives);
@@ -75,7 +79,7 @@ export function useTaskEditModal(task: Task, onClose: () => void) {
       });
 
       const userAccess = scopeUsers.map(u => ({
-        user_id: u.id,
+        user_id: u.user_id,
         access_level: u.access_level || "view",
       }));
       const orgAccess = scopeOrgs.map(o => ({
@@ -109,13 +113,13 @@ export function useTaskEditModal(task: Task, onClose: () => void) {
   };
 
   const handleAddUser = (user: AccessUser) => {
-    if (!scopeUsers.find(u => u.id === user.id)) {
+    if (!scopeUsers.find(u => u.user_id === user.user_id)) {
       setScopeUsers(prev => [...prev, user]);
     }
   };
 
   const handleRemoveUser = (userId: number) => {
-    setScopeUsers(prev => prev.filter(u => u.id !== userId));
+    setScopeUsers(prev => prev.filter(u => u.user_id !== userId));
   };
 
   const handleAddOrg = (org: OrgAccess) => {
