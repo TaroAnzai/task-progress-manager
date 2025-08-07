@@ -51,12 +51,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const hasAdminScope = () => {
     if (user?.is_superuser) return true;
     return user?.access_scopes?.some(scope=>
-      scope.role === AccessScopeRole.system_admin || AccessScopeRole.org_admin
+      scope.role === AccessScopeRole.SYSTEM_ADMIN || AccessScopeRole.ORG_ADMIN
     );
   };
 
   const hasSystemAdminScope = () =>{
-    return user?.access_scopes?.some(scope => scope.role === AccessScopeRole.system_admin);
+    return user?.access_scopes?.some(scope => scope.role === AccessScopeRole.SYSTEM_ADMIN);
   } 
   const getUserRole = (): string => {
     if (user?.is_superuser) return "Superuser";

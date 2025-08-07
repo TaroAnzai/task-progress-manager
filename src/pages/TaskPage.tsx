@@ -3,17 +3,15 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom"; 
 import {  useUser } from "@/context/UserContext";
 import TaskControlPanel from "@/components/task/TaskControlPanel";
-import { useTasks } from "@/context/TaskContext";
-import TaskSettingModal from "@/components/task/taskModal/TaskSettingModal";
+import NewTaskModal from "@/components/task/newTaskModal/NewTaskModal";
 import type { Task } from "@/api/generated/taskProgressAPI.schemas";
 import TaskList from "@/components/task/TaskList";
 
 const TaskPageContent = () =>{
-  const { user, loading:userLoading, hasAdminScope, getUserRole,refetchUser } = useUser();
-  const { tasks, isLoading, refetch } = useTasks();
+  const { user, loading:userLoading,getUserRole} = useUser();
   const navigate = useNavigate();
   const location = useLocation();
-  const [modalOpen , setModalOpen] = useState(false);
+  const [newTaskModalOpen , setNewTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null); // selectedTask
 
   useEffect(() => {
@@ -31,15 +29,14 @@ const TaskPageContent = () =>{
       権限:({String(getUserRole())})
       </p>
       <TaskControlPanel
-       onAddTask={() => {setModalOpen(true);}
+       onAddTask={() => {setNewTaskModalOpen(true);}
        } 
        onEditTasks={() => {}} onToggleViewSelector={() => {}}></TaskControlPanel>
       <TaskList />
 
-        <TaskSettingModal
-          open={modalOpen}
-          onClose={() => setModalOpen(false)}
-          task={selectedTask}
+        <NewTaskModal
+          open={newTaskModalOpen}
+          onClose={() => setNewTaskModalOpen(false)}
         />
     </>
 
