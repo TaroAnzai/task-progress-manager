@@ -41,6 +41,7 @@ const handleSaveNew = async (obj: ObjectiveInput) => {
 };
 
 const handleUpdate = async (objId: number, updates: ObjectiveUpdate) => {
+  console.log(`taskId: ${taskId}, objective ID: ${objId}, 更新内容${JSON.stringify(updates)}`);
   if (!objId) {
     console.warn("無効なIDです");
     return;

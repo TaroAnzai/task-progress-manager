@@ -2,7 +2,9 @@
 import { useState } from "react";
 import { EditableCell } from "./EditableCell";
 import { DateCell } from "./DateCell";
-import type { Objective,ObjectiveInput, ObjectiveUpdate } from "@/api/generated/taskProgressAPI.schemas";
+import { ProgressStatus as StatusType, type Objective,type ObjectiveInput, type ObjectiveUpdate, type ObjectiveUpdateStatus as updateStatusType } from "@/api/generated/taskProgressAPI.schemas";
+import { ObjectiveStatus } from "@/api/generated/taskProgressAPI.schemas";
+import { StatusBadgeCell } from "../StatusBadgeCell";
 
 type ObjectiveRowProps = {
   key: number | string;
@@ -15,8 +17,9 @@ type ObjectiveRowProps = {
 
 export function ObjectiveRow({ taskId, objective, index, onSaveNew, onUpdate }: ObjectiveRowProps) {
   const isNew = !objective;
-  const [title, setTitle] = useState(objective?.title ?? "");
+  const [title, setTitle] = useState(objective?.title?? "");
   const [dueDate, setDueDate] = useState(objective?.due_date ?? undefined);
+  const [status, setStatus] = useState<StatusType>(objective?.status?? ObjectiveStatus.UNDEFINED);
 
   const handleTitleSave = (newTitle: string) => {
     setTitle(newTitle);
@@ -33,6 +36,13 @@ export function ObjectiveRow({ taskId, objective, index, onSaveNew, onUpdate }: 
       onUpdate(objective.id, { due_date: newDate });
     }
   };
+  const handleStatusSave = (newStatus: updateStatusType) => {
+    const status = newStatus ?? StatusType.UNDEFINED;
+    setStatus(status);
+    if (objective) {
+      onUpdate(objective.id, { status: newStatus });
+    }
+  }
 
   return (
     <tr className="border-b">
@@ -44,7 +54,11 @@ export function ObjectiveRow({ taskId, objective, index, onSaveNew, onUpdate }: 
           <td className="px-3 py-2">
             <DateCell value={dueDate} onSave={handleDateSave} />
           </td>
-          <td className="px-3 py-2">{objective?.status ? objective.status : "-"}</td>
+          <td className="px-3 py-2">
+            <StatusBadgeCell
+              value={status}
+              onChange={handleStatusSave}
+            /></td>
           <td className="px-3 py-2">{objective?.assigned_user_name ?? "-"}</td>
           <td className="px-3 py-2">{objective?.latest_progress ?? "-"}</td>
           <td className="px-3 py-2">{objective?.latest_report_date ?? "-"}</td>
