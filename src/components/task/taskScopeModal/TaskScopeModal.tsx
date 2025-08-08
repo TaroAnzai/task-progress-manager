@@ -7,11 +7,13 @@ import {
   useGetProgressTasksTaskIdAuthorizedUsers,
   useGetProgressTasksTaskIdAccessUsers,
   useGetProgressTasksTaskIdAccessOrganizations,
+  usePutProgressTasksTaskIdAccessLevels,
 } from "@/api/generated/taskProgressAPI";
 import type {
   Task,
   AccessUser,
   OrgAccess,
+  AccessLevelInput,
 } from "@/api/generated/taskProgressAPI.schemas";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,6 +36,7 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
   const { data:authorized_users} = useGetProgressTasksTaskIdAuthorizedUsers(task.id);
   const { data: getUsers } = useGetProgressTasksTaskIdAccessUsers(task.id);
   const { data: getOrgs } = useGetProgressTasksTaskIdAccessOrganizations(task.id);
+  const {mutateAsync:updateAccess} = usePutProgressTasksTaskIdAccessLevels();
 
   const [isEditable, setIsEditable] = useState(false);
   const [scopeUsers, setScopeUsers] = useState<AccessUser[]>([]);
@@ -53,7 +56,20 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
 
   const onRemoveUser = (user_id: number|undefined) => {console.log(user_id)};
   const onRemoveOrg = (organization_id: number|undefined) => {console.log(organization_id)};
-
+  const handleUpdateAccess = async() =>{
+    const userAccess = scopeUsers.map(u => ({
+      user_id: u.user_id,
+      access_level: u.access_level || "view",
+    }));
+    const orgAccess = scopeOrgs.map(o => ({
+      organization_id: o.organization_id,
+      access_level: o.access_level || "view",
+    }));
+    await updateAccess({
+      taskId: task.id,
+      data: { user_access:userAccess, organization_access:orgAccess } as AccessLevelInput,
+    });
+  }
   return (
       <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-lg">
@@ -106,7 +122,7 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
             </Badge>
           ))}
           {isEditable && (
-            <Button size="sm" variant="outline" onClick={()=>{}}>
+            <Button size="sm" variant="outline" onClick={handleUpdateAccess}>
               <Plus className="w-4 h-4 mr-1" /> 追加
             </Button>
           )}

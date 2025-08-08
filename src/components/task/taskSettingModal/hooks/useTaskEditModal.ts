@@ -1,24 +1,22 @@
 // src/components/task/taskSettingModal/hooks/useTaskEditModal.ts
-
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
-  usePutProgressTasksTaskId,
-  useGetProgressObjectivesTasksTaskId,
   useDeleteProgressObjectivesObjectiveId,
-  useGetProgressTasksTaskIdAuthorizedUsers,
-  useGetProgressTasksTaskIdAccessUsers,
+  useGetProgressObjectivesTasksTaskId,
   useGetProgressTasksTaskIdAccessOrganizations,
-  usePutProgressTasksTaskIdAccessLevels,
+  useGetProgressTasksTaskIdAccessUsers,
+  useGetProgressTasksTaskIdAuthorizedUsers,
+  usePutProgressTasksTaskId,
 } from "@/api/generated/taskProgressAPI";
 import type {
-  Task,
-  Objective,
-  AccessLevelInput,
   AccessUser,
+  Objective,
   OrgAccess,
+  Task,
 } from "@/api/generated/taskProgressAPI.schemas";
 import { useUser } from "@/context/useUser";
+import { extractErrorMessage } from "@/utils/errorHandler";
 
 export function useTaskEditModal(task: Task, onClose: () => void) {
   const { user } = useUser();
@@ -37,11 +35,11 @@ export function useTaskEditModal(task: Task, onClose: () => void) {
 
   const updateTask = usePutProgressTasksTaskId();
   const { data: objData } = useGetProgressObjectivesTasksTaskId(task.id);
-  const { data:authorized_users} = useGetProgressTasksTaskIdAuthorizedUsers(task.id);
+  const { data: authorized_users } = useGetProgressTasksTaskIdAuthorizedUsers(task.id);
   const { data: userScopes } = useGetProgressTasksTaskIdAccessUsers(task.id);
   const { data: orgScopes } = useGetProgressTasksTaskIdAccessOrganizations(task.id);
 
-  const updateAccess = usePutProgressTasksTaskIdAccessLevels();
+
   const remove = useDeleteProgressObjectivesObjectiveId();
 
   useEffect(() => {
@@ -81,26 +79,11 @@ export function useTaskEditModal(task: Task, onClose: () => void) {
           due_date: formState.due_date,
         },
       });
-
-      const userAccess = scopeUsers.map(u => ({
-        user_id: u.user_id,
-        access_level: u.access_level || "view",
-      }));
-      const orgAccess = scopeOrgs.map(o => ({
-        organization_id: o.organization_id,
-        access_level: o.access_level || "view",
-      }));
-
-
-      await updateAccess.mutateAsync({
-        taskId: task.id,
-        data: { user_access:userAccess, organization_access:orgAccess } as AccessLevelInput,
-    });
-
       onClose();
-    } catch (err) {
+    } catch (e) {
+      const err = extractErrorMessage(e);
       console.error("タスク保存失敗", err);
-      alert("保存に失敗しました");
+      alert(`保存に失敗しました:${err}`);
     } finally {
       setIsSaving(false);
     }

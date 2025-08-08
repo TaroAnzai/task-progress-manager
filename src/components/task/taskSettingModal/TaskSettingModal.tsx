@@ -6,7 +6,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useTaskEditModal } from "./hooks/useTaskEditModal";
 import { ObjectiveSection } from "./ObjectiveSection";
 import { SaveButton } from "./SaveButton";
-import { ScopeSection } from "./ScopeSection";
 import { TaskEditForm } from "./TaskEditForm";
 
 
@@ -25,12 +24,6 @@ export function TaskSettingModal({ open, task, onClose }: TaskSettingModalProps)
     handleSave,
     isSaving,
     objectives,
-    scopeUsers,
-    scopeOrgs,
-    handleAddUser,
-    handleRemoveUser,
-    handleAddOrg,
-    handleRemoveOrg,
     handleRemoveObjective
   } = useTaskEditModal(task, onClose);
   return (
@@ -42,16 +35,6 @@ export function TaskSettingModal({ open, task, onClose }: TaskSettingModalProps)
         </DialogHeader>
 
         <TaskEditForm formState={formState} isEditable={isEditable} onChange={handleChange} />
-
-        <ScopeSection
-          isEditable={isEditable}
-          users={scopeUsers}
-          orgs={scopeOrgs}
-          onAddUser={handleAddUser}
-          onRemoveUser={handleRemoveUser}
-          onAddOrg={handleAddOrg}
-          onRemoveOrg={handleRemoveOrg}
-        />
 
         <ObjectiveSection
           taskId={task.id}
