@@ -1,75 +1,88 @@
 // src/components/task/ObjectiveTable.tsx
-import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 
+import {toast} from "sonner"
 
 import { useGetProgressObjectivesTasksTaskId, usePutProgressObjectivesObjectiveId  } from '@/api/generated/taskProgressAPI';
 import { usePostProgressObjectives } from "@/api/generated/taskProgressAPI";
 import type {  ObjectiveInput,  ObjectiveUpdate} from '@/api/generated/taskProgressAPI.schemas';
+import type {Objective} from "@/api/generated/taskProgressAPI.schemas";
 import { Skeleton } from '@/components/ui/skeleton';
+import { extractErrorMessage } from "@/utils/errorHandler";
 
 import { ObjectiveRow } from "./objective/ObjectiveRow";
-
-
 
 interface ObjectiveTableProps {
   taskId: number;
 }
 
 export default function ObjectiveTable({ taskId }: ObjectiveTableProps) {
-  const { data, isLoading } = useGetProgressObjectivesTasksTaskId(taskId);
+  const { data, isLoading, refetch: refetchObjectives } = useGetProgressObjectivesTasksTaskId(taskId);
   const postObjective = usePostProgressObjectives();
   const updateObjective = usePutProgressObjectivesObjectiveId();
-  const queryClient = useQueryClient();
-  const objectives = data?.objectives ?? [];
+
+  const [objectives, setObjectives] = useState<Objective[]>([]);
+
+  useEffect(() => {
+    if (data) {
+      setObjectives(data.objectives??[]);
+    }
+  }, [data]);
+
  // ObjectiveTable内に追加：新規登録関数
-const handleSaveNew = async (obj: ObjectiveInput) => {
-  if (!obj.title || !obj.title.trim()) {
-    console.warn("タイトルが入力されていません");
-    return;
-  }
+  const handleSaveNew = async (obj: ObjectiveInput) => {
+    if (!obj.title || !obj.title.trim()) {
+      console.warn("タイトルが入力されていません");
+      return;
+    }
 
-  try {
-    await postObjective.mutateAsync({
-      data: {
-        title: obj.title.trim(),
-        due_date: obj.due_date ?? null,
-        assigned_user_id: obj.assigned_user_id ?? null,
-        task_id: taskId, // propsから渡されている
-      },
-    });
+    try {
+      await postObjective.mutateAsync({
+        data: {
+          title: obj.title.trim(),
+          due_date: obj.due_date ?? null,
+          assigned_user_id: obj.assigned_user_id ?? null,
+          task_id: taskId, // propsから渡されている
+        },
+      });
 
-    // 登録後に再フェッチ（React Queryのキャッシュ更新）
-    await queryClient.invalidateQueries({ queryKey: ["getProgressObjectivesTasksTaskId", taskId] });
-  } catch (e) {
-    console.error("Objective登録失敗:", e);
-  }
-};
+      // 登録後に再フェッチ（React Queryのキャッシュ更新）
+      refetchObjectives();
+      toast.success("Objectiveを登録しました");
+    } catch (e) {
+      const err = extractErrorMessage(e);
+      console.error("Objective登録失敗:", err);
+      toast.error("Objective登録に失敗しました", {description: err});
+    }
+  };
 
-const handleUpdate = async (objId: number, updates: ObjectiveUpdate) => {
-  console.log(`taskId: ${taskId}, objective ID: ${objId}, 更新内容${JSON.stringify(updates)}`);
-  if (!objId) {
-    console.warn("無効なIDです");
-    return;
-  }
+  const handleUpdate = async (objId: number, updates: ObjectiveUpdate) => {
+    if (!objId) {
+      console.warn("無効なIDです");
+      return;
+    }
 
-  // 空文字だけのタイトルは保存させない（任意）
-  if (typeof updates.title === "string" && updates.title.trim() === "") {
-    console.warn("タイトルが空文字のため更新しません");
-    return;
-  }
+    // 空文字だけのタイトルは保存させない（任意）
+    if (typeof updates.title === "string" && updates.title.trim() === "") {
+      console.warn("タイトルが空文字のため更新しません");
+      return;
+    }
 
-  try {
-    await updateObjective.mutateAsync({
-      objectiveId: objId,
-      data: updates,
-    });
+    try {
+      await updateObjective.mutateAsync({
+        objectiveId: objId,
+        data: updates,
+      });
 
-    // キャッシュの更新（一覧再取得）
-    await queryClient.invalidateQueries({ queryKey: ["getProgressObjectivesTasksTaskId", taskId] });
-  } catch (e) {
-    console.error(`Objective ID ${objId} の更新に失敗しました`, e);
-  }
-};
+      // 更新後に再フェッチ（React Queryのキャッシュ更新）
+      refetchObjectives();
+      toast.success("Objectiveを更新しました");
+    } catch (e) {
+      const err = extractErrorMessage(e);
+      console.error(`Objective ID ${objId} の更新に失敗しました`, e);
+      toast.error("Objective更新に失敗しました", {description: err});
+    }
+  };
 
   if (isLoading) {
     return <Skeleton className="h-16 w-full" />;
@@ -103,7 +116,7 @@ const handleUpdate = async (objId: number, updates: ObjectiveUpdate) => {
 
             {/* 常に表示される新規入力行 */}
             <ObjectiveRow
-              key="new"
+              key={`new-${objectives.length}`}  
               taskId = {taskId}
               objective={null}
               index={objectives.length}

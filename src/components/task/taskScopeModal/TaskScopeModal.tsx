@@ -25,6 +25,8 @@ import {
   DialogDescription
 } from "@/components/ui/dialog";
 import { useUser } from "@/context/useUser";
+
+import UserScopeSelectModal from "./UserScopeSelectModal";
 export interface TaskScopeModalProps {
   task: Task;
   open: boolean;
@@ -41,6 +43,8 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
   const [isEditable, setIsEditable] = useState(false);
   const [scopeUsers, setScopeUsers] = useState<AccessUser[]>([]);
   const [scopeOrgs, setScopeOrgs] = useState<OrgAccess[]>([]);
+  const [openUserModal, setOpenUserModal] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<AccessUser[]>([]);
 
   useEffect(() => {
     const editable = (authorized_users ?? []).some((u) => u.user_id === currentUser?.id);
@@ -71,65 +75,72 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
     });
   }
   return (
+    <>
       <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>"タスクスコープ設定"</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
-
-    <div className="mt-6 space-y-4">
-      <div>
-        <h3 className="text-base font-semibold mb-1">ユーザースコープ</h3>
-        <div className="flex flex-wrap gap-2">
-          {scopeUsers.map((user) => (
-            <Badge
-              key={user.user_id}
-              className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1"
-            >
-              {user.name}
+        <div className="mt-6 space-y-4">
+          <div>
+            <h3 className="text-base font-semibold mb-1">ユーザースコープ</h3>
+            <div className="flex flex-wrap gap-2">
+              {scopeUsers.map((user) => (
+                <Badge
+                  key={user.user_id}
+                  className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1"
+                >
+                  {user.name}
+                  {isEditable && (
+                    <X
+                      className="w-3 h-3 cursor-pointer"
+                      onClick={() => onRemoveUser(user.user_id)}
+                    />
+                  )}
+                </Badge>
+              ))}
               {isEditable && (
-                <X
-                  className="w-3 h-3 cursor-pointer"
-                  onClick={() => onRemoveUser(user.user_id)}
-                />
+                <Button size="sm" variant="outline" onClick={() => setOpenUserModal(true)}>
+                  <Plus className="w-4 h-4 mr-1" /> 追加
+                </Button>
               )}
-            </Badge>
-          ))}
-          {isEditable && (
-            <Button size="sm" variant="outline" onClick={()=>{}}>
-              <Plus className="w-4 h-4 mr-1" /> 追加
-            </Button>
-          )}
-        </div>
-      </div>
+            </div>
+          </div>
 
-      <div>
-        <h3 className="text-base font-semibold mb-1">組織スコープ</h3>
-        <div className="flex flex-wrap gap-2">
-          {scopeOrgs.map((org) => (
-            <Badge
-              key={org.organization_id}
-              className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1"
-            >
-              {org.name}
+          <div>
+            <h3 className="text-base font-semibold mb-1">組織スコープ</h3>
+            <div className="flex flex-wrap gap-2">
+              {scopeOrgs.map((org) => (
+                <Badge
+                  key={org.organization_id}
+                  className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1"
+                >
+                  {org.name}
+                  {isEditable && (
+                    <X
+                      className="w-3 h-3 cursor-pointer"
+                      onClick={() => onRemoveOrg(org.organization_id)}
+                    />
+                  )}
+                </Badge>
+              ))}
               {isEditable && (
-                <X
-                  className="w-3 h-3 cursor-pointer"
-                  onClick={() => onRemoveOrg(org.organization_id)}
-                />
+                <Button size="sm" variant="outline" onClick={handleUpdateAccess}>
+                  <Plus className="w-4 h-4 mr-1" /> 追加
+                </Button>
               )}
-            </Badge>
-          ))}
-          {isEditable && (
-            <Button size="sm" variant="outline" onClick={handleUpdateAccess}>
-              <Plus className="w-4 h-4 mr-1" /> 追加
-            </Button>
-          )}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
       </DialogContent>
     </Dialog>
+    <UserScopeSelectModal
+      open={openUserModal}
+      onClose={() => {setOpenUserModal(false)}}
+      onConfirm={() => {}}
+    />
+  </>
+
   )
 }
