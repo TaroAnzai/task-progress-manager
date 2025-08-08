@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { UserProvider, useUser } from "@/context/UserContext";
+import { useUser } from "@/context/useUser";
 import { useNavigate, useLocation } from "react-router-dom"; 
 import { Button } from "@/components/ui/button";
 import { CompanySelectorDialog } from "@/components/admin/CompanySelectorDialog";
@@ -15,7 +15,7 @@ const AdminPageContent = () => {
   const location = useLocation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
-  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+  const [selectedCompany, setSelectedCompany] = useState<Company | undefined>(undefined);
 
   const companyId = user?.company_id ?? null;
 
@@ -56,26 +56,26 @@ const AdminPageContent = () => {
             <div className="space-y-6">
                 <div className="p-4 border rounded bg-white shadow">
                     <Button onClick={() => setDialogOpen(true)}>会社を選択</Button>
-                    <Button onClick={() => setSelectedCompany(null)}>会社選択解除</Button>
+                    <Button onClick={() => setSelectedCompany(undefined)}>会社選択解除</Button>
                     <Button onClick={() => setRegisterOpen(true)}>会社を登録</Button>
                     {selectedCompany && <p>選択中: {selectedCompany.name}</p>}
                 </div>
             </div>
           )}
 
-          {selectedCompany  || user.is_superuser ? (
+          {selectedCompany? (
           <>
             <div className="space-y-6">
               <div className="p-4 border rounded bg-white shadow">
                 <div className="mt-4 space-y-2">
-                  <AdminOrganizationComponent companyId={selectedCompany?.id!} />
+                  <AdminOrganizationComponent companyId={selectedCompany.id} />
                 </div>
               </div>
             </div>
             <div className="space-y-6">
               <div className="p-4 border rounded bg-white shadow">
                 <div className="mt-4 space-y-2">
-                  <AdminUserComponent companyId={selectedCompany?.id!} />
+                  <AdminUserComponent companyId={selectedCompany.id!} />
                 </div>
               </div>
             </div>
@@ -95,7 +95,7 @@ const AdminPageContent = () => {
       <CompanyRegisterDialog
         open={registerOpen}
         onClose={() => setRegisterOpen(false)}
-        onSuccess={() => setSelectedCompany(null)} // useGetCompanies などで再取得
+        onSuccess={() => setSelectedCompany(undefined)} // useGetCompanies などで再取得
       />
     </div>
   );

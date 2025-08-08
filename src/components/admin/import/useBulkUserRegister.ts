@@ -6,6 +6,7 @@ import {
 import type {UserInputRole} from "@/api/generated/taskProgressAPI.schemas"
 import {ROLE_LABELS} from "@/context/roleLabels"
 import { toast } from "sonner";
+import {AxiosError} from "axios"
 
 export function useBulkUserRegistration(company_id: number) {
   const [loading, setLoading] = useState(false)
@@ -61,7 +62,8 @@ export function useBulkUserRegistration(company_id: number) {
               role: role,
             },
           });
-        } catch (err:any) {
+        } catch (e) {
+          const err = e as AxiosError<{ message?: string }>;
           errors.push(`行${i + 1}: ${err.message}`);
           continue
         }

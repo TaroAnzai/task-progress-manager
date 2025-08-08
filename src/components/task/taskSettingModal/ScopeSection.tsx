@@ -19,14 +19,13 @@ interface ScopeSectionProps {
 }
 
 export function ScopeSection({
-  isEditable,
-  users,
-  orgs,
-  onAddUser,
-  onRemoveUser,
-  onAddOrg,
-  onRemoveOrg,
-}: ScopeSectionProps) {
+    isEditable,
+    users,
+    orgs,
+
+  }: ScopeSectionProps) {
+
+
   return (
     <div className="mt-6 space-y-4">
       <div>
@@ -41,7 +40,7 @@ export function ScopeSection({
               {isEditable && (
                 <X
                   className="w-3 h-3 cursor-pointer"
-                  onClick={() => onRemoveUser(user.user_id)}
+                  onClick={() => {}}
                 />
               )}
             </Badge>
@@ -66,7 +65,7 @@ export function ScopeSection({
               {isEditable && (
                 <X
                   className="w-3 h-3 cursor-pointer"
-                  onClick={() => onRemoveOrg(org.organization_id)}
+                  onClick={() => {}}
                 />
               )}
             </Badge>

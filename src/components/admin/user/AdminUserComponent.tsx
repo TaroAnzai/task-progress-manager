@@ -1,17 +1,18 @@
 // src/admin/components/user/AdminUserComponent.tsx
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useUser } from '@/context/UserContext';
+import { useUser } from '@/context/useUser.ts';
 import type { UserFormState} from './types';
 import { useGetProgressUsers } from '@/api/generated/taskProgressAPI';
 import type { UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
+import { AccessScopeRole } from '@/api/generated/taskProgressAPI.schemas';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import UserForm from './UserForm';
 import UserTable from './UserTable';
 import  BulkTextInputForm  from "../import/BulkTextInputForm"
 import { useBulkUserRegistration } from "../import/useBulkUserRegister.ts"
-import { useAlertDialog} from "@/context/AlertDialogContext.tsx"
+import { useAlertDialog} from "@/context/useAlertDialog"
 
 interface AdminUserComponentProps {
   companyId: number;
@@ -33,7 +34,7 @@ const AdminUserComponent: React.FC <AdminUserComponentProps> = ({ companyId }) =
         showCancel: false,
       });
     }
-  },[errors])
+  },[errors, openAlertDialog])
   const {
     data: users,
     isLoading,
@@ -49,7 +50,7 @@ const AdminUserComponent: React.FC <AdminUserComponentProps> = ({ companyId }) =
       email: user.email,
       //organization_code: user.organization_code,
       organization_id: user.organization_id,
-      role: matchedScope?.role ?? 'member',
+      role: matchedScope?.role ?? AccessScopeRole.MEMBER,
     });
   }, []);
 

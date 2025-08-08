@@ -3,9 +3,9 @@ import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import './index.css'
 import App from './App.tsx'
-import { UserProvider } from "./context/UserContext";
-import {AlertDialogProvider} from "./context/AlertDialogContext";
-import { TaskProvider } from "./context/TaskContext";
+import  UserProvider  from "./context/UserProvider";
+import AlertDialogProvider from "./context/AlertDialogProvider";
+import  TaskProvider  from "./context/TaskProvider";
 
 const queryClient = new QueryClient();
 

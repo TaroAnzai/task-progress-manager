@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import type { Login } from "@/api/generated/taskProgressAPI.schemas";
 import {useAlertDialog} from "@/context/AlertDialogContext.tsx";
 import { extractErrorMessage } from "@/utils/errorHandler.ts";
-import { useUser } from "@/context/UserContext"; 
+import { useUser } from "@/context/useUser"; 
 
 // 定数の定義
 const MESSAGES = {

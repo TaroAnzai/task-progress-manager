@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,11 +12,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner"
 import {
   usePostProgressTasks,
-  usePutProgressTasksTaskId,
 } from "@/api/generated/taskProgressAPI";
-import type {Task} from "@/api/generated/taskProgressAPI.schemas"
-import { useTasks } from "@/context/TaskContext";
-import { useUser } from "@/context/UserContext";
+import { useTasks } from "@/context/useTasks";
 
 interface TaskSettingModalProps {
   open: boolean;
@@ -24,7 +21,7 @@ interface TaskSettingModalProps {
 }
 
 export default function NewTaskModal({ open, onClose }: TaskSettingModalProps) {
-  const { user } = useUser();
+
   const { refetch } = useTasks();
 
 
@@ -33,7 +30,7 @@ export default function NewTaskModal({ open, onClose }: TaskSettingModalProps) {
   const [dueDate, setDueDate] = useState("");
 
   const createTaskMutation = usePostProgressTasks();
-  const updateTaskMutation = usePutProgressTasksTaskId();
+
 
   const handleSave = async () => {
     if (!title.trim()) {

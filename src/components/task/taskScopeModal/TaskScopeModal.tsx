@@ -8,24 +8,18 @@ import {
   DialogDescription
 } from "@/components/ui/dialog";
 import {
-  usePutProgressTasksTaskId,
-  useGetProgressObjectivesTasksTaskId,
-  useDeleteProgressObjectivesObjectiveId,
   useGetProgressTasksTaskIdAuthorizedUsers,
   useGetProgressTasksTaskIdAccessUsers,
   useGetProgressTasksTaskIdAccessOrganizations,
-  usePutProgressTasksTaskIdAccessLevels,
 } from "@/api/generated/taskProgressAPI";
 import type {
   Task,
-  Objective,
-  AccessLevelInput,
   AccessUser,
   OrgAccess,
 } from "@/api/generated/taskProgressAPI.schemas";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useUser } from "@/context/UserContext";
+import { useUser } from "@/context/useUser";
 import { Plus, X } from "lucide-react";
 export interface TaskScopeModalProps {
   task: Task;
@@ -55,8 +49,8 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
     if (getOrgs) setScopeOrgs(getOrgs);
   }, [getOrgs]);
 
-  const onRemoveUser = (user_id: number|undefined) => {};
-  const onRemoveOrg = (organization_id: number|undefined) => {};
+  const onRemoveUser = (user_id: number|undefined) => {console.log(user_id)};
+  const onRemoveOrg = (organization_id: number|undefined) => {console.log(organization_id)};
 
   return (
       <Dialog open={open} onOpenChange={onClose}>

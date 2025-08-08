@@ -2,7 +2,7 @@ import React, {useEffect} from "react";
 import { OrganizationTreeView } from "./OrganizationTreeView";
 import  BulkTextInputForm  from "../import/BulkTextInputForm"
 import { useBulkOrganizationRegister } from "../import/useBulkOrganizationRegister";
-import { useAlertDialog} from "@/context/AlertDialogContext.tsx"
+import { useAlertDialog} from "@/context/useAlertDialog"
 import { Card, CardContent } from '@/components/ui/card';
 /**
  * 外部からは <TreeView companyId={...} /> で使用する
@@ -24,7 +24,7 @@ export const AdminOrganizationComponent: React.FC<TreeViewProps> = ({ companyId 
         showCancel: false,
       });
     }
-  },[errors])
+  },[errors, openAlertDialog])
 
   return (
     <div className="flex gap-4">

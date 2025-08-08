@@ -17,7 +17,7 @@ interface TaskSettingsIconProps {
   user: UserWithScopes | null;
 }
 
-export default function TaskSettingsIcon({ task, user }: TaskSettingsIconProps) {
+export default function TaskSettingsIcon({ task}: TaskSettingsIconProps) {
   const [openSetting, setOpenSetting] = useState(false);
   const [openScope, setOpenScope] = useState(false);
 

@@ -1,10 +1,9 @@
 // src/pages/TaskPage.tsx
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom"; 
-import {  useUser } from "@/context/UserContext";
+import {  useUser } from "@/context/useUser";
 import TaskControlPanel from "@/components/task/TaskControlPanel";
 import NewTaskModal from "@/components/task/newTaskModal/NewTaskModal";
-import type { Task } from "@/api/generated/taskProgressAPI.schemas";
 import TaskList from "@/components/task/TaskList";
 
 const TaskPageContent = () =>{
@@ -12,7 +11,6 @@ const TaskPageContent = () =>{
   const navigate = useNavigate();
   const location = useLocation();
   const [newTaskModalOpen , setNewTaskModalOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null); // selectedTask
 
   useEffect(() => {
     if (userLoading) return; 

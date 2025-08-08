@@ -1,7 +1,8 @@
 // src/components/task/TaskStatusBadge.tsx
 
-import type { Task } from '@/api/generated/taskProgressAPI.schemas';
-import { useTasks } from '@/context/TaskContext';
+import type { Task,TaskStatus as taskStatusType } from '@/api/generated/taskProgressAPI.schemas';
+import { TaskStatus } from '@/api/generated/taskProgressAPI.schemas';
+
 //import { showTaskStatusSelector } from '@/lib/status_ui';
 
 interface TaskStatusBadgeProps {
@@ -9,7 +10,6 @@ interface TaskStatusBadgeProps {
 }
 
 export default function TaskStatusBadge({ task }: TaskStatusBadgeProps) {
-  const { tasks } = useTasks();
   const canEdit = task.user_access_level !== 'view';
 
   const handleClick = (e: React.MouseEvent) => {
@@ -22,27 +22,26 @@ export default function TaskStatusBadge({ task }: TaskStatusBadgeProps) {
   };
 
   return (
-    <>  </>
-/*     <span
-      className={`ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium status-${task.status_id} cursor-pointer`}
+    <span
+      className={`ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium status-${task.status} cursor-pointer`}
       onClick={handleClick}
     >
       <span className="mr-1 block h-2 w-2 rounded-full bg-current" />
-      {getStatusLabel(task.status_id)}
-    </span> */
+      {getStatusLabel(task.status)}
+    </span>
   );
 }
 
-function getStatusLabel(statusId: number): string {
-  switch (statusId) {
-    case 1:
+function getStatusLabel(status: taskStatusType|undefined): string {
+  switch (status) {
+    case TaskStatus.NOT_STARTED:
       return '未着手';
-    case 2:
+    case TaskStatus.IN_PROGRESS:
       return '進行中';
-    case 3:
+    case TaskStatus.COMPLETED:
       return '完了';
-    case 4:
-      return '保留';
+    case TaskStatus.SAVED:
+      return '保存';
     default:
       return '不明';
   }

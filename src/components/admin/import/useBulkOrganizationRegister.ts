@@ -4,7 +4,7 @@ import {
   useGetProgressOrganizations,
   usePostProgressOrganizations,
 } from "@/api/generated/taskProgressAPI"
-
+import type {AxiosError} from "axios"
 
 export function useBulkOrganizationRegister(company_id: number) {
   const createOrg = usePostProgressOrganizations()
@@ -65,7 +65,8 @@ export function useBulkOrganizationRegister(company_id: number) {
         })
        console.log("Creating organization:", {name, org_code, parent_code})
         success++
-      } catch (err: any) {
+      } catch (e) {
+        const err = e as AxiosError<{ message?: string }>;
         errors.push(`行${i + 1}: 「${name}」の登録に失敗：${err.message}`)
       }
     }

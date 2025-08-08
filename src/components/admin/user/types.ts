@@ -1,8 +1,7 @@
 // src/admin/components/user/types.ts
 
 //import type { User, AccessScope, OrganizationTreeNode } from '@/api/generated/taskProgressAPI.schemas';
-import type { User, AccessScope } from '@/api/generated/taskProgressAPI.schemas';
-
+import type {AccessScopeRole as AccessScopeType } from '@/api/generated/taskProgressAPI.schemas';
 /**
  * UI用のユーザーフォーム状態
  */
@@ -12,7 +11,7 @@ export interface UserFormState {
   email: string;
   //organization_code: string;
   organization_id: number;
-  role: 'system_admin' | 'org_admin' | 'member';
+  role: AccessScopeType;
 }
 
 /**

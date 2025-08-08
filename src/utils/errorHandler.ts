@@ -1,46 +1,52 @@
-/**
- * Axiosエラーからユーザーに表示するエラーメッセージを抽出するユーティリティ関数
- */
+// src/utils/errorHandler.ts
+const isObject = (v: unknown): v is Record<string, unknown> =>
+  typeof v === "object" && v !== null;
+
+const firstStringDeep = (v: unknown): string | null => {
+  if (typeof v === "string") return v;
+  if (Array.isArray(v)) {
+    for (const item of v) {
+      const s = firstStringDeep(item);
+      if (s) return s;
+    }
+    return null;
+  }
+  if (isObject(v)) {
+    for (const val of Object.values(v)) {
+      const s = firstStringDeep(val);
+      if (s) return s;
+    }
+  }
+  return null;
+};
 
 export const extractErrorMessage = (error: unknown): string => {
-  // AxiosError型であることを確認
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "response" in error &&
-    typeof (error as any).response === "object"
-  ) {
-    const responseData = (error as any).response?.data;
+  // axios 風: { response: { data: ... } } を構造で判定
+  if (isObject(error) && "response" in error) {
+    const resp = (error as Record<string, unknown>).response;
+    if (isObject(resp) && "data" in resp) {
+      const data = (resp as Record<string, unknown>).data;
 
-    // marshmallow形式のエラー: errors -> { json: { message: [文字列] } }
-    if (responseData?.errors && typeof responseData.errors === "object") {
-      const errors = responseData.errors;
+      if (isObject(data)) {
+        // marshmallow 風: { errors: {...} } 最初の文字列を深掘りで取得
+        if ("errors" in data) {
+          const msg = firstStringDeep(
+            (data as Record<string, unknown>).errors
+          );
+          if (msg) return msg;
+        }
+        // 一般的: { message: "..." } / { status: "..." }
+        const message = (data as { message?: unknown }).message;
+        if (typeof message === "string") return message;
 
-      // 最初のエラーメッセージを抽出
-      const firstMessage =
-        Object.values(errors)
-          .flatMap((field: any) =>
-            typeof field === "object" ? Object.values(field) : []
-          )
-          .flat()
-          .find((msg) => typeof msg === "string");
-
-      if (firstMessage) return firstMessage;
-    }
-
-    // 通常のメッセージがある場合
-    if (typeof responseData?.message === "string") {
-      return responseData.message;
-    }
-
-    // ステータスなど
-    if (typeof responseData?.status === "string") {
-      return responseData.status;
+        const status = (data as { status?: unknown }).status;
+        if (typeof status === "string") return status;
+      }
     }
   }
 
-  // fallback
-  if (error instanceof Error) {
+  // 標準的な Error
+  if (error instanceof Error && typeof error.message === "string") {
     return error.message;
   }
 

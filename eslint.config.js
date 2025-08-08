@@ -20,4 +20,11 @@ export default tseslint.config([
       globals: globals.browser,
     },
   },
+  {
+    files: ["src/components/ui/**/*.tsx"],
+    rules: {
+      // 定数の export は許容（※オプションが使える環境なら）
+      "react-refresh/only-export-components": "off",
+    },
+  },  
 ])

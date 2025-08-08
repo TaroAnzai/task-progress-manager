@@ -15,7 +15,7 @@ type ObjectiveRowProps = {
   onUpdate: (objId: number, obj: ObjectiveUpdate) => void;
 };
 
-export function ObjectiveRow({ taskId, objective, index, onSaveNew, onUpdate }: ObjectiveRowProps) {
+export function ObjectiveRow({ taskId, objective, onSaveNew, onUpdate }: ObjectiveRowProps) {
   const isNew = !objective;
   const [title, setTitle] = useState(objective?.title?? "");
   const [dueDate, setDueDate] = useState(objective?.due_date ?? undefined);

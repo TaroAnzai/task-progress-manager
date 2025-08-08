@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import type { Task } from '@/api/generated/taskProgressAPI.schemas';
-import { format } from 'date-fns';
-import { ja } from 'date-fns/locale';
 import TaskHeader from './TaskHeader';
 import ObjectiveTable from './ObjectiveTable';
 

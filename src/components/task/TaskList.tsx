@@ -1,13 +1,13 @@
 // src/components/task/TaskList.tsx
 
-import { useTasks } from '@/context/TaskContext';
-import { useUser } from '@/context/UserContext';
+import { useTasks } from '@/context/useTasks';
+
 import TaskCard from './TaskCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function TaskList() {
   const { tasks, isLoading } = useTasks();
-  const { user } = useUser();
+
 
   if (isLoading) {
     return (

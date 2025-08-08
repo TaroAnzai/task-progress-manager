@@ -46,7 +46,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
       setChildName("");
       setChildCode("");
       onRefresh();
-    } catch (e: any) {
+    } catch (e) {
       toast.error(`${extractErrorMessage(e)}`);
     }
   };
@@ -64,7 +64,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
       await deleteOrgMutation.mutateAsync({orgId: node.id});
       toast.success(`${node.name} を削除しました`);
       onRefresh();
-    } catch (e: any) {
+    } catch (e) {
       toast.error(`削除失敗: ${extractErrorMessage(e)}`);
     }
   };
@@ -90,7 +90,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({
       });
       toast.success("親組織を更新しました");
       onRefresh();
-    } catch (e: any) {
+    } catch (e) {
       toast.error(`登録に失敗しました: ${extractErrorMessage(e)}`);
     }
   };

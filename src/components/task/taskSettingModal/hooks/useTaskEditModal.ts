@@ -1,7 +1,7 @@
 // src/components/task/taskSettingModal/hooks/useTaskEditModal.ts
 
 import { useState, useEffect } from "react";
-import { useUser } from "@/context/UserContext";
+import { useUser } from "@/context/useUser";
 import {
   usePutProgressTasksTaskId,
   useGetProgressObjectivesTasksTaskId,
@@ -39,6 +39,9 @@ export function useTaskEditModal(task: Task, onClose: () => void) {
   const { data:authorized_users} = useGetProgressTasksTaskIdAuthorizedUsers(task.id);
   const { data: userScopes } = useGetProgressTasksTaskIdAccessUsers(task.id);
   const { data: orgScopes } = useGetProgressTasksTaskIdAccessOrganizations(task.id);
+
+  const updateAccess = usePutProgressTasksTaskIdAccessLevels();
+  const remove = useDeleteProgressObjectivesObjectiveId();
 
   useEffect(() => {
     const editable = (authorized_users ?? []).some((u) => u.user_id === user?.id);
@@ -87,7 +90,7 @@ export function useTaskEditModal(task: Task, onClose: () => void) {
         access_level: o.access_level || "view",
       }));
 
-      const updateAccess = usePutProgressTasksTaskIdAccessLevels();
+
       await updateAccess.mutateAsync({
         taskId: task.id,
         data: { user_access:userAccess, organization_access:orgAccess } as AccessLevelInput,
@@ -103,7 +106,7 @@ export function useTaskEditModal(task: Task, onClose: () => void) {
   };
 
   const handleRemoveObjective = async (objectiveId: number) => {
-    const remove = useDeleteProgressObjectivesObjectiveId();
+
     try {
       await remove.mutateAsync({ objectiveId });
       setObjectives(prev => prev.filter(o => o.id !== objectiveId));

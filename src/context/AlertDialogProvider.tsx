@@ -1,5 +1,4 @@
-// src/context/AlertDialogContext.tsx
-import { createContext, useContext, useState, useEffect } from "react";
+import {useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import {
   AlertDialog,
@@ -11,25 +10,9 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { AlertDialogContext, type DialogOptions } from "./AlertDialogContextBase";
 
-type DialogOptions = {
-  title?: string;
-  description?: string;
-  descriptionNode?: ReactNode;
-  onConfirm?: () => void;
-  onCancel?: () => void;
-  confirmText?: string;
-  cancelText?: string;
-  showCancel?: boolean;
-};
-
-type DialogContextType = {
-  openAlertDialog: (options: DialogOptions) => void;
-};
-
-const AlertDialogContext = createContext<DialogContextType | undefined>(undefined);
-
-export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
+export default function AlertDialogProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("確認");
   const [description, setDescription] = useState("");
@@ -68,13 +51,11 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    if (open) {
-            // ダイアログが開く前にアクティブな要素のフォーカスをクリア
-      if (document.activeElement && document.activeElement !== document.body) {
-        (document.activeElement as HTMLElement).blur();
-      }
+    if (open && document.activeElement && document.activeElement !== document.body) {
+      (document.activeElement as HTMLElement).blur();
     }
   }, [open]);
+
   return (
     <AlertDialogContext.Provider value={{ openAlertDialog }}>
       {children}
@@ -90,25 +71,11 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
             {descriptionNode}
           </AlertDialogHeader>
           <AlertDialogFooter>
-            {showCancel && (
-              <AlertDialogCancel onClick={onCancel}>
-                {cancelText}
-              </AlertDialogCancel>
-            )}
-            <AlertDialogAction onClick={onConfirm}>
-              {confirmText}
-            </AlertDialogAction>
+            {showCancel && <AlertDialogCancel onClick={onCancel}>{cancelText}</AlertDialogCancel>}
+            <AlertDialogAction onClick={onConfirm}>{confirmText}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </AlertDialogContext.Provider>
   );
-};
-
-export const useAlertDialog = (): DialogContextType => {
-  const context = useContext(AlertDialogContext);
-  if (!context) {
-    throw new Error("useDialog must be used within a AlertDialogProvider");
-  }
-  return context;
-};
+}

@@ -9,7 +9,7 @@ import type {
   OrganizationTree,
 } from "@/api/generated/taskProgressAPI.schemas";
 import { TreeNode } from "./TreeNode";
-import { useUser } from "@/context/UserContext";
+import { useUser } from "@/context/useUser";
 import { extractErrorMessage } from "@/utils/errorHandler";
 interface OrganizationTreeProps {
   companyId: number;
@@ -22,7 +22,7 @@ export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
   const [code, setCode] = useState("");
   const [parentCode, setParentCode] = useState("");
   const [codeToIdMap, setCodeToIdMap] = useState<Record<string, number>>({});
-  const { user, hasAdminScope, getUserRole } = useUser();
+  const { user, hasAdminScope } = useUser();
  
   // ✅ ツリー取得（ユーザー権限 & company_id に応じてフィルタ済み）
   const { data: orgs, refetch } = useGetProgressOrganizationsTree({
@@ -73,7 +73,7 @@ export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
       setCode("");
       setParentCode("");
       refetch();
-    } catch (e: any) {
+    } catch (e) {
       console.error("登録エラー:", e);
       toast.error(`登録に失敗しました: ${extractErrorMessage(e)}`);
     }

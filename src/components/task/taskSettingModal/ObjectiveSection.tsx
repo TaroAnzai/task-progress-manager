@@ -12,7 +12,6 @@ interface ObjectiveSectionProps {
 }
 
 export function ObjectiveSection({
-  taskId,
   objectives,
   isEditable,
   onRemoveObjective,
