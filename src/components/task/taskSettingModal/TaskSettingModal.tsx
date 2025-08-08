@@ -31,7 +31,6 @@ export function TaskSettingModal({ open, task, onClose }: TaskSettingModalProps)
     handleRemoveOrg,
     handleRemoveObjective
   } = useTaskEditModal(task, onClose);
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl">
@@ -58,7 +57,6 @@ export function TaskSettingModal({ open, task, onClose }: TaskSettingModalProps)
           isEditable={isEditable}
           onRemoveObjective={handleRemoveObjective}
         />
-
         <SaveButton
           isEditable={isEditable}
           isSaving={isSaving}

@@ -4,7 +4,13 @@ import type { Task, UserWithScopes } from '@/api/generated/taskProgressAPI.schem
 import { Cog } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TaskSettingModal } from './taskSettingModal/TaskSettingModal';
-//import taskSettingModal from '@/lib/task_setting_modal';
+import { TaskScopeModal}  from './taskScopeModal/TaskScopeModal.tsx';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface TaskSettingsIconProps {
   task: Task;
@@ -12,25 +18,46 @@ interface TaskSettingsIconProps {
 }
 
 export default function TaskSettingsIcon({ task, user }: TaskSettingsIconProps) {
-  const [open, setOpen] = useState(false);
+  const [openSetting, setOpenSetting] = useState(false);
+  const [openScope, setOpenScope] = useState(false);
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setOpen(true)}
-        className="text-gray-600 hover:text-gray-900"
-        title="設定"
-      >
-        <Cog className="h-5 w-5" />
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-gray-600 hover:text-gray-900"
+            title="設定"
+          >
+            <Cog className="h-5 w-5" />
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="end" className="w-44">
+          <DropdownMenuItem onClick={() => setOpenSetting(true)}>
+            設定
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setOpenScope(true)}>
+            スコープ設定
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* 設定モーダル */}
       <TaskSettingModal
-        open={open}
+        open={openSetting}
         task={task}
-        onClose={() => setOpen(false)}
+        onClose={() => setOpenSetting(false)}
+      />
+
+      {/* スコープ設定モーダル */}
+      <TaskScopeModal
+        open={openScope}
+        task={task}
+        onClose={() => setOpenScope(false)}
       />
     </>
-
   );
 }

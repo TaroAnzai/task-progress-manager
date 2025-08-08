@@ -36,7 +36,7 @@ export function useBulkUserRegistration(company_id: number) {
       roleMap[label] = code;
     }
     const errors: string[] = []
-    let success = 0
+    const success = 0
 
     for (let i = 0; i < lines.length; i++) {
       const [name, email, orgCodeOrName, roleLabel] = lines[i].split(",").map((s) => s.trim())
