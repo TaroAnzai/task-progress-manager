@@ -9,6 +9,12 @@ import eslintPluginImport from "eslint-plugin-import";
 export default tseslint.config([
   globalIgnores(['dist']),
   {
+    ignores: [
+      "src/api/generated/**",
+      "src/components/ui/**"
+    ]
+  },
+  {
     files: ['**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
