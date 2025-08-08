@@ -1,14 +1,18 @@
 // src/components/admin/user/UserForm.tsx
 
 import React, { useEffect, useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { usePostProgressUsers, usePutProgressUsersUserId, usePostProgressAccessScopesUsersUserId } from '@/api/generated/taskProgressAPI';
-import type { UserFormState, OrganizationSelectResult } from './types';
-import OrganizationSelectorDialog from './OrganizationSelectorDialog';
+
 import { toast } from "sonner";
+
+
+import { usePostProgressUsers, usePutProgressUsersUserId, usePostProgressAccessScopesUsersUserId } from '@/api/generated/taskProgressAPI';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { extractErrorMessage } from "@/utils/errorHandler";
+
+import OrganizationSelectorDialog from './OrganizationSelectorDialog';
+import type { UserFormState, OrganizationSelectResult } from './types';
 
 interface UserFormProps {
   initialData: UserFormState | null;

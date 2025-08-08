@@ -1,10 +1,15 @@
 // src/components/task/ObjectiveTable.tsx
 import { useQueryClient } from '@tanstack/react-query';
-import type {  ObjectiveInput,  ObjectiveUpdate} from '@/api/generated/taskProgressAPI.schemas';
+
+
 import { useGetProgressObjectivesTasksTaskId, usePutProgressObjectivesObjectiveId  } from '@/api/generated/taskProgressAPI';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ObjectiveRow } from "./objective/ObjectiveRow";
 import { usePostProgressObjectives } from "@/api/generated/taskProgressAPI";
+import type {  ObjectiveInput,  ObjectiveUpdate} from '@/api/generated/taskProgressAPI.schemas';
+import { Skeleton } from '@/components/ui/skeleton';
+
+import { ObjectiveRow } from "./objective/ObjectiveRow";
+
+
 
 interface ObjectiveTableProps {
   taskId: number;

@@ -1,9 +1,12 @@
 // src/components/task/TaskCard.tsx
 
 import { useState } from 'react';
+
 import type { Task } from '@/api/generated/taskProgressAPI.schemas';
-import TaskHeader from './TaskHeader';
+
 import ObjectiveTable from './ObjectiveTable';
+import TaskHeader from './TaskHeader';
+
 
 interface TaskCardProps {
   task: Task;

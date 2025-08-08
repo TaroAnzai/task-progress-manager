@@ -1,7 +1,7 @@
 // src/components/task/taskSettingModal/hooks/useTaskEditModal.ts
 
 import { useState, useEffect } from "react";
-import { useUser } from "@/context/useUser";
+
 import {
   usePutProgressTasksTaskId,
   useGetProgressObjectivesTasksTaskId,
@@ -18,6 +18,7 @@ import type {
   AccessUser,
   OrgAccess,
 } from "@/api/generated/taskProgressAPI.schemas";
+import { useUser } from "@/context/useUser";
 
 export function useTaskEditModal(task: Task, onClose: () => void) {
   const { user } = useUser();

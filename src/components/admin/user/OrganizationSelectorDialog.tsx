@@ -1,6 +1,11 @@
 // src/components/admin/user/OrganizationSelectorDialog.tsx
 
 import React from 'react';
+
+
+import { useGetProgressOrganizationsTree } from '@/api/generated/taskProgressAPI';
+import type { OrganizationTree } from '@/api/generated/taskProgressAPI.schemas';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -8,10 +13,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { useGetProgressOrganizationsTree } from '@/api/generated/taskProgressAPI';
-import type { OrganizationTree } from '@/api/generated/taskProgressAPI.schemas';
+
 import type { OrganizationSelectResult } from './types';
-import { Button } from '@/components/ui/button';
 
 interface Props {
   companyId: number;

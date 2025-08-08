@@ -1,7 +1,7 @@
 // src/components/layout/Header.tsx
 
-import { useUser } from "@/context/useUser";
 import { useDeleteProgressSessionsCurrent } from "@/api/generated/taskProgressAPI"; 
+import { useUser } from "@/context/useUser";
 
 export default function Header() {
   const { user, refetchUser } = useUser();

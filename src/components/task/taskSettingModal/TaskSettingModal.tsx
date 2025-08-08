@@ -1,12 +1,14 @@
 // src/components/task/taskSettingModal/TaskSettingModal.tsx
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { useTaskEditModal } from "./hooks/useTaskEditModal";
-import { TaskEditForm } from "./TaskEditForm";
-import { ObjectiveSection } from "./ObjectiveSection";
-import { ScopeSection } from "./ScopeSection";
-import { SaveButton } from "./SaveButton";
 import type { Task } from "@/api/generated/taskProgressAPI.schemas";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+
+import { useTaskEditModal } from "./hooks/useTaskEditModal";
+import { ObjectiveSection } from "./ObjectiveSection";
+import { SaveButton } from "./SaveButton";
+import { ScopeSection } from "./ScopeSection";
+import { TaskEditForm } from "./TaskEditForm";
+
 
 
 interface TaskSettingModalProps {

@@ -1,10 +1,12 @@
 import { useState } from "react"
+
+import type {AxiosError} from "axios"
 import { toast } from "sonner"
+
 import {
   useGetProgressOrganizations,
   usePostProgressOrganizations,
 } from "@/api/generated/taskProgressAPI"
-import type {AxiosError} from "axios"
 
 export function useBulkOrganizationRegister(company_id: number) {
   const createOrg = usePostProgressOrganizations()

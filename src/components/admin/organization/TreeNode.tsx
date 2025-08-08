@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import type { OrganizationTree } from "@/api/generated/taskProgressAPI.schemas";
+
+import { toast } from "sonner";
+
 import {
   useDeleteProgressOrganizationsOrgId,
   usePutProgressOrganizationsOrgId,
   usePostProgressOrganizations,
 } from "@/api/generated/taskProgressAPI";
-import { toast } from "sonner";
+import type { OrganizationTree } from "@/api/generated/taskProgressAPI.schemas";
 import { extractErrorMessage } from "@/utils/errorHandler";
 
 interface TreeNodeProps {

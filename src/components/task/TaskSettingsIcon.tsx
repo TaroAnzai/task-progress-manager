@@ -1,16 +1,20 @@
 // src/components/task/TaskSettingsIcon.tsx
 import { useState } from 'react';
-import type { Task, UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
+
 import { Cog } from 'lucide-react';
+
+
+import type { Task, UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
 import { Button } from '@/components/ui/button';
-import { TaskSettingModal } from './taskSettingModal/TaskSettingModal';
-import { TaskScopeModal}  from './taskScopeModal/TaskScopeModal.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
+import { TaskScopeModal}  from './taskScopeModal/TaskScopeModal.tsx';
+import { TaskSettingModal } from './taskSettingModal/TaskSettingModal';
 
 interface TaskSettingsIconProps {
   task: Task;

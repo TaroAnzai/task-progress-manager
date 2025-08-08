@@ -1,3 +1,8 @@
+import { useState } from "react"
+
+import { useGetProgressCompanies, usePostProgressCompanies, usePostProgressOrganizations, usePostProgressUsers } from "@/api/generated/taskProgressAPI";
+import {UserInputRole} from "@/api/generated/taskProgressAPI.schemas"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogClose,
@@ -7,13 +12,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
-import { useAlertDialog } from "@/context/AlertDialogContext"
+import { useAlertDialog } from "@/context/useAlertDialog"
 import { extractErrorMessage } from "@/utils/errorHandler" 
-import { useGetProgressCompanies, usePostProgressCompanies, usePostProgressOrganizations, usePostProgressUsers } from "@/api/generated/taskProgressAPI";
-import {UserInputRole} from "@/api/generated/taskProgressAPI.schemas"
 
 interface CompanyRegisterDialogProps {
   open: boolean
@@ -60,7 +61,7 @@ export function CompanyRegisterDialog({ open, onClose}: CompanyRegisterDialogPro
           name: registerSystemAdminName,
           email: registerSystemAdminEmail,
           password: registerSystemAdminEmail,
-          role: UserInputRole.system_admin,
+          role: UserInputRole.SYSTEM_ADMIN,
           organization_id: createRootOrg.id,
       }
       await createUserMutation.mutateAsync({data:createUserData})

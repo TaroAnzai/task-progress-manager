@@ -1,4 +1,5 @@
 import { useContext } from "react";
+
 import { AlertDialogContext, type DialogContextType } from "./AlertDialogContextBase";
 
 export function useAlertDialog(): DialogContextType {

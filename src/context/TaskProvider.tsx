@@ -1,7 +1,10 @@
 import { useEffect, useState, type ReactNode } from "react";
+
+
 import { useGetProgressTasks } from "@/api/generated/taskProgressAPI";
 import type { Task, TaskListResponse } from "@/api/generated/taskProgressAPI.schemas";
 import { useUser } from "@/context/useUser";
+
 import { TaskContext } from "./TaskContextBase";
 
 export default function TaskProvider({ children }: { children: ReactNode }) {

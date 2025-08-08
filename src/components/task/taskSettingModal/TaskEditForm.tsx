@@ -1,9 +1,10 @@
 // src/components/task/taskSettingModal/TaskEditForm.tsx
 
+import type { ChangeEvent } from "react";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { ChangeEvent } from "react";
 
 interface TaskEditFormProps {
   formState: {

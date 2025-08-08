@@ -1,9 +1,10 @@
 // src/components/admin/user/UserTableRow.tsx
 
 import React from 'react';
+
 import type { UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
-import { TableCell, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { TableCell, TableRow } from '@/components/ui/table';
 
 interface Props {
   user: UserWithScopes;

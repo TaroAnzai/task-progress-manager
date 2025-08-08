@@ -1,10 +1,15 @@
 // src/components/task/ObjectiveRow.tsx
 import { useState } from "react";
-import { EditableCell } from "./EditableCell";
-import { DateCell } from "./DateCell";
+
 import { ProgressStatus as StatusType, type Objective,type ObjectiveInput, type ObjectiveUpdate, type ObjectiveUpdateStatus as updateStatusType } from "@/api/generated/taskProgressAPI.schemas";
 import { ObjectiveStatus } from "@/api/generated/taskProgressAPI.schemas";
+
 import { StatusBadgeCell } from "../StatusBadgeCell";
+
+import { DateCell } from "./DateCell";
+import { EditableCell } from "./EditableCell";
+
+
 
 type ObjectiveRowProps = {
   key: number | string;

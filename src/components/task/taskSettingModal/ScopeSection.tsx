@@ -1,12 +1,13 @@
 // src/components/task/taskSettingModal/ScopeSection.tsx
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Plus, X } from "lucide-react";
+
 import type {
   AccessUser,
   OrgAccess,
 } from "@/api/generated/taskProgressAPI.schemas";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface ScopeSectionProps {
   isEditable: boolean;

@@ -1,18 +1,23 @@
 // src/admin/components/user/AdminUserComponent.tsx
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useUser } from '@/context/useUser.ts';
-import type { UserFormState} from './types';
+
+
+
 import { useGetProgressUsers } from '@/api/generated/taskProgressAPI';
 import type { UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
 import { AccessScopeRole } from '@/api/generated/taskProgressAPI.schemas';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import UserForm from './UserForm';
-import UserTable from './UserTable';
+import { useAlertDialog} from "@/context/useAlertDialog"
+import { useUser } from '@/context/useUser.ts';
+
 import  BulkTextInputForm  from "../import/BulkTextInputForm"
 import { useBulkUserRegistration } from "../import/useBulkUserRegister.ts"
-import { useAlertDialog} from "@/context/useAlertDialog"
+
+import type { UserFormState} from './types';
+import UserForm from './UserForm';
+import UserTable from './UserTable';
 
 interface AdminUserComponentProps {
   companyId: number;

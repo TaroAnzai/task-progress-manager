@@ -1,5 +1,6 @@
 import {useEffect, useState } from "react";
 import type { ReactNode } from "react";
+
 import {
   AlertDialog,
   AlertDialogContent,
@@ -10,7 +11,9 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+
 import { AlertDialogContext, type DialogOptions } from "./AlertDialogContextBase";
+
 
 export default function AlertDialogProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);

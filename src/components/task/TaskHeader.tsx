@@ -1,11 +1,15 @@
 // src/components/task/TaskHeader.tsx
 
-import type { Task } from '@/api/generated/taskProgressAPI.schemas';
-import { useUser } from '@/context/UserContext';
-import TaskStatusBadge from './TaskStatusBadge';
-import TaskSettingsIcon from './TaskSettingsIcon';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
+
+import type { Task } from '@/api/generated/taskProgressAPI.schemas';
+import { useUser } from '@/context/useUser';
+
+import TaskSettingsIcon from './TaskSettingsIcon';
+import TaskStatusBadge from './TaskStatusBadge';
+
+
 
 interface TaskHeaderProps {
   task: Task;

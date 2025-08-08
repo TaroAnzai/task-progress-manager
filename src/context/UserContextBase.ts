@@ -1,4 +1,5 @@
 import { createContext } from "react";
+
 import type { UserWithScopes } from "@/api/generated/taskProgressAPI.schemas";
 
 export interface UserContextType {

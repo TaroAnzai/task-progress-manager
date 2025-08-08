@@ -1,6 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
+
+
 import { useGetProgressSessionsCurrent } from "@/api/generated/taskProgressAPI";
 import { AccessScopeRole, type UserWithScopes } from "@/api/generated/taskProgressAPI.schemas";
+
 import { UserContext } from "./UserContextBase";
 
 export default function UserProvider({ children }: { children: ReactNode }) {

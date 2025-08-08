@@ -1,7 +1,8 @@
 // src/components/task/TaskControlPanel.tsx
 
-import { Button } from "@/components/ui/button";
 import { PlusIcon, PencilIcon, EyeIcon } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 
 interface TaskControlPanelProps {
   onAddTask: () => void;

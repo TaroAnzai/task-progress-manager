@@ -1,4 +1,5 @@
 import { createContext } from "react";
+
 import type { Task } from "@/api/generated/taskProgressAPI.schemas";
 
 export interface TaskContextType {

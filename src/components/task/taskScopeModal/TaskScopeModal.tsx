@@ -1,12 +1,8 @@
 // src/components/task/taskScopeModal/TaskScopeModal.tsx
 import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription
-} from "@/components/ui/dialog";
+
+import { Plus, X } from "lucide-react";
+
 import {
   useGetProgressTasksTaskIdAuthorizedUsers,
   useGetProgressTasksTaskIdAccessUsers,
@@ -17,10 +13,16 @@ import type {
   AccessUser,
   OrgAccess,
 } from "@/api/generated/taskProgressAPI.schemas";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription
+} from "@/components/ui/dialog";
 import { useUser } from "@/context/useUser";
-import { Plus, X } from "lucide-react";
 export interface TaskScopeModalProps {
   task: Task;
   open: boolean;
