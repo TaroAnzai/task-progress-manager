@@ -1,12 +1,8 @@
 // src/components/task/objective/DateCell.tsx
 import { useState, useRef, useEffect } from "react";
 
-import { format, parse, isValid, isDate } from "date-fns";
-import { is } from "date-fns/locale";
-
-import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 type DateCellProps = {
   value?: string | null;
   onSave: (newDate: string | undefined) => void;

@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogDescription
 } from "@/components/ui/dialog";
+import {SCOPE_LABELS} from "@/context/roleLabels";
 import { useUser } from "@/context/useUser";
 
 import UserScopeSelectModal from "./UserScopeSelectModal";
@@ -44,7 +45,7 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
   const [scopeUsers, setScopeUsers] = useState<AccessUser[]>([]);
   const [scopeOrgs, setScopeOrgs] = useState<OrgAccess[]>([]);
   const [openUserModal, setOpenUserModal] = useState(false);
-  const [selectedUsers, setSelectedUsers] = useState<AccessUser[]>([]);
+
 
   useEffect(() => {
     const editable = (authorized_users ?? []).some((u) => u.user_id === currentUser?.id);
@@ -58,7 +59,10 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
     if (getOrgs) setScopeOrgs(getOrgs);
   }, [getOrgs]);
 
-  const onRemoveUser = (user_id: number|undefined) => {console.log(user_id)};
+  const onRemoveUser = (user_id: number|undefined) => {
+    const updated = scopeUsers.filter((u) => u.user_id !== user_id);
+    setScopeUsers(updated);
+  };
   const onRemoveOrg = (organization_id: number|undefined) => {console.log(organization_id)};
   const handleUpdateAccess = async() =>{
     const userAccess = scopeUsers.map(u => ({
@@ -74,6 +78,19 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
       data: { user_access:userAccess, organization_access:orgAccess } as AccessLevelInput,
     });
   }
+  const handleUsersSelected=(users:{ id: number; name: string}[])=>{
+    const selected: AccessUser[] = users.map((u) => (
+      {
+        user_id: u.id,
+        name: u.name,
+        access_level: 'VIEW',
+      }
+    ));
+    setScopeUsers([...scopeUsers, ...selected]);
+    setOpenUserModal(false);
+  }
+
+
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
@@ -138,7 +155,11 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
     <UserScopeSelectModal
       open={openUserModal}
       onClose={() => {setOpenUserModal(false)}}
-      onConfirm={() => {}}
+      onConfirm={(users) => {handleUsersSelected(users)}}
+      excludedUserIds={[
+        ...scopeUsers.map(u => u.user_id),
+        ...(currentUser ? [currentUser.id] : []),
+      ]}
     />
   </>
 

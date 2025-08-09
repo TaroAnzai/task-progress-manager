@@ -6,11 +6,11 @@ import { useGetProgressUsers } from "@/api/generated/taskProgressAPI";
 import type { User } from "@/api/generated/taskProgressAPI.schemas";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-type PickedUser = { id: number; name: string; email: string };
+type PickedUser = { id: number; name: string};
 
 type Props = {
   open: boolean;
@@ -50,9 +50,9 @@ export default function UserScopeSelectModal({
     if (!q.trim()) return filteredByOrg;
     const query = q.trim().toLowerCase();
     return filteredByOrg.filter((u) => {
-      const name = (u.name ?? "").toLowerCase();
-      const email = (u.email ?? "").toLowerCase();
-      return name.includes(query) || email.includes(query);
+      const name = (u.name ?? "").toLowerCase(); 
+      const organization = (u.organization_name ?? "").toLowerCase();
+      return name.includes(query) || organization.includes(query);
     });
   }, [data, q, excludedUserIds]);
 
@@ -80,7 +80,6 @@ export default function UserScopeSelectModal({
       .map((u) => ({
         id: u.id as number,
         name: u.name,
-        email: u.email,
       }));
     onConfirm(picked);
     onClose();
@@ -91,11 +90,12 @@ export default function UserScopeSelectModal({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>ユーザーを選択</DialogTitle>
+          <DialogDescription></DialogDescription>          
         </DialogHeader>
 
         <div className="flex items-center gap-2">
           <Input
-            placeholder="検索（名前 / メール）"
+            placeholder="検索（名前）/ 組織名"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
@@ -137,10 +137,10 @@ export default function UserScopeSelectModal({
                   <label
                     htmlFor={`u-${u.id}`}
                     className="flex-1 cursor-pointer"
-                    title={u.email}
+                    title={u.name}
                   >
                     <div className="font-medium">{u.name}</div>
-                    <div className="text-xs text-muted-foreground">{u.email}</div>
+                    <div className="text-xs text-muted-foreground">{u.organization_name}</div>
                   </label>
                 </li>
               ))}
@@ -153,6 +153,7 @@ export default function UserScopeSelectModal({
             キャンセル
           </Button>
           <Button onClick={handleConfirm} disabled={Object.values(checked).every((v) => !v)}>
+
             追加する
           </Button>
         </DialogFooter>
