@@ -1,20 +1,20 @@
 // src/components/task/objective/DateCell.tsx
 import { useState, useRef, useEffect } from "react";
 
-import { format, parse, isValid } from "date-fns";
+import { format, parse, isValid, isDate } from "date-fns";
+import { is } from "date-fns/locale";
 
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-
 type DateCellProps = {
   value?: string | null;
   onSave: (newDate: string | undefined) => void;
 };
 
 export function DateCell({ value, onSave }: DateCellProps) {
-  const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value ?? "");
-  const inputRef = useRef<HTMLInputElement>(null); 
+  const isFromCalender = useRef(true); 
 
     useEffect(() => {
     setInputValue(value ?? "");
@@ -22,53 +22,38 @@ export function DateCell({ value, onSave }: DateCellProps) {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setInputValue(val);
+    if(isFromCalender.current){
+      onSave(val);
+    }
   };
  // エンターキーが押されたときに値を検証して保存するハンドラ
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    isFromCalender.current = false;
     if (e.key === "Enter") {
-      const parsed = parse(inputValue, "yyyy-MM-dd", new Date());
-      if (isValid(parsed)) {
-        onSave(format(parsed, "yyyy-MM-dd"));
-        setInputValue(format(parsed, "yyyy-MM-dd"));
-         inputRef.current?.blur();
+      setInputValue(inputValue);
+      onSave(inputValue);
+      (e.target as HTMLInputElement).blur();
+      isFromCalender.current = true;
       } 
-    }
-  };
-  const handleCalendarSelect = (date: Date | undefined) => {
-    if (date) {
-      const formatted = format(date, "yyyy-MM-dd");
-      setInputValue(formatted);
-      onSave(formatted);
-      setOpen(false);
-      inputRef.current?.blur(); 
-    }
   };
   const handleBlur = () => {
-    setInputValue(value ?? "");
+      setInputValue(value ?? "");
+      isFromCalender.current = true;
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <input
-          ref={inputRef}
-          type="text"
-          className="border px-1 rounded w-32"
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          onClick={() => setOpen(true)}
-          placeholder="YYYY-MM-DD"
-        />
-      </PopoverTrigger>
-      <PopoverContent className="p-0">
-        <Calendar
-          mode="single"
-          selected={inputValue && isValid(new Date(inputValue)) ? new Date(inputValue) : undefined}
-          onSelect={handleCalendarSelect}
-        />
-      </PopoverContent>
-    </Popover>
+    <Input
+      id="due_date"
+      name="due_date"
+      type="date"
+      value={inputValue || ""}
+      onChange={handleInputChange}
+      onKeyDown={handleKeyDown}
+      onBlur={handleBlur}
+        className="
+          focus:ring-2 focus:ring-ring focus:ring-offset-2
+          focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+        "
+    />
   );
 }

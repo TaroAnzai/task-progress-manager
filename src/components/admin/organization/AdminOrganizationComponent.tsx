@@ -12,10 +12,11 @@ import { OrganizationTreeView } from "./OrganizationTreeView";
  * 外部からは <TreeView companyId={...} /> で使用する
  */
 interface TreeViewProps {
+  companyName: string;
   companyId: number;
 }
 
-export const AdminOrganizationComponent: React.FC<TreeViewProps> = ({ companyId }) => {
+export const AdminOrganizationComponent: React.FC<TreeViewProps> = ({ companyName, companyId }) => {
   const { registerFromLines:orgRegister, loading, errors } = useBulkOrganizationRegister(companyId)
   const { openAlertDialog } = useAlertDialog();
 
@@ -35,6 +36,7 @@ export const AdminOrganizationComponent: React.FC<TreeViewProps> = ({ companyId 
     <Card className="w-1/2">
       <CardContent>
         <OrganizationTreeView
+          companyName={companyName}
           companyId={companyId}
         />
       </CardContent>

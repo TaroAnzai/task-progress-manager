@@ -57,7 +57,7 @@ export function ObjectiveRow({ taskId, objective, onSaveNew, onUpdate }: Objecti
         {!isNew && (
           <>
           <td className="px-3 py-2">
-            <DateCell value={dueDate} onSave={handleDateSave} />
+           <DateCell value={dueDate} onSave={handleDateSave} />
           </td>
           <td className="px-3 py-2">
             <StatusBadgeCell

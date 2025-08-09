@@ -70,7 +70,9 @@ const AdminPageContent = () => {
             <div className="space-y-6">
               <div className="p-4 border rounded bg-white shadow">
                 <div className="mt-4 space-y-2">
-                  <AdminOrganizationComponent companyId={selectedCompany.id} />
+                  <AdminOrganizationComponent
+                    companyName={selectedCompany.name}
+                    companyId={selectedCompany.id} />
                 </div>
               </div>
             </div>

@@ -16,10 +16,12 @@ import { extractErrorMessage } from "@/utils/errorHandler";
 
 import { TreeNode } from "./TreeNode";
 interface OrganizationTreeProps {
+  companyName: string;
   companyId: number;
 }
 
 export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
+  companyName,
   companyId,
 }) => {
   const [name, setName] = useState("");
@@ -93,9 +95,9 @@ export const OrganizationTreeView: React.FC<OrganizationTreeProps> = ({
   if (!user)  return null;
   return (
     <div className="p-4">
-      <p>組織ツリー（{companyId}）</p>
+      <p>組織ツリー（{companyName}）</p>
       {/* 登録フォーム（システム管理者のみ） */}
-      {hasAdminScope() && (
+      {user.is_superuser && (
         <form
           onSubmit={handleSubmit}
           className="flex gap-2 mb-4 items-center flex-wrap"
