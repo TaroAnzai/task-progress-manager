@@ -1,7 +1,8 @@
 // src/components/task/taskScopeModal/TaskScopeModal.tsx
 import { useState, useEffect } from "react";
 
-import { Plus, X } from "lucide-react";
+import { Plus} from "lucide-react";
+import { toast } from "sonner";
 
 import {
   useGetProgressTasksTaskIdAuthorizedUsers,
@@ -12,10 +13,9 @@ import {
 import type {
   Task,
   AccessUser,
+  AccessUserAccessLevel,
   OrgAccess,
-  AccessLevelInput,
 } from "@/api/generated/taskProgressAPI.schemas";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,10 +24,15 @@ import {
   DialogTitle,
   DialogDescription
 } from "@/components/ui/dialog";
-import {SCOPE_LABELS} from "@/context/roleLabels";
+import {SCOPE_LEVEL_OPTIONS} from "@/context/roleLabels";
 import { useUser } from "@/context/useUser";
+import {extractErrorMessage} from "@/utils/errorHandler";
 
+import OrganizationScopeSelectModal from "./OrganizationScopeSelectModal";
+import {ScopeLevelBadge} from "./ScopeLevelBadge";
 import UserScopeSelectModal from "./UserScopeSelectModal";
+
+
 export interface TaskScopeModalProps {
   task: Task;
   open: boolean;
@@ -39,12 +44,13 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
   const { data:authorized_users} = useGetProgressTasksTaskIdAuthorizedUsers(task.id);
   const { data: getUsers } = useGetProgressTasksTaskIdAccessUsers(task.id);
   const { data: getOrgs } = useGetProgressTasksTaskIdAccessOrganizations(task.id);
-  const {mutateAsync:updateAccess} = usePutProgressTasksTaskIdAccessLevels();
+  const {mutateAsync:updateAccess, isPending: isSaving} = usePutProgressTasksTaskIdAccessLevels();
 
   const [isEditable, setIsEditable] = useState(false);
   const [scopeUsers, setScopeUsers] = useState<AccessUser[]>([]);
   const [scopeOrgs, setScopeOrgs] = useState<OrgAccess[]>([]);
   const [openUserModal, setOpenUserModal] = useState(false);
+  const [openOrgModal, setOpenOrgModal] = useState(false);
 
 
   useEffect(() => {
@@ -63,20 +69,30 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
     const updated = scopeUsers.filter((u) => u.user_id !== user_id);
     setScopeUsers(updated);
   };
-  const onRemoveOrg = (organization_id: number|undefined) => {console.log(organization_id)};
+  const onRemoveOrg = (organization_id: number|undefined) => {
+      const updated = scopeOrgs.filter((o) => o.organization_id !== organization_id);
+      setScopeOrgs(updated);
+    };
   const handleUpdateAccess = async() =>{
-    const userAccess = scopeUsers.map(u => ({
+    const accessUserInput = scopeUsers.map((u) => ({
       user_id: u.user_id,
-      access_level: u.access_level || "view",
-    }));
-    const orgAccess = scopeOrgs.map(o => ({
+      access_level: u.access_level,
+    }))
+    const orgAccessInput = scopeOrgs.map((o) => ({
       organization_id: o.organization_id,
-      access_level: o.access_level || "view",
-    }));
-    await updateAccess({
-      taskId: task.id,
-      data: { user_access:userAccess, organization_access:orgAccess } as AccessLevelInput,
-    });
+      access_level: o.access_level,
+    }))
+    try{
+      await updateAccess({
+        taskId: task.id,
+        data: { user_access:accessUserInput, organization_access:orgAccessInput },
+      });
+      toast.success("更新しました");
+    }catch(e){
+      const err = extractErrorMessage(e);
+      toast.error("更新に失敗しました", {description: err});
+      console.error(err);
+    }
   }
   const handleUsersSelected=(users:{ id: number; name: string}[])=>{
     const selected: AccessUser[] = users.map((u) => (
@@ -89,6 +105,40 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
     setScopeUsers([...scopeUsers, ...selected]);
     setOpenUserModal(false);
   }
+
+  const handleOrgsSelected=(org:{ org_id: number; org_name: string})=>{
+    const selected: OrgAccess = {
+      organization_id: org.org_id,
+      name: org.org_name,
+      access_level: 'VIEW',
+    }
+      // 重複チェック
+    const exists = scopeOrgs.some(
+      (o) => o.organization_id === selected.organization_id
+    );
+    if(!exists){
+      setScopeOrgs([...scopeOrgs, selected]);
+    }
+    setOpenOrgModal(false);
+  }
+  const updateUserLevel = (user_id: number, level: AccessUserAccessLevel) => {
+    const updated = scopeUsers.map((u) => {
+      if (u.user_id === user_id) {
+        return { ...u, access_level: level };
+      }
+      return u;
+    });
+    setScopeUsers(updated);
+  };
+  const updateOrgLevel = (org_id: number, level: AccessUserAccessLevel) => {
+    const updated = scopeOrgs.map((o) => {
+      if (o.organization_id === org_id) {
+        return { ...o, access_level: level };
+      }
+      return o;
+    });
+    setScopeOrgs(updated);
+  };
 
 
   return (
@@ -104,18 +154,16 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
             <h3 className="text-base font-semibold mb-1">ユーザースコープ</h3>
             <div className="flex flex-wrap gap-2">
               {scopeUsers.map((user) => (
-                <Badge
+                <ScopeLevelBadge
                   key={user.user_id}
-                  className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1"
-                >
-                  {user.name}
-                  {isEditable && (
-                    <X
-                      className="w-3 h-3 cursor-pointer"
-                      onClick={() => onRemoveUser(user.user_id)}
-                    />
-                  )}
-                </Badge>
+                  text={user.name}
+                  value={user.access_level}
+                  options={SCOPE_LEVEL_OPTIONS}
+                  editable={isEditable}
+                  onChange={(val) => updateUserLevel(user.user_id!, val)}
+                  onRemove={() => onRemoveUser(user.user_id)}
+                  color="blue"
+                />
               ))}
               {isEditable && (
                 <Button size="sm" variant="outline" onClick={() => setOpenUserModal(true)}>
@@ -129,26 +177,35 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
             <h3 className="text-base font-semibold mb-1">組織スコープ</h3>
             <div className="flex flex-wrap gap-2">
               {scopeOrgs.map((org) => (
-                <Badge
+                <ScopeLevelBadge
                   key={org.organization_id}
-                  className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1"
-                >
-                  {org.name}
-                  {isEditable && (
-                    <X
-                      className="w-3 h-3 cursor-pointer"
-                      onClick={() => onRemoveOrg(org.organization_id)}
-                    />
-                  )}
-                </Badge>
+                  text={org.name}
+                  value={org.access_level}
+                  options={SCOPE_LEVEL_OPTIONS}
+                  editable={isEditable}
+                  onChange={(val) => updateOrgLevel(org.organization_id!, val)}
+                  onRemove={() => onRemoveOrg(org.organization_id)}
+                  color="blue"
+                />                
               ))}
               {isEditable && (
-                <Button size="sm" variant="outline" onClick={handleUpdateAccess}>
+                <Button size="sm" variant="outline" onClick={() => setOpenOrgModal(true)}>
                   <Plus className="w-4 h-4 mr-1" /> 追加
                 </Button>
               )}
             </div>
           </div>
+        </div>
+        <div className="mt-6 flex justify-end">
+          <Button variant="outline" onClick={onClose}>
+                閉じる
+          </Button>
+
+          {isEditable ? (
+            <Button onClick={handleUpdateAccess} disabled={isSaving}>
+              {isSaving ? "保存中..." : "保存"}
+            </Button>
+          ) : null}
         </div>
       </DialogContent>
     </Dialog>
@@ -160,6 +217,12 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
         ...scopeUsers.map(u => u.user_id),
         ...(currentUser ? [currentUser.id] : []),
       ]}
+    />
+    <OrganizationScopeSelectModal
+      open={openOrgModal}
+      onClose={() => {setOpenOrgModal(false)}}
+      onSelect={(org) => {handleOrgsSelected(org)}}
+      selectedOrgIds={scopeOrgs.map(o => o.organization_id)}
     />
   </>
 

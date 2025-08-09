@@ -14,3 +14,11 @@ export const SCOPE_LABELS: Record<AccessUserAccessLevel, string> = {
   [AccessUserAccessLevel.FULL]: 'フル',
   [AccessUserAccessLevel.OWNER]: '作成者',
 };
+
+// セレクター用配列（DropdownMenuなどで利用）
+export const SCOPE_LEVEL_OPTIONS = Object.values(AccessUserAccessLevel).map(
+  (value) => ({
+    value,            // AccessUserAccessLevel型
+    label: SCOPE_LABELS[value],
+  })
+);
