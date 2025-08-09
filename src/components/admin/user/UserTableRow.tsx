@@ -5,18 +5,13 @@ import React from 'react';
 import type { UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
 import { Button } from '@/components/ui/button';
 import { TableCell, TableRow } from '@/components/ui/table';
+import { ROLE_LABELS } from '@/context/roleLabels';
 
 interface Props {
   user: UserWithScopes;
   onEdit: () => void;
   onDelete: () => void;
 }
-
-const ROLE_LABELS: Record<string, string> = {
-  system_admin: 'システム管理者',
-  admin: '組織管理者',
-  member: 'メンバー',
-};
 
 const UserTableRow: React.FC<Props> = ({ user, onEdit, onDelete }) => {
   const visibleScopes = user.access_scopes?.filter(s => s.organization_id === user.organization_id) || [];

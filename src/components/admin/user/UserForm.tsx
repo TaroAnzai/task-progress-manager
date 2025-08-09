@@ -6,9 +6,11 @@ import { toast } from "sonner";
 
 
 import { usePostProgressUsers, usePutProgressUsersUserId, usePostProgressAccessScopesUsersUserId } from '@/api/generated/taskProgressAPI';
+import { UserInputRole } from '@/api/generated/taskProgressAPI.schemas';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import {useAlertDialog} from "@/context/useAlertDialog";
 import { extractErrorMessage } from "@/utils/errorHandler";
 
 import OrganizationSelectorDialog from './OrganizationSelectorDialog';
@@ -27,10 +29,10 @@ const emptyForm: UserFormState = {
   email: '',
   //organization_code: '',
   organization_id: 0,
-  role: 'member',
+  role: UserInputRole.MEMBER,
 };
 
-const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted, onCancel }) => {
+const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted}) => {
   const [form, setForm] = useState<UserFormState>(emptyForm);
   const [orgDialogOpen, setOrgDialogOpen] = useState(false);
   const [orgDisplayName, setOrgDisplayName] = useState<string>('組織を選択');
@@ -38,6 +40,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted
   const createUserMutation = usePostProgressUsers();
   const updateUserMutation = usePutProgressUsersUserId();
   const addScopeMutation = usePostProgressAccessScopesUsersUserId();
+  const {openAlertDialog} = useAlertDialog();
 
   useEffect(() => {
     if (initialData) {
@@ -63,7 +66,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted
     e.preventDefault();
 
     if (!form.name || !form.email || !form.organization_id) {
-      alert('名前、メール、組織コードは必須です');
+      openAlertDialog({title: 'エラー', description: '名前、メール、組織コードは必須です', showCancel: false});
       return;
     }
 
@@ -106,10 +109,17 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted
       }
 
       onSubmitted();
+      toast.success('保存しました',{description: `ユーザー${form.name}を保存しました`});
+      clearForm();
     } catch (err) {
       toast.error(`${extractErrorMessage(err)}`);
       console.error(err);
     }
+  };
+
+  const clearForm = () => {
+    setForm(emptyForm);
+    setOrgDisplayName('組織を選択');
   };
 
   return (
@@ -135,15 +145,15 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted
             <SelectValue placeholder="権限" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="system_admin">システム管理者</SelectItem>
-            <SelectItem value="org_admin">組織管理者</SelectItem>
-            <SelectItem value="member">メンバー</SelectItem>
+            <SelectItem value={UserInputRole.SYSTEM_ADMIN}>システム管理者</SelectItem>
+            <SelectItem value={UserInputRole.ORG_ADMIN}>組織管理者</SelectItem>
+            <SelectItem value={UserInputRole.MEMBER}>メンバー</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="flex gap-2 justify-end">
-        <Button type="button" variant="secondary" onClick={onCancel}>キャンセル</Button>
+        <Button type="button" variant="secondary" onClick={clearForm}>キャンセル</Button>
         <Button type="submit">{form.id ? '更新' : '登録'}</Button>
       </div>
 

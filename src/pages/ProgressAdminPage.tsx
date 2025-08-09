@@ -89,16 +89,21 @@ const AdminPageContent = () => {
       ) : (
         <p className="text-red-600 font-bold">⚠ このページは管理者専用です。</p>
       )}
-      <CompanySelectorDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        onSelect={(company) => setSelectedCompany(company)}
-      />
-      <CompanyRegisterDialog
-        open={registerOpen}
-        onClose={() => setRegisterOpen(false)}
-        onSuccess={() => setSelectedCompany(undefined)} // useGetCompanies などで再取得
-      />
+      {user.is_superuser && (
+        <>
+          <CompanySelectorDialog
+            open={dialogOpen}
+            onClose={() => setDialogOpen(false)}
+            onSelect={(company) => setSelectedCompany(company)}
+          />
+          <CompanyRegisterDialog
+            open={registerOpen}
+            onClose={() => setRegisterOpen(false)}
+            onSuccess={() => setSelectedCompany(undefined)} // useGetCompanies などで再取得
+          />                
+        </>
+      )}
+
     </div>
   );
 }
