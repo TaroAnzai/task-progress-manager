@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 
 import { useDeleteProgressUsersUserId } from '@/api/generated/taskProgressAPI';
-import type { UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
+import type { UserSchemaForAdmin } from '@/api/generated/taskProgressAPI.schemas';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { extractErrorMessage } from "@/utils/errorHandler";
@@ -12,10 +12,10 @@ import { extractErrorMessage } from "@/utils/errorHandler";
 import UserTableRow from './UserTableRow';
 
 interface Props {
-  users: UserWithScopes[];
+  users: UserSchemaForAdmin[];
   isLoading: boolean;
   error: unknown;
-  onEditUser: (user: UserWithScopes) => void;
+  onEditUser: (user: UserSchemaForAdmin) => void;
   onRefresh: () => void;
 }
 

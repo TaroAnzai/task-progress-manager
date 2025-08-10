@@ -2,10 +2,8 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 
-
-
-import { useGetProgressUsers } from '@/api/generated/taskProgressAPI';
-import type { UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
+import { useGetProgressUsersAdmin } from '@/api/generated/taskProgressAPI';
+import type { UserSchemaForAdmin } from '@/api/generated/taskProgressAPI.schemas';
 import { AccessScopeRole } from '@/api/generated/taskProgressAPI.schemas';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -45,14 +43,14 @@ const AdminUserComponent: React.FC <AdminUserComponentProps> = ({ companyId }) =
     isLoading,
     error,
     refetch,
-  } = useGetProgressUsers({company_id: companyId });
+  } = useGetProgressUsersAdmin({company_id: companyId });
 
-  const handleEditUser = useCallback((user: UserWithScopes) => {
+  const handleEditUser = useCallback((user: UserSchemaForAdmin) => {
     const matchedScope = user.access_scopes?.find(s => s.organization_id === user.organization_id);
     setEditingUser({
       id: user.id,
       name: user.name,
-      email: user.email,
+      email: user.email??"",
       //organization_code: user.organization_code,
       organization_id: user.organization_id,
       role: matchedScope?.role ?? AccessScopeRole.MEMBER,

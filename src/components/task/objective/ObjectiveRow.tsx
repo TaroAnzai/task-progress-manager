@@ -5,6 +5,7 @@ import { ProgressStatus as StatusType, type Objective,type ObjectiveInput, type 
 import { ObjectiveStatus } from "@/api/generated/taskProgressAPI.schemas";
 
 import { StatusBadgeCell } from "../StatusBadgeCell";
+import UserSelectModal from "../UserSelectModal";
 
 import { DateCell } from "./DateCell";
 import { EditableCell } from "./EditableCell";
@@ -25,6 +26,7 @@ export function ObjectiveRow({ taskId, objective, onSaveNew, onUpdate }: Objecti
   const [title, setTitle] = useState(objective?.title?? "");
   const [dueDate, setDueDate] = useState(objective?.due_date ?? undefined);
   const [status, setStatus] = useState<StatusType>(objective?.status?? ObjectiveStatus.UNDEFINED);
+  const [isUserSelectModalOpen, setIsUserSelectModalOpen] = useState(false);
 
   const handleTitleSave = (newTitle: string) => {
     setTitle(newTitle);
@@ -50,29 +52,41 @@ export function ObjectiveRow({ taskId, objective, onSaveNew, onUpdate }: Objecti
   }
 
   return (
-    <tr className="border-b">
-      <td className="px-3 py-2">
-        <EditableCell value={title} onSave={handleTitleSave} />
-      </td>
-        {!isNew && (
-          <>
-          <td className="px-3 py-2">
-           <DateCell value={dueDate} onSave={handleDateSave} />
-          </td>
-          <td className="px-3 py-2">
-            <StatusBadgeCell
-              value={status}
-              onChange={handleStatusSave}
-            /></td>
-          <td className="px-3 py-2">{objective?.assigned_user_name ?? "-"}</td>
-          <td className="px-3 py-2">{objective?.latest_progress ?? "-"}</td>
-          <td className="px-3 py-2">{objective?.latest_report_date ?? "-"}</td>
-          <td className="px-3 py-2">
-            <button className="text-blue-600 hover:underline text-xs">履歴</button>
-          </td>
-        </>
-        )}
-    </tr>
+    <>
+      <tr className="border-b">
+        <td className="px-3 py-2">
+          <EditableCell value={title} onSave={handleTitleSave} />
+        </td>
+          {!isNew && (
+            <>
+            <td className="px-3 py-2">
+            <DateCell value={dueDate} onSave={handleDateSave} />
+            </td>
+            <td className="px-3 py-2">
+              <StatusBadgeCell
+                value={status}
+                onChange={handleStatusSave}
+              /></td>
+            <td className="px-3 py-2 cursor-pointer hover:bg-muted/30"
+                onClick={() => setIsUserSelectModalOpen(true)}
+            >
+                {objective?.assigned_user_name ?? "-"}</td>
+            <td className="px-3 py-2">{objective?.latest_progress ?? "-"}</td>
+            <td className="px-3 py-2">{objective?.latest_report_date ?? "-"}</td>
+            <td className="px-3 py-2">
+              <button className="text-blue-600 hover:underline text-xs">履歴</button>
+            </td>
+          </>
+          )}
+      </tr>
+      <UserSelectModal
+        open = {isUserSelectModalOpen}
+        onClose = {() => setIsUserSelectModalOpen(false)}
+        onConfirm ={()=>{}}
+        
+      />
+    </>
+
   );
 }
 

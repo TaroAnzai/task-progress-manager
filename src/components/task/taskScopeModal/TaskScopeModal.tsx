@@ -28,9 +28,10 @@ import {SCOPE_LEVEL_OPTIONS} from "@/context/roleLabels";
 import { useUser } from "@/context/useUser";
 import {extractErrorMessage} from "@/utils/errorHandler";
 
+import UserSelectModal from "../UserSelectModal";
+
 import OrganizationScopeSelectModal from "./OrganizationScopeSelectModal";
 import {ScopeLevelBadge} from "./ScopeLevelBadge";
-import UserScopeSelectModal from "./UserScopeSelectModal";
 
 
 export interface TaskScopeModalProps {
@@ -209,7 +210,7 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
         </div>
       </DialogContent>
     </Dialog>
-    <UserScopeSelectModal
+    <UserSelectModal
       open={openUserModal}
       onClose={() => {setOpenUserModal(false)}}
       onConfirm={(users) => {handleUsersSelected(users)}}

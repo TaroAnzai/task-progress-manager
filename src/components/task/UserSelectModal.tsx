@@ -22,7 +22,7 @@ type Props = {
   organizationId?: number | null;
 };
 
-export default function UserScopeSelectModal({
+export default function UserSelectModal({
   open,
   onClose,
   onConfirm,
@@ -33,7 +33,7 @@ export default function UserScopeSelectModal({
 
   // Orval 生成の hook 仕様に合わせて params / options を渡す
   // 例: useGetProgressUsers(params?, options?)
-  const { data, isLoading, isError } = useGetProgressUsers(undefined, {
+  const { data, isLoading, isError } = useGetProgressUsers({
     query: { enabled: open }, // モーダルが開いた時だけ fetch
   });
 
