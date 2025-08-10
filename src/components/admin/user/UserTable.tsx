@@ -2,11 +2,11 @@
 
 import { toast } from "sonner";
 
-import { useDeleteProgressUsersUserId } from '@/api/generated/taskProgressAPI';
-import type { UserSchemaForAdmin } from '@/api/generated/taskProgressAPI.schemas';
-
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+import { useDeleteProgressUsersUserId } from '@/api/generated/taskProgressAPI';
+import type { UserSchemaForAdmin } from '@/api/generated/taskProgressAPI.schemas';
 
 import { extractErrorMessage } from "@/utils/errorHandler";
 

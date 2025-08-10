@@ -2,10 +2,10 @@
 
 import React from 'react';
 
-import type { UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
-
 import { Button } from '@/components/ui/button';
 import { TableCell, TableRow } from '@/components/ui/table';
+
+import type { UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
 
 import { ROLE_LABELS } from '@/context/roleLabels';
 

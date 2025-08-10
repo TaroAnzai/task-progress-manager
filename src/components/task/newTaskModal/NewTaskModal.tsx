@@ -2,10 +2,6 @@ import { useState } from "react";
 
 import { toast } from "sonner"
 
-import {
-  usePostProgressTasks,
-} from "@/api/generated/taskProgressAPI";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,6 +11,10 @@ import {
   DialogTitle} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+
+import {
+  usePostProgressTasks,
+} from "@/api/generated/taskProgressAPI";
 
 import { useTasks } from "@/context/useTasks";
 

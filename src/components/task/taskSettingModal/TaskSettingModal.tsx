@@ -1,7 +1,7 @@
 // src/components/task/taskSettingModal/TaskSettingModal.tsx
-import type { Task } from "@/api/generated/taskProgressAPI.schemas";
-
 import { Dialog, DialogContent, DialogDescription, DialogFooter,DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+import type { Task } from "@/api/generated/taskProgressAPI.schemas";
 
 import { useTaskEditModal } from "./hooks/useTaskEditModal";
 import { ObjectiveSection } from "./ObjectiveSection";

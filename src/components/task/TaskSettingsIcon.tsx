@@ -3,8 +3,6 @@ import { useState } from 'react';
 
 import { Cog } from 'lucide-react';
 
-import type { Task, UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
-
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -12,6 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
+import type { Task, UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
 
 import { TaskScopeModal}  from './taskScopeModal/TaskScopeModal.tsx';
 import { TaskSettingModal } from './taskSettingModal/TaskSettingModal';
