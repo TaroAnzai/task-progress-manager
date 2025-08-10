@@ -8,6 +8,7 @@ import { usePostProgressObjectives } from "@/api/generated/taskProgressAPI";
 import type {  ObjectiveInput,  ObjectiveUpdate} from '@/api/generated/taskProgressAPI.schemas';
 import type {Objective} from "@/api/generated/taskProgressAPI.schemas";
 import { Skeleton } from '@/components/ui/skeleton';
+import { useUser } from '@/context/useUser';
 import { extractErrorMessage } from "@/utils/errorHandler";
 
 import { ObjectiveRow } from "./objective/ObjectiveRow";
@@ -17,10 +18,11 @@ interface ObjectiveTableProps {
 }
 
 export default function ObjectiveTable({ taskId }: ObjectiveTableProps) {
+  const { user } = useUser();
+
   const { data, isLoading, refetch: refetchObjectives } = useGetProgressObjectivesTasksTaskId(taskId);
   const postObjective = usePostProgressObjectives();
   const updateObjective = usePutProgressObjectivesObjectiveId();
-
   const [objectives, setObjectives] = useState<Objective[]>([]);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ export default function ObjectiveTable({ taskId }: ObjectiveTableProps) {
       setObjectives(data.objectives??[]);
     }
   }, [data]);
-
+  if (!user) return;
  // ObjectiveTable内に追加：新規登録関数
   const handleSaveNew = async (obj: ObjectiveInput) => {
     if (!obj.title || !obj.title.trim()) {
@@ -41,7 +43,7 @@ export default function ObjectiveTable({ taskId }: ObjectiveTableProps) {
         data: {
           title: obj.title.trim(),
           due_date: obj.due_date ?? null,
-          assigned_user_id: obj.assigned_user_id ?? null,
+          assigned_user_id: obj.assigned_user_id ?? user.id,
           task_id: taskId, // propsから渡されている
         },
       });

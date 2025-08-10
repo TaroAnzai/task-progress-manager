@@ -55,7 +55,7 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
 
 
   useEffect(() => {
-    const editable = (authorized_users ?? []).some((u) => u.user_id === currentUser?.id);
+    const editable = (authorized_users ?? []).some((u) => u.id === currentUser?.id);
     setIsEditable(editable);
   }, [currentUser, task, authorized_users]);
   useEffect(() => {
@@ -89,6 +89,7 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
         data: { user_access:accessUserInput, organization_access:orgAccessInput },
       });
       toast.success("更新しました");
+      onClose();
     }catch(e){
       const err = extractErrorMessage(e);
       toast.error("更新に失敗しました", {description: err});

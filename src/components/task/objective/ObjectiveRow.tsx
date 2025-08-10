@@ -4,8 +4,8 @@ import { useState } from "react";
 import { ProgressStatus as StatusType, type Objective,type ObjectiveInput, type ObjectiveUpdate, type ObjectiveUpdateStatus as updateStatusType } from "@/api/generated/taskProgressAPI.schemas";
 import { ObjectiveStatus } from "@/api/generated/taskProgressAPI.schemas";
 
+import SingleUserSelectModal from "../SingleUserSelectModal";
 import { StatusBadgeCell } from "../StatusBadgeCell";
-import UserSelectModal from "../UserSelectModal";
 
 import { DateCell } from "./DateCell";
 import { EditableCell } from "./EditableCell";
@@ -50,6 +50,11 @@ export function ObjectiveRow({ taskId, objective, onSaveNew, onUpdate }: Objecti
       onUpdate(objective.id, { status: newStatus });
     }
   }
+  const handleAssinedUserSave = (newUserId: number) => {
+    if (objective) {
+      onUpdate(objective.id, { assigned_user_id: newUserId });
+    }
+  }
 
   return (
     <>
@@ -79,10 +84,11 @@ export function ObjectiveRow({ taskId, objective, onSaveNew, onUpdate }: Objecti
           </>
           )}
       </tr>
-      <UserSelectModal
+      <SingleUserSelectModal
+        taskId = {taskId}
         open = {isUserSelectModalOpen}
         onClose = {() => setIsUserSelectModalOpen(false)}
-        onConfirm ={()=>{}}
+        onConfirm ={(newUserId)=>{handleAssinedUserSave(newUserId.id)}}
         
       />
     </>

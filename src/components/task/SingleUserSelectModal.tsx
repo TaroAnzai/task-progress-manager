@@ -1,8 +1,8 @@
 // src/components/task/taskScopeModal/SingleUserSelectModal.tsx
 import { useEffect, useMemo, useState } from "react";
 
-import { useGetProgressUsers } from "@/api/generated/taskProgressAPI";
-import type { User } from "@/api/generated/taskProgressAPI.schemas";
+import { useGetProgressTasksTaskIdAuthorizedUsers } from "@/api/generated/taskProgressAPI";
+import type { UserWithScopes } from "@/api/generated/taskProgressAPI.schemas";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 type PickedUser = { id: number; name: string};
 
 type Props = {
+  taskId: number;
   open: boolean;
   onClose: () => void;
   onConfirm: (user: PickedUser) => void; // 単一のユーザーを返す
@@ -21,6 +22,7 @@ type Props = {
 };
 
 export default function SingleUserSelectModal({
+  taskId,
   open,
   onClose,
   onConfirm,
@@ -30,7 +32,9 @@ export default function SingleUserSelectModal({
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null); // 単一選択用の状態
 
   // Orval 生成の hook 仕様に合わせて params / options を渡す
-  const { data, isLoading, isError } = useGetProgressUsers({
+  const { data, isLoading, isError } = useGetProgressTasksTaskIdAuthorizedUsers(
+    taskId,
+    {
     query: { enabled: open }, // モーダルが開いた時だけ fetch
   });
 
@@ -39,8 +43,8 @@ export default function SingleUserSelectModal({
     if (open) setSelectedUserId(null);
   }, [open]);
 
-  const availableUsers: User[] = useMemo(() => {
-    const list = Array.isArray(data) ? (data as User[]) : [];
+  const availableUsers: UserWithScopes[] = useMemo(() => {
+    const list = Array.isArray(data) ? (data as UserWithScopes[]) : [];
     const filteredByOrg = list.filter(
       (u) => !excludedUserIds.includes(u.id ?? -1)
     );
