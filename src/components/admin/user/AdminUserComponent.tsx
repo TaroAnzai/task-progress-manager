@@ -1,12 +1,14 @@
 // src/admin/components/user/AdminUserComponent.tsx
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect,useState } from 'react';
 
 import { useGetProgressUsersAdmin } from '@/api/generated/taskProgressAPI';
 import type { UserSchemaForAdmin } from '@/api/generated/taskProgressAPI.schemas';
 import { AccessScopeRole } from '@/api/generated/taskProgressAPI.schemas';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+
 import { useAlertDialog} from "@/context/useAlertDialog"
 import { useUser } from '@/context/useUser.ts';
 

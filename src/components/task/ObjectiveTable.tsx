@@ -7,9 +7,12 @@ import { useGetProgressObjectivesTasksTaskId, usePutProgressObjectivesObjectiveI
 import { usePostProgressObjectives } from "@/api/generated/taskProgressAPI";
 import type {  ObjectiveInput,  ObjectiveUpdate} from '@/api/generated/taskProgressAPI.schemas';
 import type {Objective} from "@/api/generated/taskProgressAPI.schemas";
+
 import { Skeleton } from '@/components/ui/skeleton';
-import { useUser } from '@/context/useUser';
+
 import { extractErrorMessage } from "@/utils/errorHandler";
+
+import { useUser } from '@/context/useUser';
 
 import { ObjectiveRow } from "./objective/ObjectiveRow";
 

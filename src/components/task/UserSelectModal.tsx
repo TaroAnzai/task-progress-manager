@@ -1,12 +1,12 @@
 // src/components/task/taskScopeModal/UserScopeSelectModal.tsx
 import { useEffect, useMemo, useState } from "react";
 
-
 import { useGetProgressUsers } from "@/api/generated/taskProgressAPI";
 import type { User } from "@/api/generated/taskProgressAPI.schemas";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription,DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 

@@ -1,5 +1,6 @@
-import { useGetProgressCompanies, useDeleteProgressCompaniesCompanyId } from "@/api/generated/taskProgressAPI";
+import { useDeleteProgressCompaniesCompanyId,useGetProgressCompanies } from "@/api/generated/taskProgressAPI";
 import type { Company } from "@/api/generated/taskProgressAPI.schemas";
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -10,8 +11,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { useAlertDialog } from "@/context/useAlertDialog"
+
 import {extractErrorMessage} from "@/utils/errorHandler";
+
+import { useAlertDialog } from "@/context/useAlertDialog"
 
 
 interface CompanySelectorDialogProps {

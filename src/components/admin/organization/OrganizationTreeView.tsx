@@ -2,7 +2,6 @@ import React, {useEffect, useState } from "react";
 
 import { toast } from "sonner";
 
-
 import {
   useGetProgressOrganizationsTree,
   usePostProgressOrganizations,
@@ -11,8 +10,10 @@ import type {
   OrganizationInput,
   OrganizationTree,
 } from "@/api/generated/taskProgressAPI.schemas";
-import { useUser } from "@/context/useUser";
+
 import { extractErrorMessage } from "@/utils/errorHandler";
+
+import { useUser } from "@/context/useUser";
 
 import { TreeNode } from "./TreeNode";
 interface OrganizationTreeProps {

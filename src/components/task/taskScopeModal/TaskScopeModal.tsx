@@ -1,32 +1,34 @@
 // src/components/task/taskScopeModal/TaskScopeModal.tsx
-import { useState, useEffect } from "react";
+import { useEffect,useState } from "react";
 
 import { Plus} from "lucide-react";
 import { toast } from "sonner";
 
 import {
-  useGetProgressTasksTaskIdAuthorizedUsers,
-  useGetProgressTasksTaskIdAccessUsers,
   useGetProgressTasksTaskIdAccessOrganizations,
+  useGetProgressTasksTaskIdAccessUsers,
+  useGetProgressTasksTaskIdAuthorizedUsers,
   usePutProgressTasksTaskIdAccessLevels,
 } from "@/api/generated/taskProgressAPI";
 import type {
-  Task,
   AccessUser,
   AccessUserAccessLevel,
   OrgAccess,
+  Task,
 } from "@/api/generated/taskProgressAPI.schemas";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
-  DialogTitle,
-  DialogDescription
-} from "@/components/ui/dialog";
+  DialogTitle} from "@/components/ui/dialog";
+
+import {extractErrorMessage} from "@/utils/errorHandler";
+
 import {SCOPE_LEVEL_OPTIONS} from "@/context/roleLabels";
 import { useUser } from "@/context/useUser";
-import {extractErrorMessage} from "@/utils/errorHandler";
 
 import UserSelectModal from "../UserSelectModal";
 

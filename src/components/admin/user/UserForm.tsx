@@ -4,17 +4,19 @@ import React, { useEffect, useState } from 'react';
 
 import { toast } from "sonner";
 
-
-import { usePostProgressUsers, usePutProgressUsersUserId, usePostProgressAccessScopesUsersUserId } from '@/api/generated/taskProgressAPI';
+import { usePostProgressAccessScopesUsersUserId,usePostProgressUsers, usePutProgressUsersUserId } from '@/api/generated/taskProgressAPI';
 import { UserInputRole } from '@/api/generated/taskProgressAPI.schemas';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import {useAlertDialog} from "@/context/useAlertDialog";
+import { Select, SelectContent, SelectItem,SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { extractErrorMessage } from "@/utils/errorHandler";
 
+import {useAlertDialog} from "@/context/useAlertDialog";
+
 import OrganizationSelectorDialog from './OrganizationSelectorDialog';
-import type { UserFormState, OrganizationSelectResult } from './types';
+import type { OrganizationSelectResult,UserFormState } from './types';
 
 interface UserFormProps {
   initialData: UserFormState | null;

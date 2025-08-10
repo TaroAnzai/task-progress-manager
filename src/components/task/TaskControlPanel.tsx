@@ -1,6 +1,6 @@
 // src/components/task/TaskControlPanel.tsx
 
-import { PlusIcon, PencilIcon, EyeIcon } from "lucide-react";
+import { EyeIcon,PencilIcon, PlusIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 

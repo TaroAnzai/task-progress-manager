@@ -5,16 +5,17 @@ import { toast } from "sonner"
 import {
   usePostProgressTasks,
 } from "@/api/generated/taskProgressAPI";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
-  DialogTitle,
-  DialogDescription
-} from "@/components/ui/dialog";
+  DialogTitle} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+
 import { useTasks } from "@/context/useTasks";
 
 interface TaskSettingModalProps {

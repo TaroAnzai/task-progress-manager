@@ -2,16 +2,16 @@
 
 import React from 'react';
 
-
 import { useGetProgressOrganizationsTree } from '@/api/generated/taskProgressAPI';
 import type { OrganizationTree } from '@/api/generated/taskProgressAPI.schemas';
+
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from '@/components/ui/dialog';
 
 type OrganizationSelectResult = { org_id: number, org_name: string;}

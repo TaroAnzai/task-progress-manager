@@ -1,7 +1,7 @@
 // src/components/task/ObjectiveRow.tsx
 import { useState } from "react";
 
-import { ProgressStatus as StatusType, type Objective,type ObjectiveInput, type ObjectiveUpdate, type ObjectiveUpdateStatus as updateStatusType } from "@/api/generated/taskProgressAPI.schemas";
+import { type Objective,type ObjectiveInput, type ObjectiveUpdate, type ObjectiveUpdateStatus as updateStatusType,ProgressStatus as StatusType } from "@/api/generated/taskProgressAPI.schemas";
 import { ObjectiveStatus } from "@/api/generated/taskProgressAPI.schemas";
 
 import SingleUserSelectModal from "../SingleUserSelectModal";

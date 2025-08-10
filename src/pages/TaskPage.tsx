@@ -1,11 +1,12 @@
 // src/pages/TaskPage.tsx
 import { useEffect, useState } from "react";
 
-import { useNavigate, useLocation } from "react-router-dom";
- 
+import { useLocation,useNavigate } from "react-router-dom";
+
 import NewTaskModal from "@/components/task/newTaskModal/NewTaskModal";
 import TaskControlPanel from "@/components/task/TaskControlPanel";
 import TaskList from "@/components/task/TaskList";
+
 import {  useUser } from "@/context/useUser";
 
 const TaskPageContent = () =>{

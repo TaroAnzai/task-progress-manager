@@ -8,6 +8,7 @@ import {
   usePostProgressUsers,
 } from "@/api/generated/taskProgressAPI"
 import type {UserInputRole} from "@/api/generated/taskProgressAPI.schemas"
+
 import {ROLE_LABELS} from "@/context/roleLabels"
 
 export function useBulkUserRegistration(company_id: number) {

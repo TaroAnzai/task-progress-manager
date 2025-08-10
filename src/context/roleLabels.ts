@@ -1,5 +1,5 @@
 
-import { UserInputRole, AccessUserAccessLevel } from '@/api/generated/taskProgressAPI.schemas.ts';
+import { AccessUserAccessLevel,UserInputRole } from '@/api/generated/taskProgressAPI.schemas.ts';
 
 
 export const ROLE_LABELS: Record<UserInputRole, string> = {

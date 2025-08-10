@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 import type { Task } from '@/api/generated/taskProgressAPI.schemas';
+
 import { useUser } from '@/context/useUser';
 
 import TaskSettingsIcon from './TaskSettingsIcon';

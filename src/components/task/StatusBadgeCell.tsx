@@ -1,7 +1,8 @@
 // src/components/task/StatusBadgeCell.tsx
 import { useState } from "react";
 
-import type { ProgressStatus as StatusType, ObjectiveUpdateStatus as updateStatusType } from "@/api/generated/taskProgressAPI.schemas";
+import type { ObjectiveUpdateStatus as updateStatusType,ProgressStatus as StatusType } from "@/api/generated/taskProgressAPI.schemas";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";

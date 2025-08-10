@@ -3,8 +3,8 @@ import { useState } from 'react';
 
 import { Cog } from 'lucide-react';
 
-
 import type { Task, UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
+
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,

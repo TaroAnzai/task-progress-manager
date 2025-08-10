@@ -4,9 +4,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import type { Login } from "@/api/generated/taskProgressAPI.schemas";
 import { usePostProgressSessions } from "@/api/generated/taskProgressAPI.ts";
+
+import { extractErrorMessage } from "@/utils/errorHandler.ts";
+
 import {useAlertDialog} from "@/context/useAlertDialog";
 import { useUser } from "@/context/useUser"; 
-import { extractErrorMessage } from "@/utils/errorHandler.ts";
 
 // 定数の定義
 const MESSAGES = {

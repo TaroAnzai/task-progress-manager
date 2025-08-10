@@ -13,9 +13,11 @@ import type {
   Objective,
   Task,
 } from "@/api/generated/taskProgressAPI.schemas";
+
+import { extractErrorMessage } from "@/utils/errorHandler";
+
 import {useTasks} from "@/context/useTasks"
 import { useUser } from "@/context/useUser";
-import { extractErrorMessage } from "@/utils/errorHandler";
 
 export function useTaskEditModal(task: Task, onClose: () => void) {
   const { user } = useUser();

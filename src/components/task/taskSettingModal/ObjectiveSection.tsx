@@ -3,6 +3,7 @@
 import { Trash2 } from "lucide-react";
 
 import type { Objective } from "@/api/generated/taskProgressAPI.schemas";
+
 import { Button } from "@/components/ui/button";
 
 interface ObjectiveSectionProps {

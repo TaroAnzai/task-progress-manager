@@ -1,6 +1,7 @@
 // src/components/layout/Header.tsx
 
 import { useDeleteProgressSessionsCurrent } from "@/api/generated/taskProgressAPI"; 
+
 import { useUser } from "@/context/useUser";
 
 export default function Header() {
