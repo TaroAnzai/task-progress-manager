@@ -32,7 +32,7 @@ import { useUser } from "@/context/useUser";
 
 import UserSelectModal from "../UserSelectModal";
 
-import OrganizationScopeSelectModal from "./OrganizationScopeSelectModal";
+import {OrganizationScopeSelectModal} from "./OrganizationScopeSelectModal";
 import {ScopeLevelBadge} from "./ScopeLevelBadge";
 
 

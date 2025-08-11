@@ -5,7 +5,7 @@ import { AccessScopeRole, type UserWithScopes } from "@/api/generated/taskProgre
 
 import { UserContext } from "./UserContextBase";
 
-export default function UserProvider({ children }: { children: ReactNode }) {
+export function UserProvider({ children }: { children: ReactNode }) {
   const { data: sessionData, isLoading, isFetching, isSuccess, refetch } =
     useGetProgressSessionsCurrent();
 

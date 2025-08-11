@@ -4,7 +4,7 @@ import { useState } from "react";
 import { type Objective,type ObjectiveInput, type ObjectiveUpdate, type ObjectiveUpdateStatus as updateStatusType,ProgressStatus as StatusType } from "@/api/generated/taskProgressAPI.schemas";
 import { ObjectiveStatus } from "@/api/generated/taskProgressAPI.schemas";
 
-import SingleUserSelectModal from "../SingleUserSelectModal";
+import {SingleUserSelectModal} from "../SingleUserSelectModal";
 import { StatusBadgeCell } from "../StatusBadgeCell";
 
 import { DateCell } from "./DateCell";

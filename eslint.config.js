@@ -35,59 +35,76 @@ export default tseslint.config([
       "react-refresh/only-export-components": "off",
     },
   },  
-{
-    plugins: {
-      import: eslintPluginImport,
-      'simple-import-sort': simpleImportSort,
+  {
+      plugins: {
+        import: eslintPluginImport,
+        'simple-import-sort': simpleImportSort,
+      },
+  // ルール部だけ抜粋
+
+    rules: {
+      'import/order': 'off',
+      'simple-import-sort/imports': ['warn', {
+        groups: [
+          // React
+          ['^react$'],
+          ['^type:react$'],
+
+          // 外部ライブラリ
+          ['^@?\\w'],
+          ['^type:@?\\w'],
+
+          // shadcn/ui（外部の次）
+          ['^@/components/ui(/.*|$)'],
+          ['^type:@/components/ui(/.*|$)'],
+
+          // Orval 生成物
+          ['^@/api/generated(/.*|$)'],
+          ['^type:@/api/generated(/.*|$)'],
+
+          // 内部 - フック
+          ['^@/hooks(/.*|$)'],
+          ['^type:@/hooks(/.*|$)'],
+
+          // 内部 - コンポーネント（shadcn 以外）
+          ['^@/components(/.*|$)'],
+          ['^type:@/components(/.*|$)'],
+
+          // 内部 - ユーティリティ / 定数
+          ['^@/utils(/.*|$)', '^@/constants(/.*|$)'],
+          ['^type:@/utils(/.*|$)', '^type:@/constants(/.*|$)'],
+
+          // 残りの内部
+          ['^@/'],
+          ['^type:@/'],
+
+          // 親相対
+          ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+          ['^type:^\\.\\.(?!/?$)', '^type:^\\.\\./?$'],
+
+          // 同階層 & index
+          ['^\\./(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+          ['^type:^\\./(?!/?$)', '^type:^\\.(?!/?$)', '^type:^\\./?$'],
+        ],
+      }],
+      'simple-import-sort/exports': 'warn',
+      'import/prefer-default-export': 'off',
+      'import/no-default-export': 'warn',
     },
-// ルール部だけ抜粋
-
-  rules: {
-    'import/order': 'off',
-    'simple-import-sort/imports': ['warn', {
-      groups: [
-        // React
-        ['^react$'],
-        ['^type:react$'],
-
-        // 外部ライブラリ
-        ['^@?\\w'],
-        ['^type:@?\\w'],
-
-        // shadcn/ui（外部の次）
-        ['^@/components/ui(/.*|$)'],
-        ['^type:@/components/ui(/.*|$)'],
-
-        // Orval 生成物
-        ['^@/api/generated(/.*|$)'],
-        ['^type:@/api/generated(/.*|$)'],
-
-        // 内部 - フック
-        ['^@/hooks(/.*|$)'],
-        ['^type:@/hooks(/.*|$)'],
-
-        // 内部 - コンポーネント（shadcn 以外）
-        ['^@/components(/.*|$)'],
-        ['^type:@/components(/.*|$)'],
-
-        // 内部 - ユーティリティ / 定数
-        ['^@/utils(/.*|$)', '^@/constants(/.*|$)'],
-        ['^type:@/utils(/.*|$)', '^type:@/constants(/.*|$)'],
-
-        // 残りの内部
-        ['^@/'],
-        ['^type:@/'],
-
-        // 親相対
-        ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
-        ['^type:^\\.\\.(?!/?$)', '^type:^\\.\\./?$'],
-
-        // 同階層 & index
-        ['^\\./(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
-        ['^type:^\\./(?!/?$)', '^type:^\\.(?!/?$)', '^type:^\\./?$'],
-      ],
-    }],
-    'simple-import-sort/exports': 'warn',
   },
-},
+
+  {
+    files: ['src/pages/**/*.{ts,tsx}','src/*.{ts,tsx}'], 
+    rules: {
+      'import/no-default-export': 'off', // default許可
+    },
+  },
+  {
+    rules: {
+  "func-style": ["warn", "expression", { "allowArrowFunctions": true }],
+  "prefer-arrow-callback": "warn",
+  "arrow-body-style": ["warn", "as-needed"],
+}
+
+  }
 ])

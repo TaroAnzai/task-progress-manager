@@ -24,7 +24,7 @@ interface Props {
   selectedOrgIds?: number[];
 }
 
-const OrganizationSelectorDialog: React.FC<Props> = ({ companyId, open, onClose, onSelect, selectedOrgIds }) => {
+export const OrganizationScopeSelectModal: React.FC<Props> = ({ companyId, open, onClose, onSelect, selectedOrgIds }) => {
   const { data: treeData, isLoading, error } = useGetProgressOrganizationsTree({ company_id: companyId});
 
   const handleClick = (node: OrganizationTree) => {
@@ -70,4 +70,3 @@ const OrganizationSelectorDialog: React.FC<Props> = ({ companyId, open, onClose,
   );
 };
 
-export default OrganizationSelectorDialog;

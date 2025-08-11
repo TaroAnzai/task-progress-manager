@@ -7,7 +7,7 @@ import { useUser } from "@/context/useUser";
 
 import { TaskContext } from "./TaskContextBase";
 
-export default function TaskProvider({ children }: { children: ReactNode }) {
+export  function TaskProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
 
   const [tasks, setTasks] = useState<Task[]>([]);

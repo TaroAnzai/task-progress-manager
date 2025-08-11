@@ -22,7 +22,7 @@ type Props = {
   organizationId?: number | null;
 };
 
-export default function SingleUserSelectModal({
+export  function SingleUserSelectModal({
   taskId,
   open,
   onClose,

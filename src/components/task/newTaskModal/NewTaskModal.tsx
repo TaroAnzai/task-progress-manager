@@ -23,7 +23,7 @@ interface TaskSettingModalProps {
   onClose: () => void;
 }
 
-export default function NewTaskModal({ open, onClose }: TaskSettingModalProps) {
+export function NewTaskModal({ open, onClose }: TaskSettingModalProps) {
 
   const { refetch } = useTasks();
 

@@ -16,7 +16,7 @@ import {
 import { AlertDialogContext, type DialogOptions } from "./AlertDialogContextBase";
 
 
-export default function AlertDialogProvider({ children }: { children: ReactNode }) {
+export function AlertDialogProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("確認");
   const [description, setDescription] = useState("");
