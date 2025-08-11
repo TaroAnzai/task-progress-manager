@@ -22,7 +22,7 @@ type Props = {
   organizationId?: number | null;
 };
 
-const SingleUserSelectModal = ({
+export const SingleUserSelectModal = ({
   taskId,
   open,
   onClose,
@@ -144,5 +144,3 @@ const SingleUserSelectModal = ({
     </Dialog>
   );
 };
-
-export default SingleUserSelectModal;

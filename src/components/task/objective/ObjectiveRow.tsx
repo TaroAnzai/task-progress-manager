@@ -1,17 +1,21 @@
 // src/components/task/ObjectiveRow.tsx
 import { useState } from "react";
 
-import { type Objective,type ObjectiveInput, type ObjectiveUpdate, type ObjectiveUpdateStatus as updateStatusType,ProgressStatus as StatusType } from "@/api/generated/taskProgressAPI.schemas";
-import { ObjectiveStatus } from "@/api/generated/taskProgressAPI.schemas";
+import { toast } from "sonner";
+
+import {useGetProgressUpdatesObjectiveIdLatestProgress} from "@/api/generated/taskProgressAPI"
+import {usePostProgressUpdatesObjectiveId} from "@/api/generated/taskProgressAPI"
+import type {Objective,ObjectiveInput, ObjectiveUpdate, ObjectiveUpdateStatus as updateStatusType,ProgressInput} from "@/api/generated/taskProgressAPI.schemas";
+import { ProgressStatus as StatusType } from "@/api/generated/taskProgressAPI.schemas";
+import { ObjectiveStatus } from "@/api/generated/taskProgressAPI.schemas"; 
+
+import { useAlertDialog } from "@/context/useAlertDialog";
 
 import {SingleUserSelectModal} from "../SingleUserSelectModal";
 import { StatusBadgeCell } from "../StatusBadgeCell";
 
 import { DateCell } from "./DateCell";
 import { EditableCell } from "./EditableCell";
-
-
-
 type ObjectiveRowProps = {
   key: number | string;
   taskId: number;
@@ -27,6 +31,29 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
   const [dueDate, setDueDate] = useState(objective?.due_date ?? undefined);
   const [status, setStatus] = useState<StatusType>(objective?.status ?? ObjectiveStatus.UNDEFINED);
   const [isUserSelectModalOpen, setIsUserSelectModalOpen] = useState(false);
+  const { openAlertDialog } = useAlertDialog();
+  const {data, refetch:refetchProgress} =useGetProgressUpdatesObjectiveIdLatestProgress(
+    objective?.id??0,
+    {query: {enabled: !!objective,}}
+    )
+  const latest_progress = data?.detail ?? ""; 
+  const latest_report_date = data?.report_date ?? "";
+  const {mutate:postProgressMutation } = usePostProgressUpdatesObjectiveId(
+    {
+    mutation:{
+      onSuccess: () => {
+        toast.success("進捗を更新しました");
+        refetchProgress();
+      },
+      onError: () => {
+        openAlertDialog({
+          title: "進捗登録失敗",
+          description: "このデータを削除してもよろしいですか？",
+          showCancel:false
+        });
+      }
+    }
+  })
 
   const handleTitleSave = (newTitle: string) => {
     setTitle(newTitle);
@@ -55,6 +82,15 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
       onUpdate(objective.id, { assigned_user_id: newUserId });
     }
   };
+  const handleProgressSave = (newProgress: string) => {
+    if (objective) {
+      const data:ProgressInput = {
+       detail: newProgress,
+       report_date : new Date().toISOString()
+      }
+      postProgressMutation({objectiveId: objective.id, data: data});
+    }
+  };
 
   return (
     <>
@@ -76,8 +112,10 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
             >
               {objective?.assigned_user_name ?? "-"}
             </td>
-            <td className="px-3 py-2">{objective?.latest_progress ?? "-"}</td>
-            <td className="px-3 py-2">{objective?.latest_report_date ?? "-"}</td>
+            <td className="px-3 py-2">
+              <EditableCell value={latest_progress} onSave={handleProgressSave} />
+            </td>
+            <td className="px-3 py-2">{latest_report_date}</td>
             <td className="px-3 py-2">
               <button className="text-blue-600 hover:underline text-xs">履歴</button>
             </td>

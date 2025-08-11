@@ -24,7 +24,7 @@ interface TaskSettingModalProps {
   onClose: () => void;
 }
 
-const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
+export const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
   const { refetch } = useTasks();
 
   const [title, setTitle] = useState("");
@@ -95,4 +95,3 @@ const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
   );
 };
 
-export default NewTaskModal;
