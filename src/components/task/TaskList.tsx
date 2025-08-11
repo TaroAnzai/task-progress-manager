@@ -7,9 +7,8 @@ import { useTasks } from '@/context/useTasks';
 
 import TaskCard from './TaskCard';
 
-export default function TaskList() {
+const TaskList = () => {
   const { tasks, isLoading } = useTasks();
-
 
   if (isLoading) {
     return (
@@ -28,4 +27,6 @@ export default function TaskList() {
       ))}
     </div>
   );
-}
+};
+
+export default TaskList;

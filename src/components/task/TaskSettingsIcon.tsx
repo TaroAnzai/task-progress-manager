@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { TaskScopeModal}  from './taskScopeModal/TaskScopeModal.tsx';
+import { TaskScopeModal } from './taskScopeModal/TaskScopeModal.tsx';
 import { TaskSettingModal } from './taskSettingModal/TaskSettingModal';
 
 interface TaskSettingsIconProps {
@@ -21,7 +21,7 @@ interface TaskSettingsIconProps {
   user: UserWithScopes | null;
 }
 
-export default function TaskSettingsIcon({ task}: TaskSettingsIconProps) {
+const TaskSettingsIcon = ({ task }: TaskSettingsIconProps) => {
   const [openSetting, setOpenSetting] = useState(false);
   const [openScope, setOpenScope] = useState(false);
 
@@ -64,4 +64,6 @@ export default function TaskSettingsIcon({ task}: TaskSettingsIconProps) {
       />
     </>
   );
-}
+};
+
+export default TaskSettingsIcon;

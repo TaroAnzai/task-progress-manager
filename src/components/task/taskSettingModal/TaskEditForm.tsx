@@ -16,7 +16,7 @@ interface TaskEditFormProps {
   onChange: (key: string, value: string) => void;
 }
 
-export function TaskEditForm({ formState, isEditable, onChange }: TaskEditFormProps) {
+export const TaskEditForm = ({ formState, isEditable, onChange }: TaskEditFormProps) => {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     onChange(name, value);
@@ -59,5 +59,5 @@ export function TaskEditForm({ formState, isEditable, onChange }: TaskEditFormPr
       </div>
     </div>
   );
-}  
+};
 

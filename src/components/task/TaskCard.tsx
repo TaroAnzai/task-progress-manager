@@ -12,7 +12,7 @@ interface TaskCardProps {
   task: Task;
 }
 
-export default function TaskCard({ task }: TaskCardProps) {
+const TaskCard = ({ task }: TaskCardProps) => {
   const [isExpanded, setIsExpanded] = useState(() => {
     const stored = localStorage.getItem(`objective_visibility_${task.id}`);
     return stored ? JSON.parse(stored) : true;
@@ -42,4 +42,6 @@ export default function TaskCard({ task }: TaskCardProps) {
       )}
     </div>
   );
-}
+};
+
+export default TaskCard;
