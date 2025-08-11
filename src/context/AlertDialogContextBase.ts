@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 export type DialogOptions = {
   title?: string;
-  description?: string;
+  description?: unknown;
   descriptionNode?: ReactNode;
   onConfirm?: () => void;
   onCancel?: () => void;

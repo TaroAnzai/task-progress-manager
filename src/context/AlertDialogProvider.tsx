@@ -1,5 +1,6 @@
 import {useEffect, useState } from "react";
 
+import { isAxiosError } from "axios";
 import type { ReactNode } from "react";
 
 import {
@@ -13,9 +14,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+import { extractErrorMessage } from "@/utils/errorHandler";
+
 import { AlertDialogContext, type DialogOptions } from "./AlertDialogContextBase";
-
-
 export function AlertDialogProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("確認");
@@ -38,7 +39,13 @@ export function AlertDialogProvider({ children }: { children: ReactNode }) {
     showCancel = true,
   }: DialogOptions) => {
     setTitle(title);
-    setDescription(description);
+    if (isAxiosError(description)) {
+      setDescription(extractErrorMessage(description));
+    }else if (typeof description === "string") {
+      setDescription(description);
+    }else{
+      setDescription("Unknown error");
+    }
     setDescriptionNode(descriptionNode);
     setOnConfirm(() => () => {
       onConfirm?.();

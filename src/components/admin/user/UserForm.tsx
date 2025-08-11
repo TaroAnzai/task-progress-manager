@@ -11,8 +11,6 @@ import { Select, SelectContent, SelectItem,SelectTrigger, SelectValue } from '@/
 import { usePostProgressAccessScopesUsersUserId,usePostProgressUsers, usePutProgressUsersUserId } from '@/api/generated/taskProgressAPI';
 import { UserInputRole } from '@/api/generated/taskProgressAPI.schemas';
 
-import { extractErrorMessage } from "@/utils/errorHandler";
-
 import {useAlertDialog} from "@/context/useAlertDialog";
 
 import OrganizationSelectorDialog from './OrganizationSelectorDialog';
@@ -114,8 +112,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted
       toast.success('保存しました',{description: `ユーザー${form.name}を保存しました`});
       clearForm();
     } catch (err) {
-      toast.error(`${extractErrorMessage(err)}`);
-      console.error(err);
+      openAlertDialog({title: 'エラー', description: err, showCancel: false});
     }
   };
 
