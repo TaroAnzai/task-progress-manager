@@ -1,15 +1,14 @@
 // src/components/task/ObjectiveTable.tsx
 import { useEffect, useState } from 'react';
 
-import {toast} from "sonner"
+import { toast } from "sonner";
 
-import { Skeleton } from '@/components/ui/skeleton';
-
-import { useGetProgressObjectivesTasksTaskId, usePutProgressObjectivesObjectiveId  } from '@/api/generated/taskProgressAPI';
+import { useGetProgressObjectivesTasksTaskId, usePutProgressObjectivesObjectiveId } from '@/api/generated/taskProgressAPI';
 import { usePostProgressObjectives } from "@/api/generated/taskProgressAPI";
-import type {  ObjectiveInput,  ObjectiveUpdate} from '@/api/generated/taskProgressAPI.schemas';
-import type {Objective} from "@/api/generated/taskProgressAPI.schemas";
-
+import type { ObjectiveInput, ObjectiveUpdate } from '@/api/generated/taskProgressAPI.schemas';
+import type { Objective } from "@/api/generated/taskProgressAPI.schemas";
+import { Skeleton } from '@/components/ui/skeleton';
+import { useUser } from '@/context/useUser';
 import { extractErrorMessage } from "@/utils/errorHandler";
 
 import { useUser } from '@/context/useUser';
@@ -20,21 +19,22 @@ interface ObjectiveTableProps {
   taskId: number;
 }
 
-export default function ObjectiveTable({ taskId }: ObjectiveTableProps) {
+const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
   const { user } = useUser();
 
-  const { data, isLoading, refetch: refetchObjectives } = useGetProgressObjectivesTasksTaskId(taskId);
+  const { data, isLoading, refetch: refetchObjectives } =
+    useGetProgressObjectivesTasksTaskId(taskId);
   const postObjective = usePostProgressObjectives();
   const updateObjective = usePutProgressObjectivesObjectiveId();
   const [objectives, setObjectives] = useState<Objective[]>([]);
 
   useEffect(() => {
     if (data) {
-      setObjectives(data.objectives??[]);
+      setObjectives(data.objectives ?? []);
     }
   }, [data]);
   if (!user) return;
- // ObjectiveTable内に追加：新規登録関数
+  // ObjectiveTable内に追加：新規登録関数
   const handleSaveNew = async (obj: ObjectiveInput) => {
     if (!obj.title || !obj.title.trim()) {
       console.warn("タイトルが入力されていません");
@@ -57,7 +57,7 @@ export default function ObjectiveTable({ taskId }: ObjectiveTableProps) {
     } catch (e) {
       const err = extractErrorMessage(e);
       console.error("Objective登録失敗:", err);
-      toast.error("Objective登録に失敗しました", {description: err});
+      toast.error("Objective登録に失敗しました", { description: err });
     }
   };
 
@@ -85,7 +85,7 @@ export default function ObjectiveTable({ taskId }: ObjectiveTableProps) {
     } catch (e) {
       const err = extractErrorMessage(e);
       console.error(`Objective ID ${objId} の更新に失敗しました`, e);
-      toast.error("Objective更新に失敗しました", {description: err});
+      toast.error("Objective更新に失敗しました", { description: err });
     }
   };
 
@@ -107,29 +107,31 @@ export default function ObjectiveTable({ taskId }: ObjectiveTableProps) {
             <th className="px-3 py-2">履歴</th>
           </tr>
         </thead>
-          <tbody>
-            {objectives.map((obj, idx) => (
-              <ObjectiveRow
-                key={obj.id}
-                taskId= {taskId}
-                objective={obj}
-                index={idx}
-                onSaveNew={handleSaveNew}
-                onUpdate={handleUpdate}
-              />
-            ))}
-
-            {/* 常に表示される新規入力行 */}
+        <tbody>
+          {objectives.map((obj, idx) => (
             <ObjectiveRow
-              key={`new-${objectives.length}`}  
-              taskId = {taskId}
-              objective={null}
-              index={objectives.length}
+              key={obj.id}
+              taskId={taskId}
+              objective={obj}
+              index={idx}
               onSaveNew={handleSaveNew}
               onUpdate={handleUpdate}
             />
-          </tbody>
+          ))}
+
+          {/* 常に表示される新規入力行 */}
+          <ObjectiveRow
+            key={`new-${objectives.length}`}
+            taskId={taskId}
+            objective={null}
+            index={objectives.length}
+            onSaveNew={handleSaveNew}
+            onUpdate={handleUpdate}
+          />
+        </tbody>
       </table>
     </div>
   );
-}
+};
+
+export default ObjectiveTable;

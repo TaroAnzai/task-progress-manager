@@ -9,19 +9,17 @@ interface SaveButtonProps {
   onClose: () => void;
 }
 
-export function SaveButton({ isEditable, isSaving, onSave, onClose }: SaveButtonProps) {
-  return (
-    <div className="mt-6 flex justify-end">
-        <Button variant="outline" onClick={onClose}>
-          閉じる
-        </Button>
+export const SaveButton = ({ isEditable, isSaving, onSave, onClose }: SaveButtonProps) => (
+  <div className="mt-6 flex justify-end">
+    <Button variant="outline" onClick={onClose}>
+      閉じる
+    </Button>
 
-      {isEditable ? (
-        <Button onClick={onSave} disabled={isSaving}>
-          {isSaving ? "保存中..." : "保存"}
-        </Button>
-      ) : null}
-    </div>
-  );
-}
+    {isEditable ? (
+      <Button onClick={onSave} disabled={isSaving}>
+        {isSaving ? "保存中..." : "保存"}
+      </Button>
+    ) : null}
+  </div>
+);
 

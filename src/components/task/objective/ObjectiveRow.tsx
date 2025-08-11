@@ -21,11 +21,11 @@ type ObjectiveRowProps = {
   onUpdate: (objId: number, obj: ObjectiveUpdate) => void;
 };
 
-export function ObjectiveRow({ taskId, objective, onSaveNew, onUpdate }: ObjectiveRowProps) {
+export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: ObjectiveRowProps) => {
   const isNew = !objective;
-  const [title, setTitle] = useState(objective?.title?? "");
+  const [title, setTitle] = useState(objective?.title ?? "");
   const [dueDate, setDueDate] = useState(objective?.due_date ?? undefined);
-  const [status, setStatus] = useState<StatusType>(objective?.status?? ObjectiveStatus.UNDEFINED);
+  const [status, setStatus] = useState<StatusType>(objective?.status ?? ObjectiveStatus.UNDEFINED);
   const [isUserSelectModalOpen, setIsUserSelectModalOpen] = useState(false);
 
   const handleTitleSave = (newTitle: string) => {
@@ -33,7 +33,7 @@ export function ObjectiveRow({ taskId, objective, onSaveNew, onUpdate }: Objecti
     if (isNew) {
       onSaveNew({ task_id: taskId, title: newTitle, due_date: dueDate });
     } else if (objective) {
-      onUpdate(objective.id,{title:newTitle});
+      onUpdate(objective.id, { title: newTitle });
     }
   };
 
@@ -49,12 +49,12 @@ export function ObjectiveRow({ taskId, objective, onSaveNew, onUpdate }: Objecti
     if (objective) {
       onUpdate(objective.id, { status: newStatus });
     }
-  }
+  };
   const handleAssinedUserSave = (newUserId: number) => {
     if (objective) {
       onUpdate(objective.id, { assigned_user_id: newUserId });
     }
-  }
+  };
 
   return (
     <>
@@ -62,37 +62,37 @@ export function ObjectiveRow({ taskId, objective, onSaveNew, onUpdate }: Objecti
         <td className="px-3 py-2">
           <EditableCell value={title} onSave={handleTitleSave} />
         </td>
-          {!isNew && (
-            <>
+        {!isNew && (
+          <>
             <td className="px-3 py-2">
-            <DateCell value={dueDate} onSave={handleDateSave} />
+              <DateCell value={dueDate} onSave={handleDateSave} />
             </td>
             <td className="px-3 py-2">
-              <StatusBadgeCell
-                value={status}
-                onChange={handleStatusSave}
-              /></td>
-            <td className="px-3 py-2 cursor-pointer hover:bg-muted/30"
-                onClick={() => setIsUserSelectModalOpen(true)}
+              <StatusBadgeCell value={status} onChange={handleStatusSave} />
+            </td>
+            <td
+              className="px-3 py-2 cursor-pointer hover:bg-muted/30"
+              onClick={() => setIsUserSelectModalOpen(true)}
             >
-                {objective?.assigned_user_name ?? "-"}</td>
+              {objective?.assigned_user_name ?? "-"}
+            </td>
             <td className="px-3 py-2">{objective?.latest_progress ?? "-"}</td>
             <td className="px-3 py-2">{objective?.latest_report_date ?? "-"}</td>
             <td className="px-3 py-2">
               <button className="text-blue-600 hover:underline text-xs">履歴</button>
             </td>
           </>
-          )}
+        )}
       </tr>
       <SingleUserSelectModal
-        taskId = {taskId}
-        open = {isUserSelectModalOpen}
-        onClose = {() => setIsUserSelectModalOpen(false)}
-        onConfirm ={(newUserId)=>{handleAssinedUserSave(newUserId.id)}}
-        
+        taskId={taskId}
+        open={isUserSelectModalOpen}
+        onClose={() => setIsUserSelectModalOpen(false)}
+        onConfirm={(newUserId) => {
+          handleAssinedUserSave(newUserId.id);
+        }}
       />
     </>
-
   );
-}
+};
 

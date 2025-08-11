@@ -16,7 +16,7 @@ interface TaskHeaderProps {
   task: Task;
 }
 
-export default function TaskHeader({ task }: TaskHeaderProps) {
+const TaskHeader = ({ task }: TaskHeaderProps) => {
   const { user } = useUser();
   const dueDateStr = task.due_date
     ? format(new Date(task.due_date), 'yyyy年M月d日', { locale: ja })
@@ -36,4 +36,6 @@ export default function TaskHeader({ task }: TaskHeaderProps) {
       </div>
     </div>
   );
-}
+};
+
+export default TaskHeader;

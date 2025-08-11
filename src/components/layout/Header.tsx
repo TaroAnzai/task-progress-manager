@@ -1,10 +1,9 @@
 // src/components/layout/Header.tsx
 
-import { useDeleteProgressSessionsCurrent } from "@/api/generated/taskProgressAPI"; 
-
+import { useDeleteProgressSessionsCurrent } from "@/api/generated/taskProgressAPI";
 import { useUser } from "@/context/useUser";
 
-export default function Header() {
+const Header = () => {
   const { user, refetchUser } = useUser();
   const isLoggedIn = !!user?.id;
   const deleteSessionMutation = useDeleteProgressSessionsCurrent();
@@ -24,12 +23,16 @@ export default function Header() {
         <a href="/" className="hover:underline">タスク一覧</a>
         <a href="/objectives" className="hover:underline">オブジェクティブ</a>
         <a href="/admin" className="hover:underline">設定</a>
-        {isLoggedIn?(
-          <button onClick={handleLogout} className="hover:underline text-left">ログアウト</button>
-        ):(
+        {isLoggedIn ? (
+          <button onClick={handleLogout} className="hover:underline text-left">
+            ログアウト
+          </button>
+        ) : (
           <a href="/login" className="hover:underline">ログイン</a>
         )}
       </nav>
     </header>
   );
-}
+};
+
+export default Header;

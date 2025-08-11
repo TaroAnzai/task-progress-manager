@@ -1,6 +1,6 @@
 // src/components/task/TaskStatusBadge.tsx
 
-import type { Task,TaskStatus as taskStatusType } from '@/api/generated/taskProgressAPI.schemas';
+import type { Task, TaskStatus as taskStatusType } from '@/api/generated/taskProgressAPI.schemas';
 import { TaskStatus } from '@/api/generated/taskProgressAPI.schemas';
 
 //import { showTaskStatusSelector } from '@/lib/status_ui';
@@ -9,7 +9,7 @@ interface TaskStatusBadgeProps {
   task: Task;
 }
 
-export default function TaskStatusBadge({ task }: TaskStatusBadgeProps) {
+const TaskStatusBadge = ({ task }: TaskStatusBadgeProps) => {
   const canEdit = task.user_access_level !== 'view';
 
   const handleClick = (e: React.MouseEvent) => {
@@ -30,9 +30,9 @@ export default function TaskStatusBadge({ task }: TaskStatusBadgeProps) {
       {getStatusLabel(task.status)}
     </span>
   );
-}
+};
 
-function getStatusLabel(status: taskStatusType|undefined): string {
+const getStatusLabel = (status: taskStatusType | undefined): string => {
   switch (status) {
     case TaskStatus.NOT_STARTED:
       return '未着手';
@@ -45,4 +45,6 @@ function getStatusLabel(status: taskStatusType|undefined): string {
     default:
       return '不明';
   }
-}
+};
+
+export default TaskStatusBadge;

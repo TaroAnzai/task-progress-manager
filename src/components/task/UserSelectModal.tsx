@@ -22,12 +22,12 @@ type Props = {
   organizationId?: number | null;
 };
 
-export default function UserSelectModal({
+const UserSelectModal = ({
   open,
   onClose,
   onConfirm,
   excludedUserIds = [],
-}: Props) {
+}: Props) => {
   const [q, setQ] = useState("");
   const [checked, setChecked] = useState<Record<number, boolean>>({});
 
@@ -50,7 +50,7 @@ export default function UserSelectModal({
     if (!q.trim()) return filteredByOrg;
     const query = q.trim().toLowerCase();
     return filteredByOrg.filter((u) => {
-      const name = (u.name ?? "").toLowerCase(); 
+      const name = (u.name ?? "").toLowerCase();
       const organization = (u.organization_name ?? "").toLowerCase();
       return name.includes(query) || organization.includes(query);
     });
@@ -90,7 +90,7 @@ export default function UserSelectModal({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>ユーザーを選択</DialogTitle>
-          <DialogDescription></DialogDescription>          
+          <DialogDescription></DialogDescription>
         </DialogHeader>
 
         <div className="flex items-center gap-2">
@@ -160,4 +160,6 @@ export default function UserSelectModal({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default UserSelectModal;

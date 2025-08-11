@@ -1,4 +1,6 @@
-import { Button } from "@/components/ui/button"
+import { useGetProgressCompanies, useDeleteProgressCompaniesCompanyId } from "@/api/generated/taskProgressAPI";
+import type { Company } from "@/api/generated/taskProgressAPI.schemas";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -7,14 +9,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-
-import { useDeleteProgressCompaniesCompanyId,useGetProgressCompanies } from "@/api/generated/taskProgressAPI";
-import type { Company } from "@/api/generated/taskProgressAPI.schemas";
-
-import {extractErrorMessage} from "@/utils/errorHandler";
-
-import { useAlertDialog } from "@/context/useAlertDialog"
+} from "@/components/ui/dialog";
+import { useAlertDialog } from "@/context/useAlertDialog";
+import { extractErrorMessage } from "@/utils/errorHandler";
 
 
 interface CompanySelectorDialogProps {
@@ -23,24 +20,25 @@ interface CompanySelectorDialogProps {
   onSelect: (company: Company) => void
 }
 
-export function CompanySelectorDialog({ open, onClose, onSelect }: CompanySelectorDialogProps) {
-  const { data: companies, refetch} = useGetProgressCompanies()
-  const { openAlertDialog } = useAlertDialog()
-  const { mutate: deleteCompanyMutation, isPending: isDeleting} =useDeleteProgressCompaniesCompanyId({
-    mutation: {
-      onSuccess: () => {
-        refetch();
+export const CompanySelectorDialog = ({ open, onClose, onSelect }: CompanySelectorDialogProps) => {
+  const { data: companies, refetch } = useGetProgressCompanies();
+  const { openAlertDialog } = useAlertDialog();
+  const { mutate: deleteCompanyMutation, isPending: isDeleting } =
+    useDeleteProgressCompaniesCompanyId({
+      mutation: {
+        onSuccess: () => {
+          refetch();
+        },
+        onError: (error) => {
+          const errorMessage = extractErrorMessage(error);
+          console.error("Error deleting company:", errorMessage);
+          openAlertDialog({
+            title: "削除エラー",
+            description: errorMessage || "会社の削除に失敗しました。",
+          });
+        },
       },
-      onError: (error) => {
-        const errorMessage = extractErrorMessage(error);
-        console.error("Error deleting company:", errorMessage);
-        openAlertDialog({
-          title: "削除エラー",
-          description: errorMessage || "会社の削除に失敗しました。",
-        });
-      }
-    }
-});
+    });
 
   const handleSelect = (company: Company) => {
     onSelect(company);
@@ -52,39 +50,39 @@ export function CompanySelectorDialog({ open, onClose, onSelect }: CompanySelect
       description: `「${companyName}」を削除してもよろしいですか？`,
       confirmText: "削除する",
       onConfirm: () => {
-        deleteCompanyMutation({companyId});
-      }
-    })
-  }
+        deleteCompanyMutation({ companyId });
+      },
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-            <DialogTitle>会社を選択</DialogTitle>
-            <DialogDescription>
-              リストから選択するか、新しい会社を登録してください。
-            </DialogDescription>
+          <DialogTitle>会社を選択</DialogTitle>
+          <DialogDescription>
+            リストから選択するか、新しい会社を登録してください。
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-2 max-h-60 overflow-y-auto">
           {companies?.map((company) => (
-          <div key={company.id} className="flex justify-between items-center">
-            <Button
-              variant="outline"
-              className="flex-1 justify-start mr-2"
-              onClick={() => handleSelect(company)}
-            >
-            {company.name}
-            </Button>
-            <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(company.id, company.name)}
-                    disabled={isDeleting}
-                  >
-                    削除
-            </Button>
-          </div>
+            <div key={company.id} className="flex justify-between items-center">
+              <Button
+                variant="outline"
+                className="flex-1 justify-start mr-2"
+                onClick={() => handleSelect(company)}
+              >
+                {company.name}
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => handleDelete(company.id, company.name)}
+                disabled={isDeleting}
+              >
+                削除
+              </Button>
+            </div>
           ))}
         </div>
         <DialogFooter>
@@ -94,5 +92,5 @@ export function CompanySelectorDialog({ open, onClose, onSelect }: CompanySelect
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};

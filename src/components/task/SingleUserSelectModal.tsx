@@ -22,13 +22,13 @@ type Props = {
   organizationId?: number | null;
 };
 
-export  function SingleUserSelectModal({
+const SingleUserSelectModal = ({
   taskId,
   open,
   onClose,
   onConfirm,
   excludedUserIds = [],
-}: Props) {
+}: Props) => {
   const [q, setQ] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null); // 単一選択用の状態
 
@@ -36,8 +36,9 @@ export  function SingleUserSelectModal({
   const { data, isLoading, isError } = useGetProgressTasksTaskIdAuthorizedUsers(
     taskId,
     {
-    query: { enabled: open }, // モーダルが開いた時だけ fetch
-  });
+      query: { enabled: open }, // モーダルが開いた時だけ fetch
+    }
+  );
 
   // 初期化（モーダルオープン毎に選択状態クリア）
   useEffect(() => {
@@ -52,7 +53,7 @@ export  function SingleUserSelectModal({
     if (!q.trim()) return filteredByOrg;
     const query = q.trim().toLowerCase();
     return filteredByOrg.filter((u) => {
-      const name = (u.name ?? "").toLowerCase(); 
+      const name = (u.name ?? "").toLowerCase();
       const organization = (u.organization_name ?? "").toLowerCase();
       return name.includes(query) || organization.includes(query);
     });
@@ -64,7 +65,7 @@ export  function SingleUserSelectModal({
 
   const handleConfirm = () => {
     if (selectedUserId) {
-      const selectedUser = availableUsers.find(u => u.id === selectedUserId);
+      const selectedUser = availableUsers.find((u) => u.id === selectedUserId);
       if (selectedUser) {
         const picked: PickedUser = {
           id: selectedUser.id as number,
@@ -81,7 +82,7 @@ export  function SingleUserSelectModal({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>ユーザーを選択</DialogTitle>
-          <DialogDescription>1人のユーザーを選択してください。</DialogDescription>          
+          <DialogDescription>1人のユーザーを選択してください。</DialogDescription>
         </DialogHeader>
 
         <div className="flex items-center gap-2">
@@ -142,4 +143,6 @@ export  function SingleUserSelectModal({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default SingleUserSelectModal;

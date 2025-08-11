@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function ScopeLevelBadge<T extends string>({
+export const ScopeLevelBadge = <T extends string,>({
   text,
   value,
   options,
@@ -28,7 +28,7 @@ export function ScopeLevelBadge<T extends string>({
   onRemove?: () => void;
   color?: "blue" | "green" | "gray";
   className?: string;
-}) {
+}) => {
   const baseColor =
     color === "blue"
       ? "bg-blue-100 text-blue-800"
@@ -100,4 +100,4 @@ export function ScopeLevelBadge<T extends string>({
       )}
     </Badge>
   );
-}
+};

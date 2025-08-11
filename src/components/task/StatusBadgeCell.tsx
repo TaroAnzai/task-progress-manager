@@ -31,7 +31,7 @@ type Props = {
   disabled?: boolean;
 };
 
-export function StatusBadgeCell({ value, onChange, disabled = false }: Props) {
+export const StatusBadgeCell = ({ value, onChange, disabled = false }: Props) => {
   const [open, setOpen] = useState(false);
 
   const handleSelect = (status: updateStatusType) => {
@@ -64,4 +64,4 @@ export function StatusBadgeCell({ value, onChange, disabled = false }: Props) {
       </PopoverContent>
     </Popover>
   );
-}
+};

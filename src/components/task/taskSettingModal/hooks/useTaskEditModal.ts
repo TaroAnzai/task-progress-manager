@@ -19,9 +19,9 @@ import { extractErrorMessage } from "@/utils/errorHandler";
 import {useTasks} from "@/context/useTasks"
 import { useUser } from "@/context/useUser";
 
-export function useTaskEditModal(task: Task, onClose: () => void) {
+export const useTaskEditModal = (task: Task, onClose: () => void) => {
   const { user } = useUser();
-  const {refetch} = useTasks();
+  const { refetch } = useTasks();
 
   const [formState, setFormState] = useState({
     title: task.title || "",
@@ -37,8 +37,6 @@ export function useTaskEditModal(task: Task, onClose: () => void) {
   const { data: objData } = useGetProgressObjectivesTasksTaskId(task.id);
   const { data: authorized_users } = useGetProgressTasksTaskIdAuthorizedUsers(task.id);
 
-
-
   const remove = useDeleteProgressObjectivesObjectiveId();
 
   useEffect(() => {
@@ -50,9 +48,8 @@ export function useTaskEditModal(task: Task, onClose: () => void) {
     if (objData?.objectives) setObjectives(objData.objectives);
   }, [objData]);
 
-
   const handleChange = (key: string, value: string) => {
-    setFormState(prev => ({ ...prev, [key]: value }));
+    setFormState((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSave = async () => {
@@ -66,7 +63,7 @@ export function useTaskEditModal(task: Task, onClose: () => void) {
         description: formState.description,
         due_date: formState.due_date,
       }).filter(([, value]) => value != null && value !== "")
-    );    
+    );
     setIsSaving(true);
     try {
       await updateTask.mutateAsync({
@@ -86,10 +83,9 @@ export function useTaskEditModal(task: Task, onClose: () => void) {
   };
 
   const handleRemoveObjective = async (objectiveId: number) => {
-
     try {
       await remove.mutateAsync({ objectiveId });
-      setObjectives(prev => prev.filter(o => o.id !== objectiveId));
+      setObjectives((prev) => prev.filter((o) => o.id !== objectiveId));
     } catch (err) {
       console.error("オブジェクティブ削除失敗", err);
     }
@@ -104,4 +100,5 @@ export function useTaskEditModal(task: Task, onClose: () => void) {
     objectives,
     handleRemoveObjective,
   };
-}
+};
+

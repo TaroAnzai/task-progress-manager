@@ -8,7 +8,7 @@ type EditableCellProps = {
   onSave: (newValue: string) => void;
 };
 
-export function EditableCell({ value, onSave }: EditableCellProps) {
+export const EditableCell = ({ value, onSave }: EditableCellProps) => {
   const [editing, setEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value);
 
@@ -41,4 +41,4 @@ export function EditableCell({ value, onSave }: EditableCellProps) {
       {value || "+"}
     </div>
   );
-}
+};
