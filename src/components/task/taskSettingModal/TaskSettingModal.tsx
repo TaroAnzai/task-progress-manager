@@ -12,7 +12,7 @@ interface TaskSettingModalProps {
   onClose: () => void;
 }
 
-export function TaskSettingModal({ open, task, onClose }: TaskSettingModalProps) {
+export const TaskSettingModal = ({ open, task, onClose }: TaskSettingModalProps) => {
   const {
     formState,
     isEditable,
@@ -20,9 +20,9 @@ export function TaskSettingModal({ open, task, onClose }: TaskSettingModalProps)
     handleSave,
     isSaving,
     objectives,
-    handleRemoveObjective
+    handleRemoveObjective,
   } = useTaskEditModal(task, onClose);
-  
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
@@ -31,23 +31,22 @@ export function TaskSettingModal({ open, task, onClose }: TaskSettingModalProps)
           <DialogDescription>タスクを編集します</DialogDescription>
         </DialogHeader>
 
-          <TaskEditForm formState={formState} isEditable={isEditable} onChange={handleChange} />
-            <ObjectiveSection
-              taskId={task.id}
-              objectives={objectives}
-              isEditable={isEditable}
-              onRemoveObjective={handleRemoveObjective}
-            />
-          <DialogFooter>
-            <SaveButton
-              isEditable={isEditable}
-              isSaving={isSaving}
-              onSave={handleSave}
-              onClose={onClose}
-            />
-          </DialogFooter>
-
+        <TaskEditForm formState={formState} isEditable={isEditable} onChange={handleChange} />
+        <ObjectiveSection
+          taskId={task.id}
+          objectives={objectives}
+          isEditable={isEditable}
+          onRemoveObjective={handleRemoveObjective}
+        />
+        <DialogFooter>
+          <SaveButton
+            isEditable={isEditable}
+            isSaving={isSaving}
+            onSave={handleSave}
+            onClose={onClose}
+          />
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-}
+};

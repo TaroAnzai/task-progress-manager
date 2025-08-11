@@ -1,8 +1,13 @@
-import { useState } from "react"
+import { useState } from "react";
 
-import { useGetProgressCompanies, usePostProgressCompanies, usePostProgressOrganizations, usePostProgressUsers } from "@/api/generated/taskProgressAPI";
-import {UserInputRole} from "@/api/generated/taskProgressAPI.schemas"
-import { Button } from "@/components/ui/button"
+import {
+  useGetProgressCompanies,
+  usePostProgressCompanies,
+  usePostProgressOrganizations,
+  usePostProgressUsers,
+} from "@/api/generated/taskProgressAPI";
+import { UserInputRole } from "@/api/generated/taskProgressAPI.schemas";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -11,10 +16,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { useAlertDialog } from "@/context/useAlertDialog"
-import { extractErrorMessage } from "@/utils/errorHandler" 
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useAlertDialog } from "@/context/useAlertDialog";
+import { extractErrorMessage } from "@/utils/errorHandler";
 
 interface CompanyRegisterDialogProps {
   open: boolean
@@ -22,18 +27,17 @@ interface CompanyRegisterDialogProps {
   onSuccess?: () => void
 }
 
-export function CompanyRegisterDialog({ open, onClose}: CompanyRegisterDialogProps) {
-  const [name, setName] = useState("")
-  const [rootOrgName, setRootOrgName] = useState("")
-  const [systemAdminName, setSystemAdminName] = useState("")
-  const [systemAdminEmail, setSystemAdminEmail] = useState("")
-  const { refetch } = useGetProgressCompanies() 
-  const { openAlertDialog } = useAlertDialog()
+export const CompanyRegisterDialog = ({ open, onClose }: CompanyRegisterDialogProps) => {
+  const [name, setName] = useState("");
+  const [rootOrgName, setRootOrgName] = useState("");
+  const [systemAdminName, setSystemAdminName] = useState("");
+  const [systemAdminEmail, setSystemAdminEmail] = useState("");
+  const { refetch } = useGetProgressCompanies();
+  const { openAlertDialog } = useAlertDialog();
 
-  const createCompanyMutation = usePostProgressCompanies()
-  const createRootOrgMutation = usePostProgressOrganizations()
-  const createUserMutation = usePostProgressUsers()
-
+  const createCompanyMutation = usePostProgressCompanies();
+  const createRootOrgMutation = usePostProgressOrganizations();
+  const createUserMutation = usePostProgressUsers();
 
   const handleSubmit = async () => {
     if (!name.trim()) return;
@@ -41,33 +45,43 @@ export function CompanyRegisterDialog({ open, onClose}: CompanyRegisterDialogPro
     const registeRootOrgName = rootOrgName.trim();
     const registerSystemAdminName = systemAdminName.trim();
     const registerSystemAdminEmail = systemAdminEmail.trim();
-    if (!registerCompanyName || !registeRootOrgName || !registerSystemAdminName || !registerSystemAdminEmail) {
+    if (
+      !registerCompanyName ||
+      !registeRootOrgName ||
+      !registerSystemAdminName ||
+      !registerSystemAdminEmail
+    ) {
       openAlertDialog({
         title: "登録エラー",
-        description: "会社名、ルート組織名、システム管理者名、システム管理者メールアドレスを入力してください。",
+        description:
+          "会社名、ルート組織名、システム管理者名、システム管理者メールアドレスを入力してください。",
         showCancel: false,
       });
       return;
     }
-    try{
-      const createCompany = await createCompanyMutation.mutateAsync({data:{name:registerCompanyName}})
-      const createOrgData ={
-        name:registeRootOrgName,
-        org_code:"ROOT",
-        company_id:createCompany.id
-      }
-      const createRootOrg = await createRootOrgMutation.mutateAsync({data:createOrgData})
+    try {
+      const createCompany = await createCompanyMutation.mutateAsync({
+        data: { name: registerCompanyName },
+      });
+      const createOrgData = {
+        name: registeRootOrgName,
+        org_code: "ROOT",
+        company_id: createCompany.id,
+      };
+      const createRootOrg = await createRootOrgMutation.mutateAsync({
+        data: createOrgData,
+      });
       const createUserData = {
-          name: registerSystemAdminName,
-          email: registerSystemAdminEmail,
-          password: registerSystemAdminEmail,
-          role: UserInputRole.SYSTEM_ADMIN,
-          organization_id: createRootOrg.id,
-      }
-      await createUserMutation.mutateAsync({data:createUserData})
-      onClose()
-      refetch()
-    }catch(error){
+        name: registerSystemAdminName,
+        email: registerSystemAdminEmail,
+        password: registerSystemAdminEmail,
+        role: UserInputRole.SYSTEM_ADMIN,
+        organization_id: createRootOrg.id,
+      };
+      await createUserMutation.mutateAsync({ data: createUserData });
+      onClose();
+      refetch();
+    } catch (error) {
       const errorMessage = extractErrorMessage(error);
       openAlertDialog({
         title: "登録エラー",
@@ -75,16 +89,14 @@ export function CompanyRegisterDialog({ open, onClose}: CompanyRegisterDialogPro
         showCancel: false,
       });
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>会社を登録</DialogTitle>
-          <DialogDescription>
-            新しい会社を登録してください。
-          </DialogDescription>
+          <DialogDescription>新しい会社を登録してください。</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <Input
@@ -115,14 +127,12 @@ export function CompanyRegisterDialog({ open, onClose}: CompanyRegisterDialogPro
           />
         </div>
         <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button onClick={handleSubmit}>
-              登録
-            </Button>
-          </DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <Button onClick={handleSubmit}>登録</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};

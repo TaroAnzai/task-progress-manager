@@ -40,7 +40,7 @@ export interface TaskScopeModalProps {
   onClose: () => void;
 }
 
-export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
+export const TaskScopeModal = ({ task, open, onClose }: TaskScopeModalProps) => {
   const { user : currentUser } = useUser();
   const { data:authorized_users} = useGetProgressTasksTaskIdAuthorizedUsers(task.id);
   const { data: getUsers } = useGetProgressTasksTaskIdAccessUsers(task.id);
@@ -146,87 +146,94 @@ export function TaskScopeModal({ task, open, onClose }: TaskScopeModalProps) {
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>"タスクスコープ設定"</DialogTitle>
-          <DialogDescription></DialogDescription>
-        </DialogHeader>
-        <div className="mt-6 space-y-4">
-          <div>
-            <h3 className="text-base font-semibold mb-1">ユーザースコープ</h3>
-            <div className="flex flex-wrap gap-2">
-              {scopeUsers.map((user) => (
-                <ScopeLevelBadge
-                  key={user.user_id}
-                  text={user.name}
-                  value={user.access_level}
-                  options={SCOPE_LEVEL_OPTIONS}
-                  editable={isEditable}
-                  onChange={(val) => updateUserLevel(user.user_id!, val)}
-                  onRemove={() => onRemoveUser(user.user_id)}
-                  color="blue"
-                />
-              ))}
-              {isEditable && (
-                <Button size="sm" variant="outline" onClick={() => setOpenUserModal(true)}>
-                  <Plus className="w-4 h-4 mr-1" /> 追加
-                </Button>
-              )}
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>"タスクスコープ設定"</DialogTitle>
+            <DialogDescription></DialogDescription>
+          </DialogHeader>
+          <div className="mt-6 space-y-4">
+            <div>
+              <h3 className="text-base font-semibold mb-1">ユーザースコープ</h3>
+              <div className="flex flex-wrap gap-2">
+                {scopeUsers.map((user) => (
+                  <ScopeLevelBadge
+                    key={user.user_id}
+                    text={user.name}
+                    value={user.access_level}
+                    options={SCOPE_LEVEL_OPTIONS}
+                    editable={isEditable}
+                    onChange={(val) => updateUserLevel(user.user_id!, val)}
+                    onRemove={() => onRemoveUser(user.user_id)}
+                    color="blue"
+                  />
+                ))}
+                {isEditable && (
+                  <Button size="sm" variant="outline" onClick={() => setOpenUserModal(true)}>
+                    <Plus className="w-4 h-4 mr-1" /> 追加
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-base font-semibold mb-1">組織スコープ</h3>
+              <div className="flex flex-wrap gap-2">
+                {scopeOrgs.map((org) => (
+                  <ScopeLevelBadge
+                    key={org.organization_id}
+                    text={org.name}
+                    value={org.access_level}
+                    options={SCOPE_LEVEL_OPTIONS}
+                    editable={isEditable}
+                    onChange={(val) => updateOrgLevel(org.organization_id!, val)}
+                    onRemove={() => onRemoveOrg(org.organization_id)}
+                    color="blue"
+                  />
+                ))}
+                {isEditable && (
+                  <Button size="sm" variant="outline" onClick={() => setOpenOrgModal(true)}>
+                    <Plus className="w-4 h-4 mr-1" /> 追加
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
-
-          <div>
-            <h3 className="text-base font-semibold mb-1">組織スコープ</h3>
-            <div className="flex flex-wrap gap-2">
-              {scopeOrgs.map((org) => (
-                <ScopeLevelBadge
-                  key={org.organization_id}
-                  text={org.name}
-                  value={org.access_level}
-                  options={SCOPE_LEVEL_OPTIONS}
-                  editable={isEditable}
-                  onChange={(val) => updateOrgLevel(org.organization_id!, val)}
-                  onRemove={() => onRemoveOrg(org.organization_id)}
-                  color="blue"
-                />                
-              ))}
-              {isEditable && (
-                <Button size="sm" variant="outline" onClick={() => setOpenOrgModal(true)}>
-                  <Plus className="w-4 h-4 mr-1" /> 追加
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="mt-6 flex justify-end">
-          <Button variant="outline" onClick={onClose}>
-                閉じる
-          </Button>
-
-          {isEditable ? (
-            <Button onClick={handleUpdateAccess} disabled={isSaving}>
-              {isSaving ? "保存中..." : "保存"}
+          <div className="mt-6 flex justify-end">
+            <Button variant="outline" onClick={onClose}>
+              閉じる
             </Button>
-          ) : null}
-        </div>
-      </DialogContent>
-    </Dialog>
-    <UserSelectModal
-      open={openUserModal}
-      onClose={() => {setOpenUserModal(false)}}
-      onConfirm={(users) => {handleUsersSelected(users)}}
-      excludedUserIds={[
-        ...scopeUsers.map(u => u.user_id),
-        ...(currentUser ? [currentUser.id] : []),
-      ]}
-    />
-    <OrganizationScopeSelectModal
-      open={openOrgModal}
-      onClose={() => {setOpenOrgModal(false)}}
-      onSelect={(org) => {handleOrgsSelected(org)}}
-      selectedOrgIds={scopeOrgs.map(o => o.organization_id)}
-    />
-  </>
 
-  )
-}
+            {isEditable ? (
+              <Button onClick={handleUpdateAccess} disabled={isSaving}>
+                {isSaving ? "保存中..." : "保存"}
+              </Button>
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
+      <UserSelectModal
+        open={openUserModal}
+        onClose={() => {
+          setOpenUserModal(false);
+        }}
+        onConfirm={(users) => {
+          handleUsersSelected(users);
+        }}
+        excludedUserIds={[
+          ...scopeUsers.map((u) => u.user_id),
+          ...(currentUser ? [currentUser.id] : []),
+        ]}
+      />
+      <OrganizationScopeSelectModal
+        open={openOrgModal}
+        onClose={() => {
+          setOpenOrgModal(false);
+        }}
+        onSelect={(org) => {
+          handleOrgsSelected(org);
+        }}
+        selectedOrgIds={scopeOrgs.map((o) => o.organization_id)}
+      />
+    </>
+  );
+};

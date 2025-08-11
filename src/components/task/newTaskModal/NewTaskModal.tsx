@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { toast } from "sonner"
+import { toast } from "sonner";
 
 import {
   usePostProgressTasks,
@@ -11,7 +11,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,17 +22,14 @@ interface TaskSettingModalProps {
   onClose: () => void;
 }
 
-export default function NewTaskModal({ open, onClose }: TaskSettingModalProps) {
-
+const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
   const { refetch } = useTasks();
-
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
 
   const createTaskMutation = usePostProgressTasks();
-
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -48,12 +45,12 @@ export default function NewTaskModal({ open, onClose }: TaskSettingModalProps) {
 
     try {
       await createTaskMutation.mutateAsync({ data: payload });
-      toast("作成完了",{description: "新しいタスクを作成しました" });
+      toast("作成完了", { description: "新しいタスクを作成しました" });
       refetch();
       onClose();
     } catch (err) {
       console.error("タスク保存失敗", err);
-      toast("保存失敗",{description: "タスクの保存に失敗しました"});
+      toast("保存失敗", { description: "タスクの保存に失敗しました" });
     }
   };
 
@@ -94,4 +91,6 @@ export default function NewTaskModal({ open, onClose }: TaskSettingModalProps) {
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default NewTaskModal;
