@@ -1,5 +1,5 @@
 // src/components/task/objective/EditableCell.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 
@@ -12,11 +12,19 @@ export const EditableCell = ({ value, onSave }: EditableCellProps) => {
   const [editing, setEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value);
 
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+  const finishEditing = () => {
+    setEditing(false);
+    // 表示は常に親のvalue基準に戻す（親が成功なら後で新値に変わる）
+    setInputValue(value);
+  };
   const handleSave = () => {
     if (inputValue !== value) {
       onSave(inputValue);
     }
-    setEditing(false);
+    finishEditing();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

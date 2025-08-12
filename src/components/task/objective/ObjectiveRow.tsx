@@ -1,9 +1,12 @@
 // src/components/task/ObjectiveRow.tsx
 import { useState } from "react";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import {useGetProgressUpdatesObjectiveIdLatestProgress} from "@/api/generated/taskProgressAPI"
+import {  getGetProgressUpdatesObjectiveIdQueryOptions,
+          useDeleteProgressUpdatesProgressId,
+          useGetProgressUpdatesObjectiveIdLatestProgress        } from "@/api/generated/taskProgressAPI"
 import {usePostProgressUpdatesObjectiveId} from "@/api/generated/taskProgressAPI"
 import type {Objective,ObjectiveInput, ObjectiveUpdate, ObjectiveUpdateStatus as updateStatusType,ProgressInput} from "@/api/generated/taskProgressAPI.schemas";
 import { ProgressStatus as StatusType } from "@/api/generated/taskProgressAPI.schemas";
@@ -16,6 +19,7 @@ import { StatusBadgeCell } from "../StatusBadgeCell";
 
 import { DateCell } from "./DateCell";
 import { EditableCell } from "./EditableCell";
+import {ProgressListModal} from "./ProgressListModal";
 type ObjectiveRowProps = {
   key: number | string;
   taskId: number;
@@ -26,13 +30,15 @@ type ObjectiveRowProps = {
 };
 
 export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: ObjectiveRowProps) => {
+  const qc = useQueryClient();
   const isNew = !objective;
   const [title, setTitle] = useState(objective?.title ?? "");
   const [dueDate, setDueDate] = useState(objective?.due_date ?? undefined);
   const [status, setStatus] = useState<StatusType>(objective?.status ?? ObjectiveStatus.UNDEFINED);
   const [isUserSelectModalOpen, setIsUserSelectModalOpen] = useState(false);
+  const [isProgressListModalOpen, setIsProgressListModalOpen] = useState(false);
   const { openAlertDialog } = useAlertDialog();
-  const {data, refetch:refetchProgress} =useGetProgressUpdatesObjectiveIdLatestProgress(
+  const {data, refetch: refetchLatestProgress} =useGetProgressUpdatesObjectiveIdLatestProgress(
     objective?.id??0,
     {query: {enabled: !!objective,}}
     )
@@ -41,9 +47,12 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
   const {mutate:postProgressMutation } = usePostProgressUpdatesObjectiveId(
     {
     mutation:{
-      onSuccess: () => {
+      onSuccess: (_data,variables) => {
         toast.success("進捗を更新しました");
-        refetchProgress();
+        refetchLatestProgress();
+        const { queryKey } =
+          getGetProgressUpdatesObjectiveIdQueryOptions(variables.objectiveId, {});
+        qc.invalidateQueries({ queryKey });      
       },
       onError: () => {
         openAlertDialog({
@@ -54,7 +63,27 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
       }
     }
   })
-
+  //進捗削除
+  const {mutate:deleteProgressMutation } = useDeleteProgressUpdatesProgressId(
+    {
+    mutation:{
+      onSuccess: () => {
+        toast.success("進捗を削除しました");
+        refetchLatestProgress();
+        if (objective){
+          const { queryKey } =  getGetProgressUpdatesObjectiveIdQueryOptions(objective.id, {});
+          qc.invalidateQueries({ queryKey });
+      }      
+      },
+      onError: () => {
+        openAlertDialog({
+          title: "進捗登録失敗",
+          description: "このデータを削除してもよろしいですか？",
+          showCancel:false
+        });
+      }
+    }
+  })
   const handleTitleSave = (newTitle: string) => {
     setTitle(newTitle);
     if (isNew) {
@@ -83,12 +112,20 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
     }
   };
   const handleProgressSave = (newProgress: string) => {
+    if (newProgress === latest_progress || newProgress === "") {
+      return false;
+    }
     if (objective) {
       const data:ProgressInput = {
        detail: newProgress,
        report_date : new Date().toISOString()
       }
       postProgressMutation({objectiveId: objective.id, data: data});
+    }
+  };
+  const handleProgressDelete = (progressId: number) => {
+    if (objective) {
+      deleteProgressMutation({progressId: progressId});
     }
   };
 
@@ -117,7 +154,9 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
             </td>
             <td className="px-3 py-2">{latest_report_date}</td>
             <td className="px-3 py-2">
-              <button className="text-blue-600 hover:underline text-xs">履歴</button>
+              <button className="text-blue-600 hover:underline text-xs"
+              onClick={() => setIsProgressListModalOpen(true)}
+              >履歴</button>
             </td>
           </>
         )}
@@ -130,6 +169,14 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
           handleAssinedUserSave(newUserId.id);
         }}
       />
+      {objective && (
+        <ProgressListModal
+          open={isProgressListModalOpen}
+          objective={objective}
+          onClose={() => {setIsProgressListModalOpen(false);}}
+          onDelete={(objective_id) => {handleProgressDelete(objective_id)}}
+        />
+      )}
     </>
   );
 };
