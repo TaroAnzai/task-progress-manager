@@ -2,6 +2,7 @@
 import { useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { GripVertical } from "lucide-react";
 import { toast } from "sonner";
 
 import {  getGetProgressUpdatesObjectiveIdQueryOptions,
@@ -20,16 +21,39 @@ import { StatusBadgeCell } from "../StatusBadgeCell";
 import { DateCell } from "./DateCell";
 import { EditableCell } from "./EditableCell";
 import {ProgressListModal} from "./ProgressListModal";
-type ObjectiveRowProps = {
-  key: number | string;
-  taskId: number;
-  objective: Objective | null; // nullなら新規
-  index: number;
-  onSaveNew: (obj: ObjectiveInput) => void;
-  onUpdate: (objId: number, obj: ObjectiveUpdate) => void;
-};
 
-export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: ObjectiveRowProps) => {
+interface ObjectiveRowProps {
+  taskId: number;
+  objective: Objective | null;
+  index: number;
+  onSaveNew: (obj: ObjectiveInput) => Promise<void>;
+  onUpdate: (objId: number, updates: ObjectiveUpdate) => Promise<void>;
+  // ドラッグ関連のprops
+  isDragging: boolean;
+  isDragOver: boolean;
+  dragOverPosition: 'top' | 'bottom' | null;
+  onDragStart: (e: React.DragEvent, index: number) => void;
+  onDragOver: (e: React.DragEvent, index: number) => void;
+  onDragLeave: () => void;
+  onDrop: (e: React.DragEvent, index: number) => void;
+  onDragEnd: (e: React.DragEvent) => void;
+}
+
+export const ObjectiveRow = ({
+  taskId,
+  objective,
+  index,
+  onSaveNew,
+  onUpdate,
+  isDragging,
+  isDragOver,
+  dragOverPosition,
+  onDragStart,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+  onDragEnd,
+}: ObjectiveRowProps) => {
   const qc = useQueryClient();
   const isNew = !objective;
   const [title, setTitle] = useState(objective?.title ?? "");
@@ -128,38 +152,86 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
       deleteProgressMutation({progressId: progressId});
     }
   };
+  //ドラッグオーバ時のクラス設定
+  const getDragOverClasses = () => {
+    if (!isDragOver) return '';
+    console.log('dragOverPosition', dragOverPosition);
+    if (dragOverPosition === 'top') {
+      return 'border-t-2 border-blue-500';
+    } else if (dragOverPosition === 'bottom') {
+      return 'border-b-2 border-blue-500';
+    }
+    return '';
+  };
 
+
+  if(isNew) {
   return (
     <>
-      <tr className="border-b">
+      <tr
+        className="border-b"
+        key = {objective?.id}
+        data-id = {objective?.id}
+      >
+        <td className="w-8 px-2 py-2 select-none">
+        </td>
         <td className="px-3 py-2">
           <EditableCell value={title} onSave={handleTitleSave} />
         </td>
-        {!isNew && (
-          <>
-            <td className="px-3 py-2">
-              <DateCell value={dueDate} onSave={handleDateSave} />
-            </td>
-            <td className="px-3 py-2">
-              <StatusBadgeCell value={status} onChange={handleStatusSave} />
-            </td>
-            <td
-              className="px-3 py-2 cursor-pointer hover:bg-muted/30"
-              onClick={() => setIsUserSelectModalOpen(true)}
-            >
-              {objective?.assigned_user_name ?? "-"}
-            </td>
-            <td className="px-3 py-2">
-              <EditableCell value={latest_progress} onSave={handleProgressSave} />
-            </td>
-            <td className="px-3 py-2">{latest_report_date}</td>
-            <td className="px-3 py-2">
-              <button className="text-blue-600 hover:underline text-xs"
-              onClick={() => setIsProgressListModalOpen(true)}
-              >履歴</button>
-            </td>
-          </>
-        )}
+      </tr>
+    </>
+  );    
+  }else{
+  return (
+    <>
+      <tr
+        className={`
+            border-b hover:bg-gray-50 transition-colors
+            ${isDragging ? 'opacity-50' : ''}
+            ${getDragOverClasses()}
+          `}
+        key = {objective?.id}
+        data-id = {objective?.id}
+        onDragOver ={(e) => onDragOver(e, index)}
+        onDragLeave = {() => onDragLeave()}
+      >
+            {/* 🔽 追加: 先頭ハンドル列 */}
+        <td className="w-8 px-2 py-2 select-none">
+          <span
+            className="inline-flex items-center justify-center cursor-grab active:cursor-grabbing"
+            title="ドラッグで並び替え"
+            draggable
+            onDragStart={(e) => onDragStart(e, index)}
+            onDragEnd={(e) => onDragEnd(e)}
+          >
+            <GripVertical className="h-4 w-4 text-muted-foreground" />
+          </span>
+        </td>
+        <td className="px-3 py-2">
+          <EditableCell value={title} onSave={handleTitleSave} />
+        </td>
+        <td className="px-3 py-2">
+          <DateCell value={dueDate} onSave={handleDateSave} />
+        </td>
+        <td className="px-3 py-2">
+          <StatusBadgeCell value={status} onChange={handleStatusSave} />
+        </td>
+        <td
+          className="px-3 py-2 cursor-pointer hover:bg-muted/30"
+          onClick={() => setIsUserSelectModalOpen(true)}
+        >
+          {objective?.assigned_user_name ?? "-"}
+        </td>
+        <td className="px-3 py-2">
+          <EditableCell value={latest_progress} onSave={handleProgressSave} />
+        </td>
+        <td className="px-3 py-2">{latest_report_date}</td>
+        <td className="px-3 py-2">
+          <button className="text-blue-600 hover:underline text-xs"
+          onClick={() => setIsProgressListModalOpen(true)}
+          >履歴</button>
+        </td>
+
       </tr>
       <SingleUserSelectModal
         taskId={taskId}
@@ -179,5 +251,7 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
       )}
     </>
   );
+  }
+
 };
 

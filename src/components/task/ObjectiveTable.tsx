@@ -20,14 +20,17 @@ interface ObjectiveTableProps {
   taskId: number;
 }
 
-const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
+export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
   const { user } = useUser();
 
-  const { data, isLoading, refetch: refetchObjectives } =
-    useGetProgressObjectivesTasksTaskId(taskId);
+  const { data, isLoading, refetch: refetchObjectives } =  useGetProgressObjectivesTasksTaskId(taskId);
   const postObjective = usePostProgressObjectives();
   const updateObjective = usePutProgressObjectivesObjectiveId();
+
   const [objectives, setObjectives] = useState<Objective[]>([]);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [dragOverPosition, setDragOverPosition] = useState<'top' | 'bottom' | null>(null);
 
   useEffect(() => {
     if (data) {
@@ -94,11 +97,118 @@ const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
     return <Skeleton className="h-16 w-full" />;
   }
 
+// ドラッグ開始
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    
+    // ドラッグ中の要素のスタイル
+    const target = e.target as HTMLElement;
+    const row = target.closest('tr');
+    if (row) {
+      row.classList.add('opacity-50');
+    }
+  };
+
+  // ドラッグ中
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const midpoint = rect.top + rect.height / 2;
+    const isAbove = e.clientY < midpoint;
+    console.log('index', index,'e.clientY', e.clientY,'rect.top', rect.top,'rect.height', rect.height,'midpoint', midpoint) ;
+    console.log('isAbove', isAbove);
+    setDragOverIndex(index);
+    setDragOverPosition(isAbove ? 'top' : 'bottom');
+  };
+
+  // ドラッグ離脱
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+    setDragOverPosition(null);
+  };
+
+  // ドロップ
+  const handleDrop = async (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+
+    if (draggedIndex === null || draggedIndex === targetIndex) {
+      resetDragState();
+      return;
+    }
+
+    try {
+      const newObjectives = [...objectives];
+      const draggedItem = newObjectives[draggedIndex];
+      
+      // 配列から削除
+      newObjectives.splice(draggedIndex, 1);
+      
+      // 新しい位置に挿入
+      let insertIndex = targetIndex;
+      if (dragOverPosition === 'bottom') {
+        insertIndex = targetIndex + 1;
+      }
+      if (draggedIndex < targetIndex && dragOverPosition === 'top') {
+        insertIndex = targetIndex;
+      } else if (draggedIndex < targetIndex && dragOverPosition === 'bottom') {
+        insertIndex = targetIndex;
+      }
+
+      newObjectives.splice(insertIndex, 0, draggedItem);
+      
+      // UIを即座に更新
+      setObjectives(newObjectives);
+
+      // APIに順序更新を送信
+      const orderedIds = newObjectives.map(obj => obj.id);
+      console.log("順序更新:", orderedIds);
+
+
+      toast.success("順序を更新しました");
+    } catch (e) {
+      const err = extractErrorMessage(e);
+      console.error("順序更新失敗:", err);
+      toast.error("順序更新に失敗しました", { description: err });
+      // エラー時は元の状態に戻す
+      refetchObjectives();
+    } finally {
+      resetDragState();
+    }
+  };
+
+  // ドラッグ終了
+  const handleDragEnd = (e: React.DragEvent) => {
+    const target = e.target as HTMLElement;
+    const row = target.closest('tr');
+    if (row) {
+      row.classList.remove('opacity-50');
+    }
+    resetDragState();
+  };
+
+  // ドラッグ状態リセット
+  const resetDragState = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    setDragOverPosition(null);
+  };
+
+  if (isLoading) {
+    return <Skeleton className="h-16 w-full" />;
+  }
+
+
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full text-sm text-left">
         <thead className="bg-gray-100">
           <tr>
+            <th className="px-3 py-2">#</th>
             <th className="px-3 py-2">オブジェクティブ</th>
             <th className="px-3 py-2">期限</th>
             <th className="px-3 py-2">ステータス</th>
@@ -108,7 +218,12 @@ const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
             <th className="px-3 py-2">履歴</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody onDragOver={(e) => {
+            // drop可能にする
+            e.preventDefault();
+          }}
+          className="[&_tr.drag-over-top]:border-t-2 [&_tr.drag-over-bottom]:border-b-2"
+        >
           {objectives.map((obj, idx) => (
             <ObjectiveRow
               key={obj.id}
@@ -117,6 +232,15 @@ const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
               index={idx}
               onSaveNew={handleSaveNew}
               onUpdate={handleUpdate}
+              // ドラッグ関連のprops
+              isDragging={draggedIndex === idx}
+              isDragOver={dragOverIndex === idx}
+              dragOverPosition={dragOverPosition}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onDragEnd={handleDragEnd}              
             />
           ))}
 
@@ -128,6 +252,15 @@ const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
             index={objectives.length}
             onSaveNew={handleSaveNew}
             onUpdate={handleUpdate}
+            // 新規行はドラッグ無効
+            isDragging={false}
+            isDragOver={false}
+            dragOverPosition={null}
+            onDragStart={() => {}}
+            onDragOver={() => {}}
+            onDragLeave={() => {}}
+            onDrop={() => {}}
+            onDragEnd={() => {}}            
           />
         </tbody>
       </table>
@@ -135,4 +268,3 @@ const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
   );
 };
 
-export default ObjectiveTable;

@@ -4,7 +4,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter,DialogHeader, Di
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -22,7 +21,7 @@ interface ProgressListModalProps {
 }
 
 export const ProgressListModal = ({ open, objective, onClose, onDelete }: ProgressListModalProps) => {
-  const {data, isLoading, isError} = useGetProgressUpdatesObjectiveId(objective?.id);
+  const {data} = useGetProgressUpdatesObjectiveId(objective?.id);
 
   return(
     <Dialog open={open} onOpenChange={onClose}>

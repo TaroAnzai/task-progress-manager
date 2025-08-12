@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import type { Task } from '@/api/generated/taskProgressAPI.schemas';
 
-import ObjectiveTable from './ObjectiveTable';
+import {ObjectiveTable} from './ObjectiveTable';
 import TaskHeader from './TaskHeader';
 
 
