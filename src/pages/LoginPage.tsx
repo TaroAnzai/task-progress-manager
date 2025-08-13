@@ -74,9 +74,7 @@ function useLoginForm() {
     password,
   });
 
-  const isFormValid = () => {
-    return email.trim() !== "" && password !== "";
-  };
+  const isFormValid = () => email.trim() !== "" && password !== "";
 
   return {
     email,

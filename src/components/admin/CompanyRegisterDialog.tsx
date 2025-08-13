@@ -1,12 +1,5 @@
 import { useState } from "react";
 
-import {
-  useGetProgressCompanies,
-  usePostProgressCompanies,
-  usePostProgressOrganizations,
-  usePostProgressUsers,
-} from "@/api/generated/taskProgressAPI";
-import { UserInputRole } from "@/api/generated/taskProgressAPI.schemas";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,8 +11,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useAlertDialog } from "@/context/useAlertDialog";
+
+import {
+  useGetProgressCompanies,
+  usePostProgressCompanies,
+  usePostProgressOrganizations,
+  usePostProgressUsers,
+} from "@/api/generated/taskProgressAPI";
+import { UserInputRole } from "@/api/generated/taskProgressAPI.schemas";
+
 import { extractErrorMessage } from "@/utils/errorHandler";
+
+import { useAlertDialog } from "@/context/useAlertDialog";
 
 interface CompanyRegisterDialogProps {
   open: boolean

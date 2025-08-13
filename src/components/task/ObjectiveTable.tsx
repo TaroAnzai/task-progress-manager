@@ -5,10 +5,8 @@ import { toast } from "sonner";
 
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { useGetProgressObjectivesTasksTaskId, usePutProgressObjectivesObjectiveId } from '@/api/generated/taskProgressAPI';
-import { usePostProgressObjectives } from "@/api/generated/taskProgressAPI";
-import type { ObjectiveInput, ObjectiveUpdate } from '@/api/generated/taskProgressAPI.schemas';
-import type { Objective } from "@/api/generated/taskProgressAPI.schemas";
+import { useGetProgressObjectivesTasksTaskId, usePostProgressObjectives, usePostProgressTasksTaskIdObjectivesOrder, usePutProgressObjectivesObjectiveId } from '@/api/generated/taskProgressAPI';
+import type { Objective, ObjectiveInput, ObjectiveUpdate } from '@/api/generated/taskProgressAPI.schemas';
 
 import { extractErrorMessage } from "@/utils/errorHandler";
 
@@ -23,7 +21,7 @@ interface ObjectiveTableProps {
 export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
   const { user } = useUser();
 
-  const { data, isLoading, refetch: refetchObjectives } =  useGetProgressObjectivesTasksTaskId(taskId);
+  const { data, isLoading, refetch: refetchObjectives } = useGetProgressObjectivesTasksTaskId(taskId);
   const postObjective = usePostProgressObjectives();
   const updateObjective = usePutProgressObjectivesObjectiveId();
 
@@ -31,6 +29,25 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [dragOverPosition, setDragOverPosition] = useState<'top' | 'bottom' | null>(null);
+
+  const { mutate: postObjectivesOrderMutation } = usePostProgressTasksTaskIdObjectivesOrder(
+    {
+      mutation: {
+        onSuccess: () => {
+          toast.success("順序を更新しました");
+          refetchObjectives();
+        },
+        onError: (e) => {
+          const err = extractErrorMessage(e);
+          toast.error("順序更新に失敗しました", { description: err });
+          refetchObjectives();//登録失敗時に元の並びに戻す
+        },
+        onSettled: () => {
+          resetDragState();
+        },
+      }
+    }
+  );
 
   useEffect(() => {
     if (data) {
@@ -76,7 +93,6 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
       console.warn("タイトルが空文字のため更新しません");
       return;
     }
-
     try {
       await updateObjective.mutateAsync({
         objectiveId: objId,
@@ -97,11 +113,11 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
     return <Skeleton className="h-16 w-full" />;
   }
 
-// ドラッグ開始
+  // ドラッグ開始
   const handleDragStart = (e: React.DragEvent, index: number) => {
     setDraggedIndex(index);
     e.dataTransfer.effectAllowed = 'move';
-    
+
     // ドラッグ中の要素のスタイル
     const target = e.target as HTMLElement;
     const row = target.closest('tr');
@@ -120,8 +136,6 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const midpoint = rect.top + rect.height / 2;
     const isAbove = e.clientY < midpoint;
-    console.log('index', index,'e.clientY', e.clientY,'rect.top', rect.top,'rect.height', rect.height,'midpoint', midpoint) ;
-    console.log('isAbove', isAbove);
     setDragOverIndex(index);
     setDragOverPosition(isAbove ? 'top' : 'bottom');
   };
@@ -135,50 +149,32 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
   // ドロップ
   const handleDrop = async (e: React.DragEvent, targetIndex: number) => {
     e.preventDefault();
-
     if (draggedIndex === null || draggedIndex === targetIndex) {
       resetDragState();
       return;
     }
+    const newObjectives = [...objectives];
+    const draggedItem = newObjectives[draggedIndex];
 
-    try {
-      const newObjectives = [...objectives];
-      const draggedItem = newObjectives[draggedIndex];
-      
-      // 配列から削除
-      newObjectives.splice(draggedIndex, 1);
-      
-      // 新しい位置に挿入
-      let insertIndex = targetIndex;
-      if (dragOverPosition === 'bottom') {
-        insertIndex = targetIndex + 1;
-      }
-      if (draggedIndex < targetIndex && dragOverPosition === 'top') {
-        insertIndex = targetIndex;
-      } else if (draggedIndex < targetIndex && dragOverPosition === 'bottom') {
-        insertIndex = targetIndex;
-      }
+    // 配列から削除
+    newObjectives.splice(draggedIndex, 1);
 
-      newObjectives.splice(insertIndex, 0, draggedItem);
-      
-      // UIを即座に更新
-      setObjectives(newObjectives);
-
-      // APIに順序更新を送信
-      const orderedIds = newObjectives.map(obj => obj.id);
-      console.log("順序更新:", orderedIds);
-
-
-      toast.success("順序を更新しました");
-    } catch (e) {
-      const err = extractErrorMessage(e);
-      console.error("順序更新失敗:", err);
-      toast.error("順序更新に失敗しました", { description: err });
-      // エラー時は元の状態に戻す
-      refetchObjectives();
-    } finally {
-      resetDragState();
+    // 新しい位置に挿入
+    let insertIndex = targetIndex;
+    if (dragOverPosition === 'bottom') {
+      insertIndex = targetIndex + 1;
     }
+    if (draggedIndex < targetIndex && dragOverPosition === 'top') {
+      insertIndex = targetIndex;
+    } else if (draggedIndex < targetIndex && dragOverPosition === 'bottom') {
+      insertIndex = targetIndex;
+    }
+
+    newObjectives.splice(insertIndex, 0, draggedItem);
+
+    setObjectives(newObjectives);
+    const orderedIds = newObjectives.map(obj => obj.id);
+    postObjectivesOrderMutation({ taskId: taskId, data: { order: orderedIds } });
   };
 
   // ドラッグ終了
@@ -219,9 +215,9 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
           </tr>
         </thead>
         <tbody onDragOver={(e) => {
-            // drop可能にする
-            e.preventDefault();
-          }}
+          // drop可能にする
+          e.preventDefault();
+        }}
           className="[&_tr.drag-over-top]:border-t-2 [&_tr.drag-over-bottom]:border-b-2"
         >
           {objectives.map((obj, idx) => (
@@ -240,7 +236,7 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              onDragEnd={handleDragEnd}              
+              onDragEnd={handleDragEnd}
             />
           ))}
 
@@ -256,11 +252,11 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
             isDragging={false}
             isDragOver={false}
             dragOverPosition={null}
-            onDragStart={() => {}}
-            onDragOver={() => {}}
-            onDragLeave={() => {}}
-            onDrop={() => {}}
-            onDragEnd={() => {}}            
+            onDragStart={() => { }}
+            onDragOver={() => { }}
+            onDragLeave={() => { }}
+            onDrop={() => { }}
+            onDragEnd={() => { }}
           />
         </tbody>
       </table>
