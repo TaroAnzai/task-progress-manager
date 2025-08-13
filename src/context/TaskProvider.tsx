@@ -1,4 +1,4 @@
-import { type ReactNode,useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { useGetProgressTasks } from "@/api/generated/taskProgressAPI";
 import type { Task, TaskListResponse } from "@/api/generated/taskProgressAPI.schemas";
@@ -7,7 +7,7 @@ import { useUser } from "@/context/useUser";
 
 import { TaskContext } from "./TaskContextBase";
 
-export  function TaskProvider({ children }: { children: ReactNode }) {
+export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useUser();
 
   const [tasks, setTasks] = useState<Task[]>([]);

@@ -1,6 +1,6 @@
 // src/components/task/TaskControlPanel.tsx
 
-import { EyeIcon,PencilIcon, PlusIcon } from "lucide-react";
+import { EyeIcon, PencilIcon, PlusIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -10,7 +10,7 @@ interface TaskControlPanelProps {
   onToggleViewSelector: () => void;
 }
 
-const TaskControlPanel = ({
+export const TaskControlPanel = ({
   onAddTask,
   onEditTasks,
   onToggleViewSelector,
@@ -38,4 +38,4 @@ const TaskControlPanel = ({
   </div>
 );
 
-export default TaskControlPanel;
+

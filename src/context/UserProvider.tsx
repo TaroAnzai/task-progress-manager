@@ -1,11 +1,11 @@
-import { type ReactNode,useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { useGetProgressSessionsCurrent } from "@/api/generated/taskProgressAPI";
 import { AccessScopeRole, type UserWithScopes } from "@/api/generated/taskProgressAPI.schemas";
 
 import { UserContext } from "./UserContextBase";
 
-export function UserProvider({ children }: { children: ReactNode }) {
+export const UserProvider = ({ children }: { children: ReactNode }) => {
   const { data: sessionData, isLoading, isFetching, isSuccess, refetch } =
     useGetProgressSessionsCurrent();
 
@@ -25,9 +25,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const hasAdminScope = (): boolean =>
     !!(user?.is_superuser ||
-       user?.access_scopes?.some((s) =>
-         s.role === AccessScopeRole.SYSTEM_ADMIN || s.role === AccessScopeRole.ORG_ADMIN
-       ));
+      user?.access_scopes?.some((s) =>
+        s.role === AccessScopeRole.SYSTEM_ADMIN || s.role === AccessScopeRole.ORG_ADMIN
+      ));
 
   const getUserRole = (): string => {
     if (user?.is_superuser) return "Superuser";

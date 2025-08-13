@@ -21,7 +21,7 @@ interface TaskSettingsIconProps {
   user: UserWithScopes | null;
 }
 
-const TaskSettingsIcon = ({ task }: TaskSettingsIconProps) => {
+export const TaskSettingsIcon = ({ task }: TaskSettingsIconProps) => {
   const [openSetting, setOpenSetting] = useState(false);
   const [openScope, setOpenScope] = useState(false);
 
@@ -66,4 +66,4 @@ const TaskSettingsIcon = ({ task }: TaskSettingsIconProps) => {
   );
 };
 
-export default TaskSettingsIcon;
+

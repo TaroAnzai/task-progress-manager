@@ -4,15 +4,15 @@ import { useState } from 'react';
 
 import type { Task } from '@/api/generated/taskProgressAPI.schemas';
 
-import {ObjectiveTable} from './ObjectiveTable';
-import TaskHeader from './TaskHeader';
+import { ObjectiveTable } from './ObjectiveTable';
+import { TaskHeader } from './TaskHeader';
 
 
 interface TaskCardProps {
   task: Task;
 }
 
-const TaskCard = ({ task }: TaskCardProps) => {
+export const TaskCard = ({ task }: TaskCardProps) => {
   const [isExpanded, setIsExpanded] = useState(() => {
     const stored = localStorage.getItem(`objective_visibility_${task.id}`);
     return stored ? JSON.parse(stored) : true;
@@ -44,4 +44,4 @@ const TaskCard = ({ task }: TaskCardProps) => {
   );
 };
 
-export default TaskCard;
+

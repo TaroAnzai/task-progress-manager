@@ -10,7 +10,7 @@ import type { UserSchemaForAdmin } from '@/api/generated/taskProgressAPI.schemas
 
 import { extractErrorMessage } from "@/utils/errorHandler";
 
-import UserTableRow from './UserTableRow';
+import { UserTableRow } from './UserTableRow';
 
 interface Props {
   users: UserSchemaForAdmin[];
@@ -20,8 +20,8 @@ interface Props {
   onRefresh: () => void;
 }
 
-const UserTable: React.FC<Props> = ({ users, isLoading, error, onEditUser, onRefresh }) => {
-  const {mutateAsync:deleteUser} = useDeleteProgressUsersUserId(); 
+export const UserTable: React.FC<Props> = ({ users, isLoading, error, onEditUser, onRefresh }) => {
+  const { mutateAsync: deleteUser } = useDeleteProgressUsersUserId();
   const handleDelete = async (userId: number) => {
     if (!confirm('本当にこのユーザーを削除しますか？')) return;
     try {
@@ -77,4 +77,3 @@ const UserTable: React.FC<Props> = ({ users, isLoading, error, onEditUser, onRef
   );
 };
 
-export default UserTable;

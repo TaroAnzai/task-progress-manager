@@ -17,7 +17,7 @@ interface ViewSelectorPopupProps {
   onChange: (value: string) => void;
 }
 
-const ViewSelectorPopup = ({ onChange }: ViewSelectorPopupProps) => {
+export const ViewSelectorPopup = ({ onChange }: ViewSelectorPopupProps) => {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<string>(() => localStorage.getItem(STORAGE_KEY) || 'all');
   const ref = useRef<HTMLDivElement>(null);
@@ -70,4 +70,3 @@ const ViewSelectorPopup = ({ onChange }: ViewSelectorPopupProps) => {
   );
 };
 
-export default ViewSelectorPopup;

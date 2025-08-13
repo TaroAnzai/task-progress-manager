@@ -5,17 +5,17 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { TableCell, TableRow } from '@/components/ui/table';
 
-import type { UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
+import type { UserSchemaForAdmin } from '@/api/generated/taskProgressAPI.schemas';
 
 import { ROLE_LABELS } from '@/context/roleLabels';
 
 interface Props {
-  user: UserWithScopes;
+  user: UserSchemaForAdmin;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-const UserTableRow: React.FC<Props> = ({ user, onEdit, onDelete }) => {
+export const UserTableRow: React.FC<Props> = ({ user, onEdit, onDelete }) => {
   const visibleScopes = user.access_scopes?.filter(s => s.organization_id === user.organization_id) || [];
   const scopeDisplay = visibleScopes.length > 0
     ? visibleScopes.map(s => ROLE_LABELS[s.role] ?? s.role).join(', ')
@@ -40,4 +40,4 @@ const UserTableRow: React.FC<Props> = ({ user, onEdit, onDelete }) => {
   );
 };
 
-export default UserTableRow;
+

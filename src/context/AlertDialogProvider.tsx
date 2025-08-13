@@ -1,4 +1,4 @@
-import {useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { isAxiosError } from "axios";
 import type { ReactNode } from "react";
@@ -17,13 +17,13 @@ import {
 import { extractErrorMessage } from "@/utils/errorHandler";
 
 import { AlertDialogContext, type DialogOptions } from "./AlertDialogContextBase";
-export function AlertDialogProvider({ children }: { children: ReactNode }) {
+export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("確認");
   const [description, setDescription] = useState("");
   const [descriptionNode, setDescriptionNode] = useState<ReactNode>(null);
-  const [onConfirm, setOnConfirm] = useState<() => void>(() => () => {});
-  const [onCancel, setOnCancel] = useState<() => void>(() => {});
+  const [onConfirm, setOnConfirm] = useState<() => void>(() => () => { });
+  const [onCancel, setOnCancel] = useState<() => void>(() => { });
   const [confirmText, setConfirmText] = useState("OK");
   const [cancelText, setCancelText] = useState("キャンセル");
   const [showCancel, setShowCancel] = useState(true);
@@ -41,9 +41,9 @@ export function AlertDialogProvider({ children }: { children: ReactNode }) {
     setTitle(title);
     if (isAxiosError(description)) {
       setDescription(extractErrorMessage(description));
-    }else if (typeof description === "string") {
+    } else if (typeof description === "string") {
       setDescription(description);
-    }else{
+    } else {
       setDescription("Unknown error");
     }
     setDescriptionNode(descriptionNode);

@@ -4,7 +4,7 @@ import { useDeleteProgressSessionsCurrent } from "@/api/generated/taskProgressAP
 
 import { useUser } from "@/context/useUser";
 
-const Header = () => {
+export const Header = () => {
   const { user, refetchUser } = useUser();
   const isLoggedIn = !!user?.id;
   const deleteSessionMutation = useDeleteProgressSessionsCurrent();
@@ -36,4 +36,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+

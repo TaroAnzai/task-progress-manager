@@ -9,7 +9,7 @@ interface TaskStatusBadgeProps {
   task: Task;
 }
 
-const TaskStatusBadge = ({ task }: TaskStatusBadgeProps) => {
+export const TaskStatusBadge = ({ task }: TaskStatusBadgeProps) => {
   const canEdit = task.user_access_level !== 'view';
 
   const handleClick = (e: React.MouseEvent) => {
@@ -17,7 +17,7 @@ const TaskStatusBadge = ({ task }: TaskStatusBadgeProps) => {
     if (!canEdit) return;
     const wrapper = e.currentTarget.closest('.status-badge-wrapper') as HTMLElement;
     if (wrapper) {
-     // showTaskStatusSelector(task.id, wrapper, task.status_id);
+      // showTaskStatusSelector(task.id, wrapper, task.status_id);
     }
   };
 
@@ -47,4 +47,4 @@ const getStatusLabel = (status: taskStatusType | undefined): string => {
   }
 };
 
-export default TaskStatusBadge;
+

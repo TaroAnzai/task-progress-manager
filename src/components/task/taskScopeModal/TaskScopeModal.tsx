@@ -1,7 +1,7 @@
 // src/components/task/taskScopeModal/TaskScopeModal.tsx
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 
-import { Plus} from "lucide-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,8 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle} from "@/components/ui/dialog";
+  DialogTitle
+} from "@/components/ui/dialog";
 
 import {
   useGetProgressTasksTaskIdAccessOrganizations,
@@ -25,15 +26,15 @@ import type {
   Task,
 } from "@/api/generated/taskProgressAPI.schemas";
 
-import {extractErrorMessage} from "@/utils/errorHandler";
+import { extractErrorMessage } from "@/utils/errorHandler";
 
-import {SCOPE_LEVEL_OPTIONS} from "@/context/roleLabels";
+import { SCOPE_LEVEL_OPTIONS } from "@/context/roleLabels";
 import { useUser } from "@/context/useUser";
 
-import UserSelectModal from "../UserSelectModal";
+import { UserSelectModal } from "../UserSelectModal";
 
-import {OrganizationScopeSelectModal} from "./OrganizationScopeSelectModal";
-import {ScopeLevelBadge} from "./ScopeLevelBadge";
+import { OrganizationScopeSelectModal } from "./OrganizationScopeSelectModal";
+import { ScopeLevelBadge } from "./ScopeLevelBadge";
 
 
 export interface TaskScopeModalProps {
@@ -43,11 +44,11 @@ export interface TaskScopeModalProps {
 }
 
 export const TaskScopeModal = ({ task, open, onClose }: TaskScopeModalProps) => {
-  const { user : currentUser } = useUser();
-  const { data:authorized_users} = useGetProgressTasksTaskIdAuthorizedUsers(task.id);
+  const { user: currentUser } = useUser();
+  const { data: authorized_users } = useGetProgressTasksTaskIdAuthorizedUsers(task.id);
   const { data: getUsers } = useGetProgressTasksTaskIdAccessUsers(task.id);
   const { data: getOrgs } = useGetProgressTasksTaskIdAccessOrganizations(task.id);
-  const {mutateAsync:updateAccess, isPending: isSaving} = usePutProgressTasksTaskIdAccessLevels();
+  const { mutateAsync: updateAccess, isPending: isSaving } = usePutProgressTasksTaskIdAccessLevels();
 
   const [isEditable, setIsEditable] = useState(false);
   const [scopeUsers, setScopeUsers] = useState<AccessUser[]>([]);
@@ -68,15 +69,15 @@ export const TaskScopeModal = ({ task, open, onClose }: TaskScopeModalProps) => 
     if (getOrgs) setScopeOrgs(getOrgs);
   }, [getOrgs]);
 
-  const onRemoveUser = (user_id: number|undefined) => {
+  const onRemoveUser = (user_id: number | undefined) => {
     const updated = scopeUsers.filter((u) => u.user_id !== user_id);
     setScopeUsers(updated);
   };
-  const onRemoveOrg = (organization_id: number|undefined) => {
-      const updated = scopeOrgs.filter((o) => o.organization_id !== organization_id);
-      setScopeOrgs(updated);
-    };
-  const handleUpdateAccess = async() =>{
+  const onRemoveOrg = (organization_id: number | undefined) => {
+    const updated = scopeOrgs.filter((o) => o.organization_id !== organization_id);
+    setScopeOrgs(updated);
+  };
+  const handleUpdateAccess = async () => {
     const accessUserInput = scopeUsers.map((u) => ({
       user_id: u.user_id,
       access_level: u.access_level,
@@ -85,20 +86,20 @@ export const TaskScopeModal = ({ task, open, onClose }: TaskScopeModalProps) => 
       organization_id: o.organization_id,
       access_level: o.access_level,
     }))
-    try{
+    try {
       await updateAccess({
         taskId: task.id,
-        data: { user_access:accessUserInput, organization_access:orgAccessInput },
+        data: { user_access: accessUserInput, organization_access: orgAccessInput },
       });
       toast.success("更新しました");
       onClose();
-    }catch(e){
+    } catch (e) {
       const err = extractErrorMessage(e);
-      toast.error("更新に失敗しました", {description: err});
+      toast.error("更新に失敗しました", { description: err });
       console.error(err);
     }
   }
-  const handleUsersSelected=(users:{ id: number; name: string}[])=>{
+  const handleUsersSelected = (users: { id: number; name: string }[]) => {
     const selected: AccessUser[] = users.map((u) => (
       {
         user_id: u.id,
@@ -110,17 +111,17 @@ export const TaskScopeModal = ({ task, open, onClose }: TaskScopeModalProps) => 
     setOpenUserModal(false);
   }
 
-  const handleOrgsSelected=(org:{ org_id: number; org_name: string})=>{
+  const handleOrgsSelected = (org: { org_id: number; org_name: string }) => {
     const selected: OrgAccess = {
       organization_id: org.org_id,
       name: org.org_name,
       access_level: 'VIEW',
     }
-      // 重複チェック
+    // 重複チェック
     const exists = scopeOrgs.some(
       (o) => o.organization_id === selected.organization_id
     );
-    if(!exists){
+    if (!exists) {
       setScopeOrgs([...scopeOrgs, selected]);
     }
     setOpenOrgModal(false);

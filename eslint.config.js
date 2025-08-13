@@ -1,18 +1,19 @@
-import js from '@eslint/js'
-import { globalIgnores } from 'eslint/config'
+import js from '@eslint/js';
 import eslintPluginImport from "eslint-plugin-import";
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import simpleImportSort from 'eslint-plugin-simple-import-sort'
-import globals from 'globals'
-import tseslint from 'typescript-eslint'
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import { globalIgnores } from 'eslint/config';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default tseslint.config([
   globalIgnores(['dist']),
   {
     ignores: [
       "src/api/generated/**",
-      "src/components/ui/**"
+      "src/components/ui/**",
+      "src/lib/**",
     ]
   },
   {
@@ -28,19 +29,13 @@ export default tseslint.config([
       globals: globals.browser,
     },
   },
+
   {
-    files: ["src/components/ui/**/*.tsx"],
-    rules: {
-      // 定数の export は許容（※オプションが使える環境なら）
-      "react-refresh/only-export-components": "off",
+    plugins: {
+      import: eslintPluginImport,
+      'simple-import-sort': simpleImportSort,
     },
-  },  
-  {
-      plugins: {
-        import: eslintPluginImport,
-        'simple-import-sort': simpleImportSort,
-      },
-  // ルール部だけ抜粋
+    // ルール部だけ抜粋
 
     rules: {
       'import/order': 'off',
@@ -92,19 +87,24 @@ export default tseslint.config([
       'import/no-default-export': 'warn',
     },
   },
-
   {
-    files: ['src/pages/**/*.{ts,tsx}','src/*.{ts,tsx}'], 
+    rules: {
+      "func-style": ["warn", "expression", { "allowArrowFunctions": true }],
+      "prefer-arrow-callback": "warn",
+      "arrow-body-style": ["warn", "as-needed"],
+    }
+  },
+  {
+    files: ['src/pages/**/*.{ts,tsx}', 'src/*.{ts,tsx}'],
     rules: {
       'import/no-default-export': 'off', // default許可
     },
   },
   {
+    files: ["src/components/ui/**/*.tsx"],
     rules: {
-  "func-style": ["warn", "expression", { "allowArrowFunctions": true }],
-  "prefer-arrow-callback": "warn",
-  "arrow-body-style": ["warn", "as-needed"],
-}
-
-  }
+      // 定数の export は許容（※オプションが使える環境なら）
+      "react-refresh/only-export-components": "off",
+    },
+  },
 ])

@@ -1,9 +1,9 @@
 // src/App.tsx
 
-import { BrowserRouter as Router, Route,Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 
-import Header from "@/components/layout/Header";
+import { Header } from "@/components/layout/Header";
 
 import LoginPage from "@/pages/LoginPage"; // ✅ ログインページを追加
 import ProgressAdminPage from "@/pages/ProgressAdminPage.tsx";
@@ -12,8 +12,6 @@ import TaskPage from "@/pages/TaskPage";
 import "./index.css"; // ✅ Tailwindを有効にする
 
 export default function App() {
-  const userData = { getDisplayId: () => 123 };
-
   return (
     <Router>
       <div className="bg-gray-100 min-h-screen">
@@ -21,7 +19,7 @@ export default function App() {
         <main>
           <Routes>
             {/* ✅ トップページ（タスクページ） */}
-            <Route path="/" element={<TaskPage userData={userData} />} />
+            <Route path="/" element={<TaskPage />} />
 
             {/* ✅ ログインページ */}
             <Route path="/login" element={<LoginPage />} />

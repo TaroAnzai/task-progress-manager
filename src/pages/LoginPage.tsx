@@ -7,8 +7,8 @@ import { usePostProgressSessions } from "@/api/generated/taskProgressAPI.ts";
 
 import { extractErrorMessage } from "@/utils/errorHandler.ts";
 
-import {useAlertDialog} from "@/context/useAlertDialog";
-import { useUser } from "@/context/useUser"; 
+import { useAlertDialog } from "@/context/useAlertDialog";
+import { useUser } from "@/context/useUser";
 
 // 定数の定義
 const MESSAGES = {
@@ -26,17 +26,17 @@ const ROUTES = {
 } as const;
 
 // カスタムフック: ログイン処理の分離
-function useLogin() {
+const useLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: string })?.from || ROUTES.DEFAULT;
   const { openAlertDialog } = useAlertDialog();
-  const { refetchUser } = useUser(); 
+  const { refetchUser } = useUser();
 
   const mutation = usePostProgressSessions({
     mutation: {
       onSuccess: async () => {
-        await refetchUser(); 
+        await refetchUser();
         navigate(from, { replace: true });
       },
       onError: (error) => {
@@ -60,7 +60,7 @@ function useLogin() {
 }
 
 // カスタムフック: フォーム状態管理の分離
-function useLoginForm() {
+const useLoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -96,22 +96,21 @@ interface InputFieldProps {
   required?: boolean;
 }
 
-function InputField({ label, type, value, onChange, required = false }: InputFieldProps) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700">
-        {label}
-      </label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-200 focus:border-blue-400"
-        required={required}
-      />
-    </div>
-  );
-}
+const InputField = ({ label, type, value, onChange, required = false }: InputFieldProps) =>
+(
+  <div>
+    <label className="block text-sm font-medium text-gray-700">
+      {label}
+    </label>
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-200 focus:border-blue-400"
+      required={required}
+    />
+  </div>
+);
 
 // UI コンポーネント: ログインボタン
 interface LoginButtonProps {
@@ -119,21 +118,20 @@ interface LoginButtonProps {
   isDisabled: boolean;
 }
 
-function LoginButton({ isLoading, isDisabled }: LoginButtonProps) {
-  return (
-    <button
-      type="submit"
-      className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
-      disabled={isDisabled}
-    >
-      {isLoading ? MESSAGES.LOGIN_LOADING : MESSAGES.LOGIN_BUTTON}
-    </button>
-  );
-}
+const LoginButton = ({ isLoading, isDisabled }: LoginButtonProps) => (
+  <button
+    type="submit"
+    className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+    disabled={isDisabled}
+  >
+    {isLoading ? MESSAGES.LOGIN_LOADING : MESSAGES.LOGIN_BUTTON}
+  </button>
+);
+
 
 // メインコンポーネント
 export default function LoginPage() {
-  const { login, isLoading} = useLogin();
+  const { login, isLoading } = useLogin();
   const {
     email,
     setEmail,
@@ -146,7 +144,7 @@ export default function LoginPage() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    
+
     if (!isFormValid()) {
       alert("メールアドレスとパスワードを入力してください");
       return;
@@ -162,7 +160,7 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold mb-6 text-center">
           {MESSAGES.LOGIN_TITLE}
         </h1>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <InputField
             label={MESSAGES.EMAIL_LABEL}
@@ -171,7 +169,7 @@ export default function LoginPage() {
             onChange={setEmail}
             required
           />
-          
+
           <InputField
             label={MESSAGES.PASSWORD_LABEL}
             type="password"
@@ -179,7 +177,7 @@ export default function LoginPage() {
             onChange={setPassword}
             required
           />
-          
+
           <LoginButton
             isLoading={isLoading}
             isDisabled={isLoading || !isFormValid()}

@@ -11,7 +11,7 @@ import {
   useGetProgressUpdatesObjectiveIdLatestProgress,
   usePostProgressUpdatesObjectiveId
 } from "@/api/generated/taskProgressAPI";
-import type { Objective, ObjectiveInput, ObjectiveUpdate, ProgressInput, ObjectiveUpdateStatus as updateStatusType } from "@/api/generated/taskProgressAPI.schemas";
+import type { Objective, ObjectiveInput, ObjectiveUpdate, ObjectiveUpdateStatus as updateStatusType,ProgressInput } from "@/api/generated/taskProgressAPI.schemas";
 import { ObjectiveStatus, ProgressStatus as StatusType } from "@/api/generated/taskProgressAPI.schemas";
 
 import { useAlertDialog } from "@/context/useAlertDialog";

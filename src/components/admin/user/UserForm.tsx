@@ -6,15 +6,15 @@ import { toast } from "sonner";
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem,SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { usePostProgressAccessScopesUsersUserId,usePostProgressUsers, usePutProgressUsersUserId } from '@/api/generated/taskProgressAPI';
+import { usePostProgressAccessScopesUsersUserId, usePostProgressUsers, usePutProgressUsersUserId } from '@/api/generated/taskProgressAPI';
 import { UserInputRole } from '@/api/generated/taskProgressAPI.schemas';
 
-import {useAlertDialog} from "@/context/useAlertDialog";
+import { useAlertDialog } from "@/context/useAlertDialog";
 
-import OrganizationSelectorDialog from './OrganizationSelectorDialog';
-import type { OrganizationSelectResult,UserFormState } from './types';
+import { OrganizationSelectorDialog } from './OrganizationSelectorDialog';
+import type { OrganizationSelectResult, UserFormState } from './types';
 
 interface UserFormProps {
   initialData: UserFormState | null;
@@ -32,7 +32,7 @@ const emptyForm: UserFormState = {
   role: UserInputRole.MEMBER,
 };
 
-const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted}) => {
+export const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted }) => {
   const [form, setForm] = useState<UserFormState>(emptyForm);
   const [orgDialogOpen, setOrgDialogOpen] = useState(false);
   const [orgDisplayName, setOrgDisplayName] = useState<string>('組織を選択');
@@ -40,7 +40,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted
   const createUserMutation = usePostProgressUsers();
   const updateUserMutation = usePutProgressUsersUserId();
   const addScopeMutation = usePostProgressAccessScopesUsersUserId();
-  const {openAlertDialog} = useAlertDialog();
+  const { openAlertDialog } = useAlertDialog();
 
   useEffect(() => {
     if (initialData) {
@@ -66,7 +66,7 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted
     e.preventDefault();
 
     if (!form.name || !form.email || !form.organization_id) {
-      openAlertDialog({title: 'エラー', description: '名前、メール、組織コードは必須です', showCancel: false});
+      openAlertDialog({ title: 'エラー', description: '名前、メール、組織コードは必須です', showCancel: false });
       return;
     }
 
@@ -109,10 +109,10 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted
       }
 
       onSubmitted();
-      toast.success('保存しました',{description: `ユーザー${form.name}を保存しました`});
+      toast.success('保存しました', { description: `ユーザー${form.name}を保存しました` });
       clearForm();
     } catch (err) {
-      openAlertDialog({title: 'エラー', description: err, showCancel: false});
+      openAlertDialog({ title: 'エラー', description: err, showCancel: false });
     }
   };
 
@@ -166,4 +166,4 @@ const UserForm: React.FC<UserFormProps> = ({ initialData, companyId, onSubmitted
   );
 };
 
-export default UserForm;
+

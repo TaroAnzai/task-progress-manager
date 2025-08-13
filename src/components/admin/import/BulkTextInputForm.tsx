@@ -10,7 +10,7 @@ type Props = {
   title?: string;
 };
 
-const BulkTextInputForm = ({
+export const BulkTextInputForm = ({
   placeholder,
   onSubmit,
   loading = false,
@@ -46,4 +46,4 @@ const BulkTextInputForm = ({
   );
 };
 
-export default BulkTextInputForm;
+

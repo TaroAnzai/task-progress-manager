@@ -7,8 +7,8 @@ import type { Task } from '@/api/generated/taskProgressAPI.schemas';
 
 import { useUser } from '@/context/useUser';
 
-import TaskSettingsIcon from './TaskSettingsIcon';
-import TaskStatusBadge from './TaskStatusBadge';
+import { TaskSettingsIcon } from './TaskSettingsIcon';
+import { TaskStatusBadge } from './TaskStatusBadge';
 
 
 
@@ -16,7 +16,7 @@ interface TaskHeaderProps {
   task: Task;
 }
 
-const TaskHeader = ({ task }: TaskHeaderProps) => {
+export const TaskHeader = ({ task }: TaskHeaderProps) => {
   const { user } = useUser();
   const dueDateStr = task.due_date
     ? format(new Date(task.due_date), 'yyyy年M月d日', { locale: ja })
@@ -38,4 +38,3 @@ const TaskHeader = ({ task }: TaskHeaderProps) => {
   );
 };
 
-export default TaskHeader;

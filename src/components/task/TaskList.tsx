@@ -6,9 +6,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { useTasks } from '@/context/useTasks';
 
-import TaskCard from './TaskCard';
+import { TaskCard } from './TaskCard';
 
-const TaskList = () => {
+export const TaskList = () => {
   const { tasks, isLoading } = useTasks();
 
   if (isLoading) {
@@ -30,4 +30,4 @@ const TaskList = () => {
   );
 };
 
-export default TaskList;
+
