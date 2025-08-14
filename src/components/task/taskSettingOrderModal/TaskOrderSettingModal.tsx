@@ -1,9 +1,6 @@
 //src\components\task\taskSettingOrderModal\TaskOrderSettingModal.tsx
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-
-import type { Task } from "@/api/generated/taskProgressAPI.schemas";
-
-import { useTasks } from "@/context/useTasks"
 import {
     Table,
     TableBody,
@@ -12,12 +9,15 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+
+import { useTasks } from "@/context/useTasks"
 interface TaskSettingModalProps {
     open: boolean;
     onClose: () => void;
+    onDelete: (id: number) => void
 }
 
-export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) => {
+export const TaskOrderSettingModal = ({ open, onClose, onDelete }: TaskSettingModalProps) => {
     const { tasks } = useTasks();
 
     return (
@@ -31,20 +31,24 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[100px]">進捗</TableHead>
-                            <TableHead>登録者</TableHead>
-                            <TableHead>登録日</TableHead>
+                            <TableHead className="w-[100px]">タスク名</TableHead>
+                            <TableHead>作成者</TableHead>
+                            <TableHead>期限</TableHead>
+                            <TableHead>ステータス</TableHead>
+                            <TableHead>アクセス権限</TableHead>                            
                             <TableHead className="text-right">削除</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data?.map((update) => (
-                            <TableRow key={update.id}>
-                                <TableCell className="font-medium">{update.detail}</TableCell>
-                                <TableCell>{update.updated_by}</TableCell>
-                                <TableCell>{update.report_date}</TableCell>
+                        {tasks?.map((task) => (
+                            <TableRow key={task.id}>
+                                <TableCell className="font-medium">{task.title}</TableCell>
+                                <TableCell>{task.due_date}</TableCell>
+                                <TableCell>{task.create_user_name}</TableCell>
+                                <TableCell>{task.status}</TableCell>
+                                <TableCell>{task.user_access_level}</TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="destructive" size="sm" onClick={() => onDelete(update.id)}>削除</Button>
+                                    <Button variant="destructive" size="sm" onClick={() => onDelete(task.id)}>削除</Button>
                                 </TableCell>
                             </TableRow>
                         ))
@@ -52,6 +56,9 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
                     </TableBody>
 
                 </Table>
+
+            <DialogFooter>
+                <Button onClick={onClose}>閉じる</Button>
             </DialogFooter>
         </DialogContent>
         </Dialog >

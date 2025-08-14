@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { NewTaskModal } from "@/components/task/newTaskModal/NewTaskModal";
 import { TaskControlPanel } from "@/components/task/TaskControlPanel";
 import { TaskList } from "@/components/task/TaskList";
+import {TaskOrderSettingModal} from "@/components/task/taskSettingOrderModal/TaskOrderSettingModal";
 
 import { useUser } from "@/context/useUser";
 
@@ -14,6 +15,7 @@ const TaskPageContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
+  const [taskOrderModalOpen, setTaskOrderModalOpen] = useState(false);
 
   useEffect(() => {
     if (userLoading) return;
@@ -30,14 +32,20 @@ const TaskPageContent = () => {
         権限:({String(getUserRole())})
       </p>
       <TaskControlPanel
-        onAddTask={() => { setNewTaskModalOpen(true); }
-        }
-        onEditTasks={() => { }} onToggleViewSelector={() => { }}></TaskControlPanel>
+        onAddTask={() => { setNewTaskModalOpen(true); }}
+        onEditTasks={() => {setTaskOrderModalOpen(true);}}
+        onToggleViewSelector={() => { }}
+      />
       <TaskList />
 
       <NewTaskModal
         open={newTaskModalOpen}
         onClose={() => setNewTaskModalOpen(false)}
+      />
+      <TaskOrderSettingModal
+        open={taskOrderModalOpen}
+        onClose={() => {setTaskOrderModalOpen(false)}}
+        onDelete={() => { }}
       />
     </>
 

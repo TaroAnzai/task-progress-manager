@@ -33,6 +33,12 @@ export const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
 
   const createTaskMutation = usePostProgressTasks();
 
+  const clearForm = () => {
+    setTitle("");
+    setDescription("");
+    setDueDate("");
+  };
+
   const handleSave = async () => {
     if (!title.trim()) {
       toast.error("タイトルは必須です");
@@ -49,6 +55,7 @@ export const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
       await createTaskMutation.mutateAsync({ data: payload });
       toast("作成完了", { description: "新しいタスクを作成しました" });
       refetch();
+      clearForm();
       onClose();
     } catch (err) {
       console.error("タスク保存失敗", err);
@@ -84,7 +91,7 @@ export const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
           />
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={()=>{clearForm(); onClose();}}>
               キャンセル
             </Button>
             <Button onClick={handleSave}>"作成"</Button>
