@@ -6,9 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import type { ObjectiveUpdateStatus as updateStatusType,ProgressStatus as StatusType } from "@/api/generated/taskProgressAPI.schemas";
-
-
-
+import { TaskStatus } from "@/api/generated/taskProgressAPI.schemas";
 const STATUS_LABELS: Record<StatusType, string> = {
   UNDEFINED: "未定義",
   NOT_STARTED: "未着手",
@@ -26,8 +24,8 @@ const STATUS_COLORS: Record<StatusType, string> = {
 };
 
 type Props = {
-  value: StatusType;
-  onChange: (newStatus: updateStatusType) => void;
+  value: StatusType|TaskStatus;
+  onChange?: (newStatus: updateStatusType) => void;
   disabled?: boolean;
 };
 
@@ -35,12 +33,14 @@ export const StatusBadgeCell = ({ value, onChange, disabled = false }: Props) =>
   const [open, setOpen] = useState(false);
 
   const handleSelect = (status: updateStatusType) => {
-    onChange(status);
+    if(onChange)  onChange(status);
     setOpen(false);
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={()=>{
+        if(!disabled) setOpen(true);
+      }}>
       <PopoverTrigger asChild>
         <Badge
           className={`cursor-pointer ${STATUS_COLORS[value]}`}

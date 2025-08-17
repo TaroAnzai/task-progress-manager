@@ -17,9 +17,12 @@ import type { Task } from "@/api/generated/taskProgressAPI.schemas"
 
 import {DraggableRow,DraggableTable,DraggableTableBody} from "@/components/DraggableTable";
 
+import {SCOPE_LABELS} from "@/context/roleLabels"
 import { useAlertDialog } from "@/context/useAlertDialog";
 import { useTasks } from "@/context/useTasks"
 import {useUser} from "@/context/useUser"
+
+import { StatusBadgeCell } from '../StatusBadgeCell';
 
 interface TaskSettingModalProps {
     open: boolean;
@@ -115,8 +118,10 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
                               <TableCell className="font-medium">{task.title}</TableCell>
                               <TableCell>{task.create_user_name}</TableCell>
                               <TableCell>{task.due_date}</TableCell>
-                              <TableCell>{task.status}</TableCell>
-                              <TableCell>{task.user_access_level}</TableCell>
+                              <TableCell>
+                                  <StatusBadgeCell value={task.status??"UNDEFINED"} disabled={true} />
+                                  </TableCell>
+                              <TableCell>{task.user_access_level?SCOPE_LABELS[task.user_access_level]:""}</TableCell>
                               <TableCell className="text-right">
                                   <Button variant="destructive" size="sm" onClick={() => handleDerete(task.id)}>削除</Button>
                               </TableCell>

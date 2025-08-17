@@ -9,9 +9,9 @@ export const ROLE_LABELS: Record<UserInputRole, string> = {
 };
 
 export const SCOPE_LABELS: Record<AccessUserAccessLevel, string> = {
-  [AccessUserAccessLevel.VIEW]: '閲覧',
-  [AccessUserAccessLevel.EDIT]: '編集',
-  [AccessUserAccessLevel.FULL]: 'フル',
+  [AccessUserAccessLevel.VIEW]: '閲覧権限',
+  [AccessUserAccessLevel.EDIT]: '編集権限',
+  [AccessUserAccessLevel.FULL]: 'フル権限',
   [AccessUserAccessLevel.OWNER]: '作成者',
 };
 
