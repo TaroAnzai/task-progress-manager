@@ -8,7 +8,7 @@ import {
   useEffect,
   useMemo,
   useState} from "react";
-import { Children, isValidElement, useRef } from "react";
+import { Children, isValidElement } from "react";
 
 import {
   closestCenter,
@@ -189,7 +189,6 @@ export function DraggableRow({
     attributes,
     listeners,
     setNodeRef,
-    setActivatorNodeRef, 
     transform,
     transition,
     isDragging,
@@ -201,8 +200,6 @@ export function DraggableRow({
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
-  // activator 用に ref を expose するため
-  const activatorRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <TableRow

@@ -4,16 +4,22 @@ import { useEffect, useState } from 'react';
 import { toast } from "sonner";
 
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 
 import { useGetProgressObjectivesTasksTaskId, usePostProgressObjectives, usePostProgressTasksTaskIdObjectivesOrder, usePutProgressObjectivesObjectiveId } from '@/api/generated/taskProgressAPI';
 import type { Objective, ObjectiveInput, ObjectiveUpdate } from '@/api/generated/taskProgressAPI.schemas';
+
+import {DraggableRow,DraggableTable,DraggableTableBody} from "@/components/DraggableTable";
 
 import { extractErrorMessage } from "@/utils/errorHandler";
 
 import { useUser } from '@/context/useUser';
 
 import { ObjectiveRow } from "./objective/ObjectiveRow";
-
 interface ObjectiveTableProps {
   taskId: number;
 }
@@ -26,9 +32,6 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
   const updateObjective = usePutProgressObjectivesObjectiveId();
 
   const [objectives, setObjectives] = useState<Objective[]>([]);
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [dragOverPosition, setDragOverPosition] = useState<'top' | 'bottom' | null>(null);
 
   const { mutate: postObjectivesOrderMutation } = usePostProgressTasksTaskIdObjectivesOrder(
     {
@@ -41,9 +44,6 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
           const err = extractErrorMessage(e);
           toast.error("順序更新に失敗しました", { description: err });
           refetchObjectives();//登録失敗時に元の並びに戻す
-        },
-        onSettled: () => {
-          resetDragState();
         },
       }
     }
@@ -113,85 +113,12 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
     return <Skeleton className="h-16 w-full" />;
   }
 
-  // ドラッグ開始
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    setDraggedIndex(index);
-    e.dataTransfer.effectAllowed = 'move';
-
-    // ドラッグ中の要素のスタイル
-    const target = e.target as HTMLElement;
-    const row = target.closest('tr');
-    if (row) {
-      row.classList.add('opacity-50');
-    }
-  };
-
-  // ドラッグ中
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-
-    if (draggedIndex === null || draggedIndex === index) return;
-
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const midpoint = rect.top + rect.height / 2;
-    const isAbove = e.clientY < midpoint;
-    setDragOverIndex(index);
-    setDragOverPosition(isAbove ? 'top' : 'bottom');
-  };
-
-  // ドラッグ離脱
-  const handleDragLeave = () => {
-    setDragOverIndex(null);
-    setDragOverPosition(null);
-  };
 
   // ドロップ
-  const handleDrop = async (e: React.DragEvent, targetIndex: number) => {
-    e.preventDefault();
-    if (draggedIndex === null || draggedIndex === targetIndex) {
-      resetDragState();
-      return;
-    }
-    const newObjectives = [...objectives];
-    const draggedItem = newObjectives[draggedIndex];
-
-    // 配列から削除
-    newObjectives.splice(draggedIndex, 1);
-
-    // 新しい位置に挿入
-    let insertIndex = targetIndex;
-    if (dragOverPosition === 'bottom') {
-      insertIndex = targetIndex + 1;
-    }
-    if (draggedIndex < targetIndex && dragOverPosition === 'top') {
-      insertIndex = targetIndex;
-    } else if (draggedIndex < targetIndex && dragOverPosition === 'bottom') {
-      insertIndex = targetIndex;
-    }
-
-    newObjectives.splice(insertIndex, 0, draggedItem);
-
-    setObjectives(newObjectives);
-    const orderedIds = newObjectives.map(obj => obj.id);
-    postObjectivesOrderMutation({ taskId: taskId, data: { order: orderedIds } });
-  };
-
-  // ドラッグ終了
-  const handleDragEnd = (e: React.DragEvent) => {
-    const target = e.target as HTMLElement;
-    const row = target.closest('tr');
-    if (row) {
-      row.classList.remove('opacity-50');
-    }
-    resetDragState();
-  };
-
-  // ドラッグ状態リセット
-  const resetDragState = () => {
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-    setDragOverPosition(null);
+  const handleRender = (newObj: Objective[]) => {
+    const newObjectives = newObj.map((o)=>o.id);
+    setObjectives(newObj);
+     postObjectivesOrderMutation({ taskId: taskId, data: { order: newObjectives } });
   };
 
   if (isLoading) {
@@ -201,65 +128,48 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full text-sm text-left">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="px-3 py-2">#</th>
-            <th className="px-3 py-2">オブジェクティブ</th>
-            <th className="px-3 py-2">期限</th>
-            <th className="px-3 py-2">ステータス</th>
-            <th className="px-3 py-2">担当者</th>
-            <th className="px-3 py-2">進捗</th>
-            <th className="px-3 py-2">報告日</th>
-            <th className="px-3 py-2">履歴</th>
-          </tr>
-        </thead>
-        <tbody onDragOver={(e) => {
-          // drop可能にする
-          e.preventDefault();
-        }}
-          className="[&_tr.drag-over-top]:border-t-2 [&_tr.drag-over-bottom]:border-b-2"
-        >
-          {objectives.map((obj, idx) => (
-            <ObjectiveRow
-              key={obj.id}
-              taskId={taskId}
-              objective={obj}
-              index={idx}
-              onSaveNew={handleSaveNew}
-              onUpdate={handleUpdate}
-              // ドラッグ関連のprops
-              isDragging={draggedIndex === idx}
-              isDragOver={dragOverIndex === idx}
-              dragOverPosition={dragOverPosition}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onDragEnd={handleDragEnd}
-            />
+      <DraggableTable
+          items={objectives}
+          getId={(item) => item.id}
+          useGrabHandle = {true}
+          onReorder={handleRender}
+          className="min-w-full text-sm text-left"
+      >
+        <TableHeader className="bg-gray-100">
+          <TableRow>
+            <TableHead className="px-3 py-2">オブジェクティブ</TableHead>
+            <TableHead className="px-3 py-2">期限</TableHead>
+            <TableHead className="px-3 py-2">ステータス</TableHead>
+            <TableHead className="px-3 py-2">担当者</TableHead>
+            <TableHead className="px-3 py-2">進捗</TableHead>
+            <TableHead className="px-3 py-2">報告日</TableHead>
+            <TableHead className="px-3 py-2">履歴</TableHead>
+          </TableRow>
+        </TableHeader>
+        <DraggableTableBody>
+          {objectives.map((obj) => (
+            <DraggableRow key={obj.id} id={obj.id}>
+              <ObjectiveRow
+                taskId={taskId}
+                objective={obj}
+                onSaveNew={handleSaveNew}
+                onUpdate={handleUpdate}
+              />
+            </DraggableRow>
           ))}
 
           {/* 常に表示される新規入力行 */}
-          <ObjectiveRow
-            key={`new-${objectives.length}`}
-            taskId={taskId}
-            objective={null}
-            index={objectives.length}
-            onSaveNew={handleSaveNew}
-            onUpdate={handleUpdate}
-            // 新規行はドラッグ無効
-            isDragging={false}
-            isDragOver={false}
-            dragOverPosition={null}
-            onDragStart={() => { }}
-            onDragOver={() => { }}
-            onDragLeave={() => { }}
-            onDrop={() => { }}
-            onDragEnd={() => { }}
-          />
-        </tbody>
-      </table>
+          <TableRow>
+            <ObjectiveRow
+              key="new"
+              taskId={taskId}
+              objective={null}
+              onSaveNew={handleSaveNew}
+              onUpdate={handleUpdate}
+            />
+          </TableRow>
+        </DraggableTableBody>
+      </DraggableTable>
     </div>
   );
 };
