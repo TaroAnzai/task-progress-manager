@@ -38,9 +38,12 @@ export const StatusBadgeCell = ({ value, onChange, disabled = false }: Props) =>
   };
 
   return (
-    <Popover open={open} onOpenChange={()=>{
-        if(!disabled) setOpen(true);
-      }}>
+    <Popover 
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!disabled) setOpen(nextOpen);
+      }}
+    >
       <PopoverTrigger asChild>
         <Badge
           className={`cursor-pointer ${STATUS_COLORS[value]}`}

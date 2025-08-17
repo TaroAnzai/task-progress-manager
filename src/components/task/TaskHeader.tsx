@@ -7,8 +7,8 @@ import type { Task } from '@/api/generated/taskProgressAPI.schemas';
 
 import { useUser } from '@/context/useUser';
 
+import {StatusBadgeCell} from "./StatusBadgeCell"
 import { TaskSettingsIcon } from './TaskSettingsIcon';
-import { TaskStatusBadge } from './TaskStatusBadge';
 
 
 
@@ -29,7 +29,7 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
           {task.title}
         </h4>
         <span className="text-sm text-gray-500">[期限: {dueDateStr}]</span>
-        <TaskStatusBadge task={task} />
+        <StatusBadgeCell value={task.status?task.status:"NOT_STARTED"} />
       </div>
       <div className="shrink-0">
         <TaskSettingsIcon task={task} user={user} />
