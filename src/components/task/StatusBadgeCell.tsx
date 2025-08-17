@@ -31,9 +31,11 @@ type Props = {
 
 export const StatusBadgeCell = ({ value, onChange, disabled = false }: Props) => {
   const [open, setOpen] = useState(false);
+  const [status, setStatus] = useState(value);
 
   const handleSelect = (status: updateStatusType) => {
     if(onChange)  onChange(status);
+    setStatus(status);
     setOpen(false);
   };
 
@@ -46,10 +48,10 @@ export const StatusBadgeCell = ({ value, onChange, disabled = false }: Props) =>
     >
       <PopoverTrigger asChild>
         <Badge
-          className={`cursor-pointer ${STATUS_COLORS[value]}`}
+          className={`cursor-pointer ${STATUS_COLORS[status]}`}
           variant="outline"
         >
-          {STATUS_LABELS[value] ?? value}
+          {STATUS_LABELS[status] ?? status}
         </Badge>
       </PopoverTrigger>
       <PopoverContent className="p-2 w-40">
