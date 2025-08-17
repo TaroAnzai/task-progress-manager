@@ -56,6 +56,9 @@ export const TaskScopeModal = ({ task, open, onClose }: TaskScopeModalProps) => 
   const [openUserModal, setOpenUserModal] = useState(false);
   const [openOrgModal, setOpenOrgModal] = useState(false);
 
+  const scopeLevelsWithoutOwner = SCOPE_LEVEL_OPTIONS.filter(
+    (l) => l.value !== "OWNER"
+  );
 
   useEffect(() => {
     const editable = (authorized_users ?? []).some((u) => u.id === currentUser?.id);
@@ -163,7 +166,7 @@ export const TaskScopeModal = ({ task, open, onClose }: TaskScopeModalProps) => 
                     key={user.user_id}
                     text={user.name}
                     value={user.access_level}
-                    options={SCOPE_LEVEL_OPTIONS}
+                    options={scopeLevelsWithoutOwner}
                     editable={isEditable}
                     onChange={(val) => updateUserLevel(user.user_id!, val)}
                     onRemove={() => onRemoveUser(user.user_id)}
@@ -186,7 +189,7 @@ export const TaskScopeModal = ({ task, open, onClose }: TaskScopeModalProps) => 
                     key={org.organization_id}
                     text={org.name}
                     value={org.access_level}
-                    options={SCOPE_LEVEL_OPTIONS}
+                    options={scopeLevelsWithoutOwner}
                     editable={isEditable}
                     onChange={(val) => updateOrgLevel(org.organization_id!, val)}
                     onRemove={() => onRemoveOrg(org.organization_id)}
