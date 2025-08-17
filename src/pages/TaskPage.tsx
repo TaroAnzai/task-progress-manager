@@ -7,15 +7,16 @@ import { NewTaskModal } from "@/components/task/newTaskModal/NewTaskModal";
 import { TaskControlPanel } from "@/components/task/TaskControlPanel";
 import { TaskList } from "@/components/task/TaskList";
 import {TaskOrderSettingModal} from "@/components/task/taskSettingOrderModal/TaskOrderSettingModal";
+import { TestModal } from "@/components/TestModal";
 
 import { useUser } from "@/context/useUser";
-
 const TaskPageContent = () => {
   const { user, loading: userLoading, getUserRole } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
   const [taskOrderModalOpen, setTaskOrderModalOpen] = useState(false);
+  const [testModalOpen, setTestModalOpen] = useState(false);
 
   useEffect(() => {
     if (userLoading) return;
@@ -34,7 +35,7 @@ const TaskPageContent = () => {
       <TaskControlPanel
         onAddTask={() => { setNewTaskModalOpen(true); }}
         onEditTasks={() => {setTaskOrderModalOpen(true);}}
-        onToggleViewSelector={() => { }}
+        onToggleViewSelector={() => {setTestModalOpen(true)}}
       />
       <TaskList />
 
@@ -46,6 +47,10 @@ const TaskPageContent = () => {
         open={taskOrderModalOpen}
         onClose={() => {setTaskOrderModalOpen(false)}}
         onDelete={() => { }}
+      />
+      <TestModal
+        open={testModalOpen}
+        onClose={() => {setTestModalOpen(false)}}
       />
     </>
 
