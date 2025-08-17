@@ -46,7 +46,6 @@ const TaskPageContent = () => {
       <TaskOrderSettingModal
         open={taskOrderModalOpen}
         onClose={() => {setTaskOrderModalOpen(false)}}
-        onDelete={() => { }}
       />
       <TestModal
         open={testModalOpen}

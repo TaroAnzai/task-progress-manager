@@ -1,5 +1,5 @@
 //src\components\task\taskSettingOrderModal\TaskOrderSettingModal.tsx
-import { useState } from "react"
+import { useEffect,useState } from "react"
 
 import {toast} from "sonner"
 
@@ -12,7 +12,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
-import {usePostProgressTaskOrders} from "@/api/generated/taskProgressAPI"
+import {useDeleteProgressTasksTaskId,usePostProgressTaskOrders} from "@/api/generated/taskProgressAPI"
 import type { Task } from "@/api/generated/taskProgressAPI.schemas"
 
 import {DraggableRow,DraggableTable,DraggableTableBody} from "@/components/DraggableTable";
@@ -20,21 +20,45 @@ import {DraggableRow,DraggableTable,DraggableTableBody} from "@/components/Dragg
 import { useAlertDialog } from "@/context/useAlertDialog";
 import { useTasks } from "@/context/useTasks"
 import {useUser} from "@/context/useUser"
+
 interface TaskSettingModalProps {
     open: boolean;
     onClose: () => void;
-    onDelete: (id: number) => void
 }
 
-export const TaskOrderSettingModal = ({ open, onClose, onDelete }: TaskSettingModalProps) => {
+export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) => {
     const { tasks,refetch:refetchTasks } = useTasks();
     const { user } = useUser();
     const {openAlertDialog} = useAlertDialog();
-    const [items, setItems] = useState<Task[]>(tasks);
+    const [items, setItems] = useState<Task[]>([]);
+
+    useEffect(() => {
+      if (tasks) {
+        setItems(tasks);
+      }
+    }, [tasks]);
+
+
     const {mutate: postProgressTaskOrders} = usePostProgressTaskOrders({
       mutation:{
         onSuccess: () => {
           toast.success("順序を更新しました");
+          refetchTasks();
+        },
+        onError:(error) => {
+          openAlertDialog({
+            title: "Error",
+            description: error,
+            confirmText: "閉じる",
+            showCancel: false,
+          });
+        }
+      }
+    });
+    const {mutate: deleteProgressTasksTaskId} = useDeleteProgressTasksTaskId({
+      mutation:{
+        onSuccess: () => {
+          toast.success("タスクを削除しました");
           refetchTasks();
         },
         onError:(error) => {
@@ -56,6 +80,11 @@ export const TaskOrderSettingModal = ({ open, onClose, onDelete }: TaskSettingMo
     const newTasksArray = items.map((task) => task.id,)
     postProgressTaskOrders({data:{task_ids:newTasksArray, user_id:user.id}});
   }
+
+  const handleDerete = (id:number) => {
+    deleteProgressTasksTaskId({taskId:id});
+  }
+
   return (
       <Dialog open={open} onOpenChange={onClose} >
           <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col" >
@@ -65,7 +94,7 @@ export const TaskOrderSettingModal = ({ open, onClose, onDelete }: TaskSettingMo
               </DialogHeader>
 
                 <DraggableTable
-                  items={tasks}
+                  items={items}
                   getId={(item) => item.id}
                   useGrabHandle = {true}
                   onReorder={handleRender}
@@ -84,12 +113,12 @@ export const TaskOrderSettingModal = ({ open, onClose, onDelete }: TaskSettingMo
                       {items?.map((task) => (
                           <DraggableRow key={task.id} id={task.id}>
                               <TableCell className="font-medium">{task.title}</TableCell>
-                              <TableCell>{task.due_date}</TableCell>
                               <TableCell>{task.create_user_name}</TableCell>
+                              <TableCell>{task.due_date}</TableCell>
                               <TableCell>{task.status}</TableCell>
                               <TableCell>{task.user_access_level}</TableCell>
                               <TableCell className="text-right">
-                                  <Button variant="destructive" size="sm" onClick={() => onDelete(task.id)}>削除</Button>
+                                  <Button variant="destructive" size="sm" onClick={() => handleDerete(task.id)}>削除</Button>
                               </TableCell>
                           </DraggableRow>
                       ))

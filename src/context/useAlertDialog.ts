@@ -8,6 +8,23 @@ export const useAlertDialog = (): DialogContextType => {
   return context;
 }
 
+/* AXIOS ERROR 例
+     const { openAlertDialog } = useAlertDialog();
+
+      onError:(error) => {
+        openAlertDialog({
+          title: "Error",
+          description: error,
+          confirmText: "閉じる",
+          showCancel: false,
+        });
+      }
+
+*/
+
+
+
+
 /*   const { openAlertDialog } = useAlertDialog();
 
     openAlertDialog({
