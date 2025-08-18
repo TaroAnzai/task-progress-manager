@@ -1,6 +1,7 @@
 //src\components\task\taskSettingOrderModal\TaskOrderSettingModal.tsx
 import { useEffect,useState } from "react"
 
+import { useQueryClient } from "@tanstack/react-query";
 import {toast} from "sonner"
 
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,8 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
-import {useDeleteProgressTasksTaskId,usePostProgressTaskOrders} from "@/api/generated/taskProgressAPI"
-import type { Task } from "@/api/generated/taskProgressAPI.schemas"
+import {getGetProgressTasksQueryOptions,useDeleteProgressTasksTaskId,usePostProgressTaskOrders, usePutProgressTasksTaskId} from "@/api/generated/taskProgressAPI"
+import type { Task,TaskUpdateStatus } from "@/api/generated/taskProgressAPI.schemas"
 
 import {DraggableRow,DraggableTable,DraggableTableBody} from "@/components/DraggableTable";
 
@@ -23,13 +24,13 @@ import { useTasks } from "@/context/useTasks"
 import {useUser} from "@/context/useUser"
 
 import { StatusBadgeCell } from '../StatusBadgeCell';
-
 interface TaskSettingModalProps {
     open: boolean;
     onClose: () => void;
 }
 
 export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) => {
+    const qc = useQueryClient();
     const { tasks,refetch:refetchTasks } = useTasks();
     const { user } = useUser();
     const {openAlertDialog} = useAlertDialog();
@@ -74,7 +75,30 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
         }
       }
     });
+  const {mutate:updateTask} = usePutProgressTasksTaskId({
+    mutation: {
+      onSuccess: () => {
+        toast.success("タスクを更新しました");
+        const { queryKey } = getGetProgressTasksQueryOptions();
+        qc.invalidateQueries({ queryKey });
+      },
+      onError: (error) => {
+        openAlertDialog({
+          title: "Error",
+          description: error,
+          confirmText: "閉じる",
+          showCancel: false
+        })
+      }
+    }
+  });
 
+  const handleUpdateTaskStatus = (task_id:number,status:TaskUpdateStatus) => {
+    const payload = {
+      status: status,
+    };
+    updateTask({taskId:task_id, data:payload});
+  };
 
 
   const handleRender = (items:Task[]) =>{
@@ -119,7 +143,7 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
                               <TableCell>{task.create_user_name}</TableCell>
                               <TableCell>{task.due_date}</TableCell>
                               <TableCell>
-                                  <StatusBadgeCell value={task.status??"UNDEFINED"} disabled={true} />
+                                  <StatusBadgeCell value={task.status??"UNDEFINED" } onChange={(newStatus)=>{handleUpdateTaskStatus(task.id,newStatus)}}/>
                                   </TableCell>
                               <TableCell>{task.user_access_level?SCOPE_LABELS[task.user_access_level]:""}</TableCell>
                               <TableCell className="text-right">

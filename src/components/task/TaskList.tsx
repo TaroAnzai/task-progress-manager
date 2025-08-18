@@ -1,7 +1,4 @@
 // src/components/task/TaskList.tsx
-
-
-
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { TaskStatus } from '@/api/generated/taskProgressAPI.schemas';
@@ -12,7 +9,7 @@ import { TaskCard } from './TaskCard';
 
 export const TaskList = () => {
   const { tasks, isLoading } = useTasks();
-
+  
   if (isLoading) {
     return (
       <div className="space-y-2">

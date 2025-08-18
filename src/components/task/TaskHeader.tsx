@@ -1,28 +1,42 @@
 // src/components/task/TaskHeader.tsx
 
+import {useState} from "react"
+
+import { useQueryClient } from "@tanstack/react-query";
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { toast } from 'sonner';
 
-import {usePutProgressTasksTaskId} from "@/api/generated/taskProgressAPI"
-import type { Task, TaskUpdateStatus } from '@/api/generated/taskProgressAPI.schemas';
+import {getGetProgressTasksQueryOptions, usePutProgressTasksTaskId} from "@/api/generated/taskProgressAPI"
+import type { Task, TaskUpdateStatus as TaskUpdateStatusType } from '@/api/generated/taskProgressAPI.schemas';
+import {TaskUpdateStatus} from "@/api/generated/taskProgressAPI.schemas"
 
 import { useAlertDialog } from '@/context/useAlertDialog';
 import { useUser } from '@/context/useUser';
 
 import {StatusBadgeCell} from "./StatusBadgeCell"
 import { TaskSettingsIcon } from './TaskSettingsIcon';
+
 interface TaskHeaderProps {
   task: Task;
 }
 
+
 export const TaskHeader = ({ task }: TaskHeaderProps) => {
+  const qc = useQueryClient();
   const { user } = useUser();
   const { openAlertDialog } = useAlertDialog();
+  const [status, setStatus] = useState<TaskUpdateStatusType>(task.status??TaskUpdateStatus.UNDEFINED);
   const {mutate:updateTask} = usePutProgressTasksTaskId({
     mutation: {
-      onSuccess: () => {
+      onSuccess: (_data, variables) => {
         toast.success("タスクを更新しました");
+        setStatus(status);
+        if (variables.data.status === TaskUpdateStatus.SAVED) {
+          const { queryKey } = getGetProgressTasksQueryOptions();
+          qc.invalidateQueries({ queryKey });
+        }
+
       },
       onError: (error) => {
         openAlertDialog({
@@ -35,7 +49,7 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
     }
   });
 
-  const handleUpdateTaskStatus = (status:TaskUpdateStatus) => {
+  const handleUpdateTaskStatus = (status:TaskUpdateStatusType) => {
     const payload = {
       status: status,
     };
@@ -56,7 +70,7 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
         </h4>
         <span className="text-sm text-gray-500">[期限: {dueDateStr}]</span>
         <StatusBadgeCell
-          value={task.status?task.status:"NOT_STARTED"}
+          value={status}
           onChange ={handleUpdateTaskStatus}  
          />
       </div>
