@@ -4,6 +4,8 @@
 
 import { Skeleton } from '@/components/ui/skeleton';
 
+import { TaskStatus } from '@/api/generated/taskProgressAPI.schemas';
+
 import { useTasks } from '@/context/useTasks';
 
 import { TaskCard } from './TaskCard';
@@ -23,9 +25,11 @@ export const TaskList = () => {
 
   return (
     <div className="space-y-4">
-      {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} />
-      ))}
+      {tasks
+        .filter((task) => task.status !== TaskStatus.SAVED)
+        .map((task) => (
+          <TaskCard key={task.id} task={task} />
+        ))}
     </div>
   );
 };
