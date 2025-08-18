@@ -13,6 +13,7 @@ import {
 
 import type { Task, UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
 
+import { ObjectiveListModal } from './objectiveListModal/ObjectiveListModal';
 import { TaskScopeModal } from './taskScopeModal/TaskScopeModal.tsx';
 import { TaskSettingModal } from './taskSettingModal/TaskSettingModal';
 
@@ -24,6 +25,7 @@ interface TaskSettingsIconProps {
 export const TaskSettingsIcon = ({ task }: TaskSettingsIconProps) => {
   const [openSetting, setOpenSetting] = useState(false);
   const [openScope, setOpenScope] = useState(false);
+  const [openObjectiveModal, setOpenObjectiveModal] = useState(false);
 
   return (
     <>
@@ -46,6 +48,9 @@ export const TaskSettingsIcon = ({ task }: TaskSettingsIconProps) => {
           <DropdownMenuItem onClick={() => setOpenScope(true)}>
             スコープ設定
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setOpenObjectiveModal(true)}>
+            オブジェクティブ一覧
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -61,6 +66,13 @@ export const TaskSettingsIcon = ({ task }: TaskSettingsIconProps) => {
         open={openScope}
         task={task}
         onClose={() => setOpenScope(false)}
+      />
+
+      {/* オブジェクティブ一覧モーダル */}
+      <ObjectiveListModal
+        open={openObjectiveModal}
+        task={task}
+        onClose={() => setOpenObjectiveModal(false)}
       />
     </>
   );

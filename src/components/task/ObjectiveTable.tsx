@@ -12,6 +12,7 @@ import {
 
 import { useGetProgressObjectivesTasksTaskId, usePostProgressObjectives, usePostProgressTasksTaskIdObjectivesOrder, usePutProgressObjectivesObjectiveId } from '@/api/generated/taskProgressAPI';
 import type { Objective, ObjectiveInput, ObjectiveUpdate } from '@/api/generated/taskProgressAPI.schemas';
+import {ObjectiveStatus} from '@/api/generated/taskProgressAPI.schemas'
 
 import {DraggableRow,DraggableTable,DraggableTableBody} from "@/components/DraggableTable";
 
@@ -147,16 +148,19 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
           </TableRow>
         </TableHeader>
         <DraggableTableBody>
-          {objectives.map((obj) => (
-            <DraggableRow key={obj.id} id={obj.id}>
-              <ObjectiveRow
-                taskId={taskId}
-                objective={obj}
-                onSaveNew={handleSaveNew}
-                onUpdate={handleUpdate}
-              />
-            </DraggableRow>
-          ))}
+          {objectives
+            .filter((task) => task.status !== ObjectiveStatus.SAVED)
+            .map((obj) => (
+              <DraggableRow key={obj.id} id={obj.id}>
+                <ObjectiveRow
+                  taskId={taskId}
+                  objective={obj}
+                  onSaveNew={handleSaveNew}
+                  onUpdate={handleUpdate}
+                />
+              </DraggableRow>
+            ))
+        }
 
           {/* 常に表示される新規入力行 */}
           <TableRow>

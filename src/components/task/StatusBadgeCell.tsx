@@ -1,5 +1,5 @@
 // src/components/task/StatusBadgeCell.tsx
-import { useState } from "react";
+import { useEffect,useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -38,6 +38,10 @@ export const StatusBadgeCell = ({ value, onChange, disabled = false }: Props) =>
     setStatus(status);
     setOpen(false);
   };
+
+  useEffect(() => {
+    setStatus(value);
+  }, [value]);
 
   return (
     <Popover

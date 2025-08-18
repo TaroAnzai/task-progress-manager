@@ -1,5 +1,5 @@
 // src/components/task/ObjectiveRow.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -137,7 +137,13 @@ export const ObjectiveRow = ({
       deleteProgressMutation({ progressId: progressId });
     }
   };
-
+  useEffect(() => {
+    if (objective) {
+      setTitle(objective.title?? "");
+      setDueDate(objective.due_date?? undefined);
+      setStatus(objective.status);
+    }
+  }, [objective]);
   if (isNew) {
     return (
       <>
