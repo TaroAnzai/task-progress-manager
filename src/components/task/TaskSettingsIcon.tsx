@@ -1,7 +1,7 @@
 // src/components/task/TaskSettingsIcon.tsx
 import { useState } from 'react';
 
-import { Cog } from 'lucide-react';
+import { Settings } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -37,7 +37,7 @@ export const TaskSettingsIcon = ({ task }: TaskSettingsIconProps) => {
             className="text-gray-600 hover:text-gray-900"
             title="設定"
           >
-            <Cog className="h-5 w-5" />
+            <Settings className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
 
