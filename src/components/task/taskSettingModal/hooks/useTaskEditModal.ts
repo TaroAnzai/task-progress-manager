@@ -16,7 +16,7 @@ import type {
 
 import { extractErrorMessage } from "@/utils/errorHandler";
 
-import {useTasks} from "@/context/useTasks"
+import { useTasks } from "@/context/useTasks";
 import { useUser } from "@/context/useUser";
 
 export const useTaskEditModal = (task: Task, onClose: () => void) => {
@@ -40,7 +40,7 @@ export const useTaskEditModal = (task: Task, onClose: () => void) => {
   const remove = useDeleteProgressObjectivesObjectiveId();
 
   useEffect(() => {
-    const editable = (authorized_users ?? []).some((u) => u.user_id === user?.id);
+    const editable = (authorized_users ?? []).some((u) => u.id === user?.id);
     setIsEditable(editable);
   }, [user, task, authorized_users]);
 

@@ -1,20 +1,20 @@
 // src/components/task/TaskHeader.tsx
 
-import {useState} from "react"
+import { useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { toast } from 'sonner';
 
-import {getGetProgressTasksQueryOptions, usePutProgressTasksTaskId} from "@/api/generated/taskProgressAPI"
+import { getGetProgressTasksQueryOptions, usePutProgressTasksTaskId } from "@/api/generated/taskProgressAPI";
 import type { Task, TaskUpdateStatus as TaskUpdateStatusType } from '@/api/generated/taskProgressAPI.schemas';
-import {TaskUpdateStatus} from "@/api/generated/taskProgressAPI.schemas"
+import { TaskUpdateStatus } from "@/api/generated/taskProgressAPI.schemas";
 
 import { useAlertDialog } from '@/context/useAlertDialog';
 import { useUser } from '@/context/useUser';
 
-import {StatusBadgeCell} from "./StatusBadgeCell"
+import { StatusBadgeCell } from "./StatusBadgeCell";
 import { TaskSettingsIcon } from './TaskSettingsIcon';
 
 interface TaskHeaderProps {
@@ -26,8 +26,8 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
   const qc = useQueryClient();
   const { user } = useUser();
   const { openAlertDialog } = useAlertDialog();
-  const [status, setStatus] = useState<TaskUpdateStatusType>(task.status??TaskUpdateStatus.UNDEFINED);
-  const {mutate:updateTask} = usePutProgressTasksTaskId({
+  const [status, setStatus] = useState<TaskUpdateStatusType>(task.status ?? TaskUpdateStatus.UNDEFINED);
+  const { mutate: updateTask } = usePutProgressTasksTaskId({
     mutation: {
       onSuccess: (_data, variables) => {
         toast.success("タスクを更新しました");
@@ -49,11 +49,11 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
     }
   });
 
-  const handleUpdateTaskStatus = (status:TaskUpdateStatusType) => {
+  const handleUpdateTaskStatus = (status: TaskUpdateStatusType) => {
     const payload = {
       status: status,
     };
-    updateTask({taskId:task.id, data:payload});
+    updateTask({ taskId: task.id, data: payload });
   };
 
   const dueDateStr = task.due_date
@@ -71,8 +71,8 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
         <span className="text-sm text-gray-500">[期限: {dueDateStr}]</span>
         <StatusBadgeCell
           value={status}
-          onChange ={handleUpdateTaskStatus}  
-         />
+          onChange={handleUpdateTaskStatus}
+        />
       </div>
       <div className="shrink-0">
         <TaskSettingsIcon task={task} user={user} />

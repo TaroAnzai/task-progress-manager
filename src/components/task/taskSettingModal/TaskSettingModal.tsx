@@ -1,10 +1,9 @@
 // src/components/task/taskSettingModal/TaskSettingModal.tsx
-import { Dialog, DialogContent, DialogDescription, DialogFooter,DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 import type { Task } from "@/api/generated/taskProgressAPI.schemas";
 
 import { useTaskEditModal } from "./hooks/useTaskEditModal";
-import { ObjectiveSection } from "./ObjectiveSection";
 import { SaveButton } from "./SaveButton";
 import { TaskEditForm } from "./TaskEditForm";
 interface TaskSettingModalProps {
@@ -20,9 +19,15 @@ export const TaskSettingModal = ({ open, task, onClose }: TaskSettingModalProps)
     handleChange,
     handleSave,
     isSaving,
-    objectives,
-    handleRemoveObjective,
   } = useTaskEditModal(task, onClose);
+
+
+
+
+
+
+
+
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -33,12 +38,6 @@ export const TaskSettingModal = ({ open, task, onClose }: TaskSettingModalProps)
         </DialogHeader>
 
         <TaskEditForm formState={formState} isEditable={isEditable} onChange={handleChange} />
-        <ObjectiveSection
-          taskId={task.id}
-          objectives={objectives}
-          isEditable={isEditable}
-          onRemoveObjective={handleRemoveObjective}
-        />
         <DialogFooter>
           <SaveButton
             isEditable={isEditable}
