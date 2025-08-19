@@ -52,7 +52,7 @@ export const StatusBadgeCell = ({ value, onChange, disabled = false }: Props) =>
     >
       <PopoverTrigger asChild>
         <Badge
-          className={`cursor-pointer ${STATUS_COLORS[status]}`}
+          className={`min-w-[60px] justify-center cursor-pointer ${STATUS_COLORS[status]} `}
           variant="outline"
         >
           {STATUS_LABELS[status] ?? status}

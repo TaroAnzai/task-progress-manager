@@ -65,10 +65,10 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 flex-grow">
-        <h4 className="text-base font-semibold leading-snug text-gray-800">
+        <h4 className="md:w-[50%] text-base font-semibold leading-snug text-gray-800">
           {task.title}
         </h4>
-        <span className="text-sm text-gray-500">[期限: {dueDateStr}]</span>
+        <span className="w-[150px] text-sm text-gray-500 whitespace-nowrap">[期限: {dueDateStr}]</span>
         <StatusBadgeCell
           value={status}
           onChange={handleUpdateTaskStatus}

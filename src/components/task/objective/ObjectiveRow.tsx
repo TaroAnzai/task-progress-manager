@@ -150,7 +150,7 @@ export const ObjectiveRow = ({
           <TableCell className="w-8 px-2 py-2 select-none">
           </TableCell>
           <TableCell className="px-3 py-2">
-            <EditableCell value={title} onSave={handleTitleSave} />
+            <EditableCell value={""} onSave={handleTitleSave} />
           </TableCell>
       </>
     );
@@ -158,7 +158,7 @@ export const ObjectiveRow = ({
     return (
       <>
           <TableCell className="px-3 py-2">
-            <EditableCell value={title} onSave={handleTitleSave} />
+            <EditableCell  value={title} onSave={handleTitleSave} />
           </TableCell>
           <TableCell className="px-3 py-2">
             <DateCell value={dueDate} onSave={handleDateSave} />

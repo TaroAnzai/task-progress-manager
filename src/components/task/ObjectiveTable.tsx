@@ -138,13 +138,13 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
       >
         <TableHeader className="bg-gray-100">
           <TableRow>
-            <TableHead className="px-3 py-2">オブジェクティブ</TableHead>
-            <TableHead className="px-3 py-2">期限</TableHead>
-            <TableHead className="px-3 py-2">ステータス</TableHead>
-            <TableHead className="px-3 py-2">担当者</TableHead>
+            <TableHead className="w-[300px] px-3 py-2">オブジェクティブ</TableHead>
+            <TableHead className="w-[120px] px-3 py-2">期限</TableHead>
+            <TableHead className="w-[120px] px-3 py-2">ステータス</TableHead>
+            <TableHead className="w-[120px] px-3 py-2">担当者</TableHead>
             <TableHead className="px-3 py-2">進捗</TableHead>
-            <TableHead className="px-3 py-2">報告日</TableHead>
-            <TableHead className="px-3 py-2">履歴</TableHead>
+            <TableHead className="w-[100px] px-3 py-2">報告日</TableHead>
+            <TableHead className="w-[60px] px-3 py-2">履歴</TableHead>
           </TableRow>
         </TableHeader>
         <DraggableTableBody>

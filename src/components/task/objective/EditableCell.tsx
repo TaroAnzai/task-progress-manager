@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 type EditableCellProps = {
   value: string;
   onSave: (newValue: string) => void;
+  className?: string;
 };
 
-export const EditableCell = ({ value, onSave }: EditableCellProps) => {
+export const EditableCell = ({ value, onSave, className }: EditableCellProps) => {
   const [editing, setEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value);
 
@@ -45,7 +46,7 @@ export const EditableCell = ({ value, onSave }: EditableCellProps) => {
       autoFocus
     />
   ) : (
-    <div onClick={() => setEditing(true)} className="cursor-pointer text-left w-full min-h-[1.5rem]">
+    <div onClick={() => setEditing(true)} className={`cursor-pointer text-left w-full min-h-[1.5rem] ${className}`}>
       {value || "+"}
     </div>
   );
