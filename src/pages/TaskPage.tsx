@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { NewTaskModal } from "@/components/task/newTaskModal/NewTaskModal";
 import { TaskControlPanel } from "@/components/task/TaskControlPanel";
 import { TaskList } from "@/components/task/TaskList";
-import {TaskOrderSettingModal} from "@/components/task/taskSettingOrderModal/TaskOrderSettingModal";
+import { TaskOrderSettingModal } from "@/components/task/taskSettingOrderModal/TaskOrderSettingModal";
 import { TestModal } from "@/components/TestModal";
 
 import { useUser } from "@/context/useUser";
@@ -17,6 +17,7 @@ const TaskPageContent = () => {
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
   const [taskOrderModalOpen, setTaskOrderModalOpen] = useState(false);
   const [testModalOpen, setTestModalOpen] = useState(false);
+  const [isObjExpand, setIsObjExpand] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
     if (userLoading) return;
@@ -24,6 +25,15 @@ const TaskPageContent = () => {
       navigate("/login", { state: { from: location.pathname } });
     }
   }, [userLoading, user, navigate, location.pathname]);
+
+
+  const onAllExpand = () => {
+    setIsObjExpand(true);
+  }
+  const onAllCollapse = () => {
+    setIsObjExpand(false);
+  }
+
 
   if (userLoading) return <p className="text-gray-500">読み込み中...</p>;
   if (!user) return null;
@@ -34,10 +44,12 @@ const TaskPageContent = () => {
       </p>
       <TaskControlPanel
         onAddTask={() => { setNewTaskModalOpen(true); }}
-        onEditTasks={() => {setTaskOrderModalOpen(true);}}
-        onToggleViewSelector={() => {setTestModalOpen(true)}}
+        onEditTasks={() => { setTaskOrderModalOpen(true); }}
+        onToggleViewSelector={() => { setTestModalOpen(true) }}
+        onAllExpand={onAllExpand}
+        onAllCollapse={onAllCollapse}
       />
-      <TaskList />
+      <TaskList isExpandParent={isObjExpand} />
 
       <NewTaskModal
         open={newTaskModalOpen}
@@ -45,11 +57,11 @@ const TaskPageContent = () => {
       />
       <TaskOrderSettingModal
         open={taskOrderModalOpen}
-        onClose={() => {setTaskOrderModalOpen(false)}}
+        onClose={() => { setTaskOrderModalOpen(false) }}
       />
       <TestModal
         open={testModalOpen}
-        onClose={() => {setTestModalOpen(false)}}
+        onClose={() => { setTestModalOpen(false) }}
       />
     </>
 

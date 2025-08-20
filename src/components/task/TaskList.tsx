@@ -7,9 +7,12 @@ import { useTasks } from '@/context/useTasks';
 
 import { TaskCard } from './TaskCard';
 
-export const TaskList = () => {
+interface TaskListProps {
+  isExpandParent?: boolean
+}
+export const TaskList = ({ isExpandParent }: TaskListProps) => {
   const { tasks, isLoading } = useTasks();
-  
+
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -25,7 +28,7 @@ export const TaskList = () => {
       {tasks
         .filter((task) => task.status !== TaskStatus.SAVED)
         .map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard key={task.id} task={task} isExpandParent={isExpandParent} />
         ))}
     </div>
   );

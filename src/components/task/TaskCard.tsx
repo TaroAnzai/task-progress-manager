@@ -1,6 +1,6 @@
 // src/components/task/TaskCard.tsx
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Minus, Plus } from 'lucide-react';
 
@@ -10,19 +10,32 @@ import { ObjectiveTable } from './ObjectiveTable';
 import { TaskHeader } from './TaskHeader';
 interface TaskCardProps {
   task: Task;
+  isExpandParent?: boolean
 }
 
-export const TaskCard = ({ task }: TaskCardProps) => {
-  const [isExpanded, setIsExpanded] = useState(() => {
-    const stored = localStorage.getItem(`objective_visibility_${task.id}`);
-    return stored ? JSON.parse(stored) : true;
-  });
+const storageKey = (id: number) => `objective_visibility_${id}`;
+export const TaskCard = ({ task, isExpandParent }: TaskCardProps) => {
+  const initial = useMemo(() => {
+    const s = localStorage.getItem(storageKey(task.id));
+    return s ? JSON.parse(s) : true;
+  }, [task.id]);
 
-  const toggleVisibility = () => {
-    const newState = !isExpanded;
-    setIsExpanded(newState);
-    localStorage.setItem(`objective_visibility_${task.id}`, JSON.stringify(newState));
+  const toggle = () => setAndStore(!isExpand);
+
+  const [isExpand, setIsExpand] = useState<boolean>(initial);
+  const setAndStore = (v: boolean) => {
+    setIsExpand(v);
+    localStorage.setItem(storageKey(task.id), JSON.stringify(v));
   };
+
+
+
+  useEffect(() => {
+    if (typeof isExpandParent === "boolean" && isExpand !== isExpandParent) {
+      setAndStore(isExpandParent);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isExpandParent]);
 
   return (
     <div className="rounded-xl border border-gray-300 bg-white shadow-sm">
@@ -30,19 +43,17 @@ export const TaskCard = ({ task }: TaskCardProps) => {
         <TaskHeader task={task} />
         <div className="h-9 flex items-center">
           <button
-            onClick={toggleVisibility}
+            onClick={toggle}
             className="text-sm text-blue-600 hover:underline"
           >
-            {isExpanded ? <Minus className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+            {isExpand ? <Minus className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
           </button>
         </div>
 
       </div>
-      {isExpanded && (
-        <div className="px-4 py-2">
-          <ObjectiveTable taskId={task.id} />
-        </div>
-      )}
+      <div className={`px-4 py-2" ${isExpand ? "block" : "hidden"}`} >
+        <ObjectiveTable taskId={task.id} />
+      </div>
     </div>
   );
 };
