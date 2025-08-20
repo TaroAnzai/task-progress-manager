@@ -42,7 +42,7 @@ export const EditableCell = ({ value, onSave, className }: EditableCellProps) =>
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}
       onBlur={handleSave}
-      onKeyDown={handleKeyDown}
+      onKeyUp={handleKeyDown}
       autoFocus
     />
   ) : (

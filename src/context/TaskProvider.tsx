@@ -8,7 +8,7 @@ import type { AccessLevel, Action } from '@/acl/policy';
 import { useUser } from "@/context/useUser";
 
 import { TaskContext } from "./TaskContextBase";
-type Subject = Task | Objective
+type Subject = Task | Objective | { taskId: number }
 export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useUser();
   const currentUserId = user?.id;

@@ -3,7 +3,7 @@ import { createContext } from "react";
 import type { Objective, Task } from "@/api/generated/taskProgressAPI.schemas";
 
 import type { AccessLevel, Action } from '@/acl/policy';
-type Subject = Task | Objective;
+type Subject = Task | Objective | { taskId: number };
 export interface TaskContextType {
   tasks: Task[];
   isLoading: boolean;

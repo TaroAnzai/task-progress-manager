@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
-    TableCell,
+  TableCell,
 } from "@/components/ui/table"
 
 import {
@@ -14,7 +14,7 @@ import {
   useGetProgressUpdatesObjectiveIdLatestProgress,
   usePostProgressUpdatesObjectiveId
 } from "@/api/generated/taskProgressAPI";
-import type { Objective, ObjectiveInput, ObjectiveUpdate, ObjectiveUpdateStatus as updateStatusType,ProgressInput } from "@/api/generated/taskProgressAPI.schemas";
+import type { Objective, ObjectiveInput, ObjectiveUpdate, ObjectiveUpdateStatus as updateStatusType, ProgressInput } from "@/api/generated/taskProgressAPI.schemas";
 import { ObjectiveStatus, ProgressStatus as StatusType } from "@/api/generated/taskProgressAPI.schemas";
 
 import { useAlertDialog } from "@/context/useAlertDialog";
@@ -63,10 +63,10 @@ export const ObjectiveRow = ({
             getGetProgressUpdatesObjectiveIdQueryOptions(variables.objectiveId, {});
           qc.invalidateQueries({ queryKey });
         },
-        onError: () => {
+        onError: (err) => {
           openAlertDialog({
             title: "進捗登録失敗",
-            description: "このデータを削除してもよろしいですか？",
+            description: err,
             showCancel: false
           });
         }
@@ -139,48 +139,48 @@ export const ObjectiveRow = ({
   };
   useEffect(() => {
     if (objective) {
-      setTitle(objective.title?? "");
-      setDueDate(objective.due_date?? undefined);
+      setTitle(objective.title ?? "");
+      setDueDate(objective.due_date ?? undefined);
       setStatus(objective.status);
     }
   }, [objective]);
   if (isNew) {
     return (
       <>
-          <TableCell className="w-8 px-2 py-2 select-none">
-          </TableCell>
-          <TableCell className="px-3 py-2">
-            <EditableCell value={""} onSave={handleTitleSave} />
-          </TableCell>
+        <TableCell className="w-8 px-2 py-2 select-none">
+        </TableCell>
+        <TableCell className="px-3 py-2">
+          <EditableCell value={""} onSave={handleTitleSave} />
+        </TableCell>
       </>
     );
   } else {
     return (
       <>
-          <TableCell className="px-3 py-2">
-            <EditableCell  value={title} onSave={handleTitleSave} />
-          </TableCell>
-          <TableCell className="px-3 py-2">
-            <DateCell value={dueDate} onSave={handleDateSave} />
-          </TableCell>
-          <TableCell className="px-3 py-2">
-            <StatusBadgeCell value={status} onChange={handleStatusSave} />
-          </TableCell>
-          <TableCell
-            className="px-3 py-2 cursor-pointer hover:bg-muted/30"
-            onClick={() => setIsUserSelectModalOpen(true)}
-          >
-            {objective?.assigned_user_name ?? "-"}
-          </TableCell>
-          <TableCell className="px-3 py-2">
-            <EditableCell value={latest_progress} onSave={handleProgressSave} />
-          </TableCell>
-          <TableCell className="px-3 py-2">{latest_report_date}</TableCell>
-          <TableCell className="px-3 py-2">
-            <button className="text-blue-600 hover:underline text-xs"
-              onClick={() => setIsProgressListModalOpen(true)}
-            >履歴</button>
-          </TableCell>
+        <TableCell className="px-3 py-2">
+          <EditableCell value={title} onSave={handleTitleSave} />
+        </TableCell>
+        <TableCell className="px-3 py-2">
+          <DateCell value={dueDate} onSave={handleDateSave} />
+        </TableCell>
+        <TableCell className="px-3 py-2">
+          <StatusBadgeCell value={status} onChange={handleStatusSave} />
+        </TableCell>
+        <TableCell
+          className="px-3 py-2 cursor-pointer hover:bg-muted/30"
+          onClick={() => setIsUserSelectModalOpen(true)}
+        >
+          {objective?.assigned_user_name ?? "-"}
+        </TableCell>
+        <TableCell className="px-3 py-2">
+          <EditableCell value={latest_progress} onSave={handleProgressSave} />
+        </TableCell>
+        <TableCell className="px-3 py-2">{latest_report_date}</TableCell>
+        <TableCell className="px-3 py-2">
+          <button className="text-blue-600 hover:underline text-xs"
+            onClick={() => setIsProgressListModalOpen(true)}
+          >履歴</button>
+        </TableCell>
 
         <SingleUserSelectModal
           taskId={taskId}

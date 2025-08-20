@@ -4,11 +4,12 @@ import type { Objective, Task } from '@/api/generated/taskProgressAPI.schemas';
 
 import { type AccessLevel, type Action, baseAllowed } from './policy';
 
-type Subject = Task | Objective
+type Subject = Task | Objective | { taskId: number }
 const isTask = (s: Subject): s is Task => 'id' in s;
 const isObjective = (s: Subject): s is Objective => 'task_id' in s;
 
 const extractTaskId = (s: Subject): number => {
+  if ('taskId' in (s)) return (s).taskId;
   if (isTask(s)) return s.id;
   if (isObjective(s)) return s.task_id;
   throw new Error('Unsupported subject');
