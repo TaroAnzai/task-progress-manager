@@ -5,7 +5,7 @@ import type { Objective, Task } from '@/api/generated/taskProgressAPI.schemas';
 import { type AccessLevel, type Action, baseAllowed } from './policy';
 
 type Subject = Task | Objective | { taskId: number }
-const isTask = (s: Subject): s is Task => !('task_id' in s) && ('ud' in s);
+const isTask = (s: Subject): s is Task => !('task_id' in s) && ('user_access_level' in s);
 const isObjective = (s: Subject): s is Objective => 'task_id' in s;
 
 const extractTaskId = (s: Subject): number => {

@@ -1,6 +1,6 @@
 // src/components/task/TaskHeader.tsx
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from 'date-fns';
@@ -12,6 +12,7 @@ import type { Task, TaskUpdateStatus as TaskUpdateStatusType } from '@/api/gener
 import { TaskUpdateStatus } from "@/api/generated/taskProgressAPI.schemas";
 
 import { useAlertDialog } from '@/context/useAlertDialog';
+import { useTasks } from '@/context/useTasks'
 import { useUser } from '@/context/useUser';
 
 import { StatusBadgeCell } from "./StatusBadgeCell";
@@ -25,10 +26,17 @@ interface TaskHeaderProps {
 export const TaskHeader = ({ task }: TaskHeaderProps) => {
   const qc = useQueryClient();
   const { user } = useUser();
+  const { can } = useTasks();
   const { openAlertDialog } = useAlertDialog();
   const [status, setStatus] = useState<TaskUpdateStatusType>(task.status ?? TaskUpdateStatus.UNDEFINED);
+  const [isUpdateTask, setIsUpdateTask] = useState(false);
   const { mutate: updateTask } = usePutProgressTasksTaskId({
     mutation: {
+      onMutate: (variables) => {
+        if (variables.data.status) setStatus(variables.data.status);
+        const prevStatus = status;
+        return { prevStatus }
+      },
       onSuccess: (_data, variables) => {
         toast.success("タスクを更新しました");
         setStatus(status);
@@ -38,13 +46,15 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
         }
 
       },
-      onError: (error) => {
+      onError: (error, _variables, context) => {
         openAlertDialog({
           title: "Error",
           description: error,
           confirmText: "閉じる",
           showCancel: false
         })
+        if (!context?.prevStatus) return
+        setStatus(context.prevStatus);
       }
     }
   });
@@ -60,6 +70,9 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
     ? format(new Date(task.due_date), 'yyyy年M月d日', { locale: ja })
     : '期限未設定';
 
+  useEffect(() => {
+    setIsUpdateTask(can("task.update", task))
+  }, [can, task])
 
 
   return (
@@ -72,11 +85,17 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
         <StatusBadgeCell
           value={status}
           onChange={handleUpdateTaskStatus}
+          disabled={!isUpdateTask}
         />
       </div>
-      <div className="shrink-0">
-        <TaskSettingsIcon task={task} user={user} />
-      </div>
+      {isUpdateTask ? (
+        <div className="shrink-0">
+          <TaskSettingsIcon task={task} user={user} />
+        </div>
+      ) : (
+        <div className="w-[36px]"></div>
+      )}
+
     </div>
   );
 };

@@ -1,11 +1,11 @@
 // src/components/task/StatusBadgeCell.tsx
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-import type { ObjectiveUpdateStatus as updateStatusType,ProgressStatus as StatusType, TaskUpdateStatus } from "@/api/generated/taskProgressAPI.schemas";
+import type { ObjectiveUpdateStatus as updateStatusType, ProgressStatus as StatusType, TaskUpdateStatus } from "@/api/generated/taskProgressAPI.schemas";
 import { TaskStatus } from "@/api/generated/taskProgressAPI.schemas";
 const STATUS_LABELS: Record<StatusType, string> = {
   UNDEFINED: "未定義",
@@ -25,7 +25,7 @@ const STATUS_COLORS: Record<StatusType, string> = {
 
 type Props = {
   value: StatusType | TaskStatus;
-  onChange?: (newStatus: updateStatusType|TaskUpdateStatus) => void;
+  onChange?: (newStatus: updateStatusType | TaskUpdateStatus) => void;
   disabled?: boolean;
 };
 
@@ -52,7 +52,7 @@ export const StatusBadgeCell = ({ value, onChange, disabled = false }: Props) =>
     >
       <PopoverTrigger asChild>
         <Badge
-          className={`min-w-[60px] justify-center cursor-pointer ${STATUS_COLORS[status]} `}
+          className={`min-w-[60px] justify-center ${!disabled ? "cursor-pointer" : "cursor-default"}  ${STATUS_COLORS[status]} `}
           variant="outline"
         >
           {STATUS_LABELS[status] ?? status}
