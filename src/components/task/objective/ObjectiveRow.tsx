@@ -14,10 +14,11 @@ import {
   useGetProgressUpdatesObjectiveIdLatestProgress,
   usePostProgressUpdatesObjectiveId
 } from "@/api/generated/taskProgressAPI";
-import type { Objective, ObjectiveInput, ObjectiveUpdate, ProgressInput, ObjectiveUpdateStatus as updateStatusType } from "@/api/generated/taskProgressAPI.schemas";
+import type { Objective, ObjectiveInput, ObjectiveUpdate, ObjectiveUpdateStatus as updateStatusType, ProgressInput } from "@/api/generated/taskProgressAPI.schemas";
 import { ObjectiveStatus, ProgressStatus as StatusType } from "@/api/generated/taskProgressAPI.schemas";
 
 import { useAlertDialog } from "@/context/useAlertDialog";
+import { useTasks } from "@/context/useTasks";
 
 import { SingleUserSelectModal } from "../SingleUserSelectModal";
 import { StatusBadgeCell } from "../StatusBadgeCell";
@@ -31,7 +32,6 @@ interface ObjectiveRowProps {
   objective: Objective | null;
   onSaveNew: (obj: ObjectiveInput) => Promise<void>;
   onUpdate: (objId: number, updates: ObjectiveUpdate) => Promise<void>;
-  disabled?: boolean;
 }
 
 export const ObjectiveRow = ({
@@ -39,9 +39,9 @@ export const ObjectiveRow = ({
   objective,
   onSaveNew,
   onUpdate,
-  disabled,
 }: ObjectiveRowProps) => {
   const qc = useQueryClient();
+  const { can, getDisabledProps } = useTasks();
   const isNew = !objective;
   const [title, setTitle] = useState(objective?.title ?? "");
   const [dueDate, setDueDate] = useState(objective?.due_date ?? undefined);
@@ -160,7 +160,7 @@ export const ObjectiveRow = ({
     return (
       <>
         <TableCell className="px-3 py-2">
-          <EditableCell value={title} onSave={handleTitleSave} />
+          <EditableCell value={title} onSave={handleTitleSave} disabled={!can("objective.update", objective)} />
         </TableCell>
         <TableCell className="px-3 py-2">
           <DateCell value={dueDate} onSave={handleDateSave} />

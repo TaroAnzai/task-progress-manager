@@ -7,9 +7,10 @@ type EditableCellProps = {
   value: string;
   onSave: (newValue: string) => void;
   className?: string;
+  disabled?: boolean;
 };
 
-export const EditableCell = ({ value, onSave, className }: EditableCellProps) => {
+export const EditableCell = ({ value, onSave, className, disabled }: EditableCellProps) => {
   const [editing, setEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value);
 
@@ -46,7 +47,7 @@ export const EditableCell = ({ value, onSave, className }: EditableCellProps) =>
       autoFocus
     />
   ) : (
-    <div onClick={() => setEditing(true)} className={`cursor-pointer text-left w-full min-h-[1.5rem] ${className}`}>
+    <div onClick={() => setEditing(disabled ? false : true)} className={`cursor-pointer text-left w-full min-h-[1.5rem] ${className}`}>
       {value || "+"}
     </div>
   );

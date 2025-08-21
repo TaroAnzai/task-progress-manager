@@ -180,7 +180,6 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
                   objective={obj}
                   onSaveNew={handleSaveNew}
                   onUpdate={handleUpdate}
-                  {...getDisabledProps('progress.update', obj)}
                 />
               </DraggableRow>
             ))
