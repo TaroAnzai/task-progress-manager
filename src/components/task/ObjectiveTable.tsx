@@ -36,7 +36,7 @@ interface ObjectiveTableProps {
 export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
   const qc = useQueryClient();
   const { user } = useUser();
-  const { can, getDisabledProps } = useTasks();
+  const { can } = useTasks();
   const { data, isLoading, refetch: refetchObjectives } = useGetProgressObjectivesTasksTaskId(taskId);
   const [objectives, setObjectives] = useState<Objective[]>(data?.objectives ?? []);
 

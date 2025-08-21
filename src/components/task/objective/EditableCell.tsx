@@ -47,8 +47,14 @@ export const EditableCell = ({ value, onSave, className, disabled }: EditableCel
       autoFocus
     />
   ) : (
-    <div onClick={() => setEditing(disabled ? false : true)} className={`cursor-pointer text-left w-full min-h-[1.5rem] ${className}`}>
-      {value || "+"}
-    </div>
+    disabled ? (
+      <div onClick={() => setEditing(false)} className={`text-left w-full min-h-[1.5rem] ${className}`}>
+        {value || "+"}
+      </div>
+    ) : (
+      <div onClick={() => setEditing(true)} className={`cursor-pointer text-left w-full min-h-[1.5rem] ${className}`}>
+        {value || "+"}
+      </div >
+    )
   );
 };

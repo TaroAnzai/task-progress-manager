@@ -41,13 +41,15 @@ export const ObjectiveRow = ({
   onUpdate,
 }: ObjectiveRowProps) => {
   const qc = useQueryClient();
-  const { can, getDisabledProps } = useTasks();
+  const { can } = useTasks();
   const isNew = !objective;
   const [title, setTitle] = useState(objective?.title ?? "");
   const [dueDate, setDueDate] = useState(objective?.due_date ?? undefined);
   const [status, setStatus] = useState<StatusType>(objective?.status ?? ObjectiveStatus.UNDEFINED);
   const [isUserSelectModalOpen, setIsUserSelectModalOpen] = useState(false);
   const [isProgressListModalOpen, setIsProgressListModalOpen] = useState(false);
+  const [isCanUpdate, setIsCanUpdate] = useState(false);
+  const [isCanEditProgress, setIsCanEditProgress] = useState(false);
   const { openAlertDialog } = useAlertDialog();
   const { data, refetch: refetchLatestProgress } = useGetProgressUpdatesObjectiveIdLatestProgress(
     objective?.id ?? 0,
@@ -146,6 +148,11 @@ export const ObjectiveRow = ({
       setStatus(objective.status);
     }
   }, [objective]);
+  useEffect(() => {
+    if (!objective) return
+    setIsCanUpdate(can("objective.update", objective));
+    setIsCanEditProgress(can("progress.update", objective));
+  }, [can, objective]);
   if (isNew) {
     return (
       <>
@@ -159,25 +166,27 @@ export const ObjectiveRow = ({
   } else {
     return (
       <>
-        <TableCell className="px-3 py-2">
-          <EditableCell value={title} onSave={handleTitleSave} disabled={!can("objective.update", objective)} />
+        <TableCell className={`px-3 py-2 ${isCanUpdate ? "" : "bg-gray-50 cursor-not-allowed"}`}>
+          <EditableCell value={title} onSave={handleTitleSave} disabled={!isCanUpdate} />
         </TableCell>
-        <TableCell className="px-3 py-2">
-          <DateCell value={dueDate} onSave={handleDateSave} />
+        <TableCell className={`px-3 py-2 ${isCanUpdate ? "" : "bg-gray-50 cursor-not-allowed"}`}>
+          <DateCell value={dueDate} onSave={handleDateSave} disabled={!isCanUpdate} />
         </TableCell>
-        <TableCell className="px-3 py-2">
-          <StatusBadgeCell value={status} onChange={handleStatusSave} />
+        <TableCell className={`px-3 py-2 ${isCanUpdate ? "" : "bg-gray-50 cursor-not-allowed"}`}>
+          <StatusBadgeCell value={status} onChange={handleStatusSave} disabled={!isCanUpdate} />
         </TableCell>
         <TableCell
-          className="px-3 py-2 cursor-pointer hover:bg-muted/30"
-          onClick={() => setIsUserSelectModalOpen(true)}
+          className={`px-3 py-2 ${isCanUpdate ? "" : "bg-gray-50 cursor-not-allowed"}`}
+          onClick={() => setIsUserSelectModalOpen(isCanUpdate)}
         >
           {objective?.assigned_user_name ?? "-"}
         </TableCell>
-        <TableCell className="px-3 py-2">
-          <EditableCell value={latest_progress} onSave={handleProgressSave} />
+        <TableCell className={`px-3 py-2 ${isCanEditProgress ? "" : "bg-gray-50 cursor-not-allowed"}`}>
+          <EditableCell value={latest_progress} onSave={handleProgressSave} disabled={!isCanEditProgress} />
         </TableCell>
-        <TableCell className="px-3 py-2">{latest_report_date}</TableCell>
+        <TableCell className={`px-3 py-2 ${isCanEditProgress ? "" : "bg-gray-50 cursor-not-allowed"}`}>
+          {latest_report_date}
+        </TableCell>
         <TableCell className="px-3 py-2">
           <button className="text-blue-600 hover:underline text-xs"
             onClick={() => setIsProgressListModalOpen(true)}

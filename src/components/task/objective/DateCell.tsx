@@ -1,14 +1,15 @@
 // src/components/task/objective/DateCell.tsx
-import { useEffect,useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 
 type DateCellProps = {
   value?: string | null;
   onSave: (newDate: string | undefined) => void;
+  disabled?: boolean;
 };
 
-export const DateCell = ({ value, onSave }: DateCellProps) => {
+export const DateCell = ({ value, onSave, disabled }: DateCellProps) => {
   const [inputValue, setInputValue] = useState(value ?? "");
   const isFromCalender = useRef(true);
 
@@ -50,6 +51,7 @@ export const DateCell = ({ value, onSave }: DateCellProps) => {
           focus:ring-2 focus:ring-ring focus:ring-offset-2
           focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
         "
+      disabled={disabled}
     />
   );
 };
