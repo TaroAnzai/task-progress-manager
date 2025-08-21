@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
 import {
   getGetProgressObjectivesTasksTaskIdQueryKey,
@@ -19,13 +19,13 @@ import {
   usePutProgressObjectivesObjectiveId
 } from '@/api/generated/taskProgressAPI';
 import type { Objective, ObjectiveInput, ObjectivesList, ObjectiveUpdate } from '@/api/generated/taskProgressAPI.schemas';
-import { ObjectiveStatus } from '@/api/generated/taskProgressAPI.schemas'
+import { ObjectiveStatus } from '@/api/generated/taskProgressAPI.schemas';
 
 import { DraggableRow, DraggableTable, DraggableTableBody } from "@/components/DraggableTable";
 
 import { extractErrorMessage } from "@/utils/errorHandler";
 
-import { useTasks } from "@/context/useTasks"
+import { useTasks } from "@/context/useTasks";
 import { useUser } from '@/context/useUser';
 
 import { ObjectiveRow } from "./objective/ObjectiveRow";
@@ -36,12 +36,11 @@ interface ObjectiveTableProps {
 export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
   const qc = useQueryClient();
   const { user } = useUser();
-  const { can } = useTasks();
+  const { can, getDisabledProps } = useTasks();
   const { data, isLoading, refetch: refetchObjectives } = useGetProgressObjectivesTasksTaskId(taskId);
   const [objectives, setObjectives] = useState<Objective[]>(data?.objectives ?? []);
 
   useEffect(() => {
-    console.log("useEffect", data);
     if (data?.objectives) setObjectives(data.objectives);
   }, [data]);
 
@@ -62,15 +61,32 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
   });
   const { mutate: updateObjective } = usePutProgressObjectivesObjectiveId({
     mutation: {
+      onMutate: async (variables) => {
+        await qc.cancelQueries({ queryKey: getGetProgressObjectivesTasksTaskIdQueryKey(taskId) });
+        const previousData: ObjectivesList | undefined = qc.getQueryData(
+          getGetProgressObjectivesTasksTaskIdQueryKey(taskId)
+        );
+        if (!previousData?.objectives) return { previousData };
+        //楽観的更新
+        const optimisticObjective: Objective[] = previousData.objectives.map((obj) =>
+          obj.id === variables.objectiveId ? { ...obj, ...variables.data } : obj
+        );
+        if (!optimisticObjective) return { previousData };
+        setObjectives(optimisticObjective);
+        qc.setQueryData(
+          getGetProgressObjectivesTasksTaskIdQueryKey(taskId),
+          optimisticObjective
+        );
+        return { previousData };
+      },
       onSuccess: () => {
         toast.success("Objectiveを更新しました");
-        refetchObjectives();
       },
-      onError: (e) => {
+      onError: (e, _vars, context) => {
         const err = extractErrorMessage(e);
         console.error(`Objectiveの更新に失敗しました`, e);
         toast.error("Objective更新に失敗しました", { description: err });
-        refetchObjectives();
+        setObjectives(context?.previousData?.objectives ?? []);
       },
     }
   });
@@ -164,6 +180,7 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
                   objective={obj}
                   onSaveNew={handleSaveNew}
                   onUpdate={handleUpdate}
+                  {...getDisabledProps('progress.update', obj)}
                 />
               </DraggableRow>
             ))

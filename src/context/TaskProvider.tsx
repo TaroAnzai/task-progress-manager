@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { useGetProgressTasks } from "@/api/generated/taskProgressAPI";
 import type { Objective, Task, TaskListResponse } from "@/api/generated/taskProgressAPI.schemas";
@@ -42,6 +42,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     (action: Action, subject: Subject) => rawCan(action, subject, levelOf, currentUserId),
     [levelOf, currentUserId]
   );
+  //{...getDisabledProps('progress.update',obj)}
   const getDisabledProps = useCallback(
     (action: Action, subject: Subject) => {
       const allowed = can(action, subject);

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import {
   TableCell,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
 import {
   getGetProgressUpdatesObjectiveIdQueryOptions,
@@ -14,7 +14,7 @@ import {
   useGetProgressUpdatesObjectiveIdLatestProgress,
   usePostProgressUpdatesObjectiveId
 } from "@/api/generated/taskProgressAPI";
-import type { Objective, ObjectiveInput, ObjectiveUpdate, ObjectiveUpdateStatus as updateStatusType, ProgressInput } from "@/api/generated/taskProgressAPI.schemas";
+import type { Objective, ObjectiveInput, ObjectiveUpdate, ProgressInput, ObjectiveUpdateStatus as updateStatusType } from "@/api/generated/taskProgressAPI.schemas";
 import { ObjectiveStatus, ProgressStatus as StatusType } from "@/api/generated/taskProgressAPI.schemas";
 
 import { useAlertDialog } from "@/context/useAlertDialog";
@@ -31,6 +31,7 @@ interface ObjectiveRowProps {
   objective: Objective | null;
   onSaveNew: (obj: ObjectiveInput) => Promise<void>;
   onUpdate: (objId: number, updates: ObjectiveUpdate) => Promise<void>;
+  disabled?: boolean;
 }
 
 export const ObjectiveRow = ({
@@ -38,6 +39,7 @@ export const ObjectiveRow = ({
   objective,
   onSaveNew,
   onUpdate,
+  disabled,
 }: ObjectiveRowProps) => {
   const qc = useQueryClient();
   const isNew = !objective;
