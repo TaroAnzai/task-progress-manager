@@ -1,13 +1,15 @@
 // src/components/task/taskSettingModal/hooks/useTaskEditModal.ts
 import { useEffect, useState } from "react";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
+  getGetProgressTasksTaskIdQueryOptions,
   useDeleteProgressObjectivesObjectiveId,
   useGetProgressObjectivesTasksTaskId,
   useGetProgressTasksTaskIdAuthorizedUsers,
-  usePutProgressTasksTaskId,
+  usePutProgressTasksTaskId
 } from "@/api/generated/taskProgressAPI";
 import type {
   Objective,
@@ -18,8 +20,8 @@ import { extractErrorMessage } from "@/utils/errorHandler";
 
 import { useTasks } from "@/context/useTasks";
 import { useUser } from "@/context/useUser";
-
 export const useTaskEditModal = (task: Task, onClose: () => void) => {
+  const qc = useQueryClient();
   const { user } = useUser();
   const { refetch } = useTasks();
 
@@ -70,6 +72,8 @@ export const useTaskEditModal = (task: Task, onClose: () => void) => {
         taskId: task.id,
         data: filteredData,
       });
+      const { queryKey } = getGetProgressTasksTaskIdQueryOptions(task.id);
+      qc.invalidateQueries({ queryKey });
       onClose();
       refetch();
       toast.success("更新完了", { description: "タスクを更新しました" });

@@ -1,5 +1,4 @@
 // src/components/task/TaskList.tsx
-import { Skeleton } from '@/components/ui/skeleton';
 
 import { TaskStatus } from '@/api/generated/taskProgressAPI.schemas';
 
@@ -11,24 +10,15 @@ interface TaskListProps {
   isExpandParent?: boolean
 }
 export const TaskList = ({ isExpandParent }: TaskListProps) => {
-  const { tasks, isLoading } = useTasks();
+  const { tasks } = useTasks();
 
-  if (isLoading) {
-    return (
-      <div className="space-y-2">
-        {[...Array(3)].map((_, i) => (
-          <Skeleton key={i} className="h-24 w-full rounded-xl" />
-        ))}
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
       {tasks
         .filter((task) => task.status !== TaskStatus.SAVED)
         .map((task) => (
-          <TaskCard key={task.id} task={task} isExpandParent={isExpandParent} />
+          <TaskCard key={task.id} taskId={task.id} isExpandParent={isExpandParent} />
         ))}
     </div>
   );

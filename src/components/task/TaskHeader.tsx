@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { toast } from 'sonner';
 
-import { getGetProgressTasksQueryOptions, usePutProgressTasksTaskId } from "@/api/generated/taskProgressAPI";
+import { getGetProgressTasksTaskIdQueryOptions, usePutProgressTasksTaskId } from "@/api/generated/taskProgressAPI";
 import type { Task, TaskUpdateStatus as TaskUpdateStatusType } from '@/api/generated/taskProgressAPI.schemas';
 import { TaskUpdateStatus } from "@/api/generated/taskProgressAPI.schemas";
 
@@ -26,7 +26,7 @@ interface TaskHeaderProps {
 export const TaskHeader = ({ task }: TaskHeaderProps) => {
   const qc = useQueryClient();
   const { user } = useUser();
-  const { can } = useTasks();
+  const { refetch: refetchTasks, can } = useTasks();
   const { openAlertDialog } = useAlertDialog();
   const [status, setStatus] = useState<TaskUpdateStatusType>(task.status ?? TaskUpdateStatus.UNDEFINED);
   const [isUpdateTask, setIsUpdateTask] = useState(false);
@@ -39,11 +39,12 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
       },
       onSuccess: (_data, variables) => {
         toast.success("タスクを更新しました");
+        refetchTasks();
         setStatus(status);
-        if (variables.data.status === TaskUpdateStatus.SAVED) {
-          const { queryKey } = getGetProgressTasksQueryOptions();
-          qc.invalidateQueries({ queryKey });
-        }
+        //     if (variables.data.status === TaskUpdateStatus.SAVED) {
+        const { queryKey } = getGetProgressTasksTaskIdQueryOptions(task.id);
+        qc.invalidateQueries({ queryKey });
+        //   }
       },
       onError: (error, _variables, context) => {
         openAlertDialog({

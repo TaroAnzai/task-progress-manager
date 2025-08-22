@@ -22,13 +22,6 @@ export const TaskSettingModal = ({ open, task, onClose }: TaskSettingModalProps)
   } = useTaskEditModal(task, onClose);
 
 
-
-
-
-
-
-
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
