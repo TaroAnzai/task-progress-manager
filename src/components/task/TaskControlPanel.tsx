@@ -1,52 +1,79 @@
 // src/components/task/TaskControlPanel.tsx
+import { useState } from "react";
 
 import { EyeIcon, Minus, PencilIcon, Plus, PlusIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+
+import { NewTaskModal } from "@/components/task/newTaskModal/NewTaskModal";
+import { TaskOrderSettingModal } from "@/components/task/taskSettingOrderModal/TaskOrderSettingModal";
+import { TestModal } from "@/components/TestModal";
+
 interface TaskControlPanelProps {
-  onAddTask: () => void;
-  onEditTasks: () => void;
-  onToggleViewSelector: () => void;
   onAllExpand: () => void
   onAllCollapse: () => void
 }
 
 export const TaskControlPanel = ({
-  onAddTask,
-  onEditTasks,
-  onToggleViewSelector,
   onAllExpand,
   onAllCollapse
-}: TaskControlPanelProps) => (
-  <div className="flex justify-between gap-2 mb-4" id="task-controls-box">
-    <div className="flex gap-2 ">
-      <Button onClick={onAddTask} className="flex items-center gap-1">
-        <PlusIcon size={16} />
-        新規
-      </Button>
+}: TaskControlPanelProps) => {
+  const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
+  const [taskOrderModalOpen, setTaskOrderModalOpen] = useState(false);
+  const [testModalOpen, setTestModalOpen] = useState(false);
 
-      <Button onClick={onEditTasks} variant="secondary" className="flex items-center gap-1">
-        <PencilIcon size={16} />
-        編集
-      </Button>
+  return (
+    <>
+      <div className="flex justify-between gap-2 mb-4" id="task-controls-box">
+        <div className="flex gap-2 ">
+          <Button
+            onClick={() => { setNewTaskModalOpen(true) }}
+            className="flex items-center gap-1"
+          >
+            <PlusIcon size={16} />
+            新規
+          </Button>
 
-      <Button
-        onClick={onToggleViewSelector}
-        variant="outline"
-        id="view-selecter-btn"
-        className="flex items-center gap-1"
-      >
-        <EyeIcon size={16} />
-        表示切替
-      </Button>
-    </div>
+          <Button
+            onClick={() => { setTaskOrderModalOpen(true) }}
+            variant="secondary"
+            className="flex items-center gap-1"
+          >
+            <PencilIcon size={16} />
+            編集
+          </Button>
 
-    <div className="flex gap-2">
-      <Button className="" onClick={onAllExpand}><Plus /></Button>
-      <Button className="" onClick={onAllCollapse}><Minus /></Button>
-    </div>
+          <Button
+            onClick={() => { setTestModalOpen(true) }}
+            variant="outline"
+            id="view-selecter-btn"
+            className="flex items-center gap-1"
+          >
+            <EyeIcon size={16} />
+            表示切替
+          </Button>
+        </div>
 
-  </div>
-);
+        <div className="flex gap-2">
+          <Button className="" onClick={onAllExpand}><Plus /></Button>
+          <Button className="" onClick={onAllCollapse}><Minus /></Button>
+        </div>
+
+      </div>
+      <NewTaskModal
+        open={newTaskModalOpen}
+        onClose={() => setNewTaskModalOpen(false)}
+      />
+      <TaskOrderSettingModal
+        open={taskOrderModalOpen}
+        onClose={() => { setTaskOrderModalOpen(false) }}
+      />
+      <TestModal
+        open={testModalOpen}
+        onClose={() => { setTestModalOpen(false) }}
+      />
+    </>
+  )
+};
 
 

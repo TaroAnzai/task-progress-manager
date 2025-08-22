@@ -37,7 +37,7 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
         const prevStatus = status;
         return { prevStatus }
       },
-      onSuccess: (_data, variables) => {
+      onSuccess: () => {
         toast.success("タスクを更新しました");
         refetchTasks();
         setStatus(status);
@@ -73,7 +73,11 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
   useEffect(() => {
     setIsUpdateTask(can("task.update", task))
   }, [can, task])
-
+  useEffect(() => {
+    if (task.status) {
+      setStatus(task.status);
+    }
+  }, [task.status]);
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 w-full">

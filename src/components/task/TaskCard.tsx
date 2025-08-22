@@ -16,7 +16,6 @@ interface TaskCardProps {
 const storageKey = (id: number) => `objective_visibility_${id}`;
 export const TaskCard = ({ taskId, isExpandParent }: TaskCardProps) => {
   const { data: task } = useGetProgressTasksTaskId(taskId);
-
   const initial = useMemo(() => {
     const s = localStorage.getItem(storageKey(taskId));
     return s ? JSON.parse(s) : true;
@@ -35,6 +34,7 @@ export const TaskCard = ({ taskId, isExpandParent }: TaskCardProps) => {
     if (typeof isExpandParent === "boolean" && isExpand !== isExpandParent) {
       setAndStore(isExpandParent);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isExpandParent]);
 
   if (!task) return null;

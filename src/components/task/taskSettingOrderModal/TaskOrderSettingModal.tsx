@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { getGetProgressTasksQueryOptions, useDeleteProgressTasksTaskId, usePostProgressTaskOrders, usePutProgressTasksTaskId } from "@/api/generated/taskProgressAPI"
+import { getGetProgressTasksTaskIdQueryOptions, useDeleteProgressTasksTaskId, usePostProgressTaskOrders, usePutProgressTasksTaskId } from "@/api/generated/taskProgressAPI"
 import type { Task, TaskUpdateStatus } from "@/api/generated/taskProgressAPI.schemas"
 
 import { DraggableRow, DraggableTable, DraggableTableBody } from "@/components/DraggableTable";
@@ -31,7 +31,7 @@ interface TaskSettingModalProps {
 
 export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) => {
   const qc = useQueryClient();
-  const { tasks, refetch: refetchTasks } = useTasks();
+  const { tasks, refetch: refetchTasks, can } = useTasks();
   const { user } = useUser();
   const { openAlertDialog } = useAlertDialog();
   const [items, setItems] = useState<Task[]>([]);
@@ -77,18 +77,33 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
   });
   const { mutate: updateTask } = usePutProgressTasksTaskId({
     mutation: {
-      onSuccess: () => {
-        toast.success("タスクを更新しました");
-        const { queryKey } = getGetProgressTasksQueryOptions();
-        qc.invalidateQueries({ queryKey });
+      onMutate: (variables) => {
+        const prevTasks = items;
+        const prevTaskData = items.find((item) => item.id === variables.taskId);
+        if (!prevTaskData) return { prevTasks };
+        const changedTaskData = { ...prevTaskData, ...variables.data };
+        const newTasks = items.map((task) =>
+          task.id === variables.taskId ? changedTaskData : task
+        );
+        setItems(newTasks);
+        return { prevTasks }
       },
-      onError: (error) => {
+      onSuccess: (_data, variables) => {
+        toast.success("タスクを更新しました");
+        const { queryKey } = getGetProgressTasksTaskIdQueryOptions(variables.taskId);
+        qc.invalidateQueries({ queryKey });
+        refetchTasks();
+      },
+      onError: (error, _variables, context) => {
         openAlertDialog({
           title: "Error",
           description: error,
           confirmText: "閉じる",
           showCancel: false
         })
+        if (context?.prevTasks) {
+          setItems(context.prevTasks);
+        };
       }
     }
   });
@@ -143,11 +158,17 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
                 <TableCell>{task.create_user_name}</TableCell>
                 <TableCell>{task.due_date}</TableCell>
                 <TableCell>
-                  <StatusBadgeCell value={task.status ?? "UNDEFINED"} onChange={(newStatus) => { handleUpdateTaskStatus(task.id, newStatus) }} />
+                  <StatusBadgeCell
+                    value={task.status ?? "UNDEFINED"}
+                    onChange={(newStatus) => { handleUpdateTaskStatus(task.id, newStatus) }}
+                    disabled={!can("task.update", task)}
+                  />
                 </TableCell>
                 <TableCell>{task.user_access_level ? SCOPE_LABELS[task.user_access_level] : ""}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="destructive" size="sm" onClick={() => handleDerete(task.id)}>削除</Button>
+                  {can("task.delete", task) &&
+                    <Button variant="destructive" size="sm" onClick={() => handleDerete(task.id)}>削除</Button>
+                  }
                 </TableCell>
               </DraggableRow>
             ))

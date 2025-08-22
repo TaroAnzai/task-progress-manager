@@ -3,20 +3,15 @@ import { useEffect, useState } from "react";
 
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { NewTaskModal } from "@/components/task/newTaskModal/NewTaskModal";
 import { TaskControlPanel } from "@/components/task/TaskControlPanel";
 import { TaskList } from "@/components/task/TaskList";
-import { TaskOrderSettingModal } from "@/components/task/taskSettingOrderModal/TaskOrderSettingModal";
-import { TestModal } from "@/components/TestModal";
 
 import { useUser } from "@/context/useUser";
 const TaskPageContent = () => {
   const { user, loading: userLoading, getUserRole } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
-  const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
-  const [taskOrderModalOpen, setTaskOrderModalOpen] = useState(false);
-  const [testModalOpen, setTestModalOpen] = useState(false);
+
   const [isObjExpand, setIsObjExpand] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
@@ -43,26 +38,12 @@ const TaskPageContent = () => {
         権限:({String(getUserRole())})
       </p>
       <TaskControlPanel
-        onAddTask={() => { setNewTaskModalOpen(true); }}
-        onEditTasks={() => { setTaskOrderModalOpen(true); }}
-        onToggleViewSelector={() => { setTestModalOpen(true) }}
         onAllExpand={onAllExpand}
         onAllCollapse={onAllCollapse}
       />
       <TaskList isExpandParent={isObjExpand} />
 
-      <NewTaskModal
-        open={newTaskModalOpen}
-        onClose={() => setNewTaskModalOpen(false)}
-      />
-      <TaskOrderSettingModal
-        open={taskOrderModalOpen}
-        onClose={() => { setTaskOrderModalOpen(false) }}
-      />
-      <TestModal
-        open={testModalOpen}
-        onClose={() => { setTestModalOpen(false) }}
-      />
+
     </>
 
   );

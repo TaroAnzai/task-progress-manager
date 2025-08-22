@@ -18,12 +18,10 @@ import type {
 
 import { extractErrorMessage } from "@/utils/errorHandler";
 
-import { useTasks } from "@/context/useTasks";
 import { useUser } from "@/context/useUser";
 export const useTaskEditModal = (task: Task, onClose: () => void) => {
   const qc = useQueryClient();
   const { user } = useUser();
-  const { refetch } = useTasks();
 
   const [formState, setFormState] = useState({
     title: task.title || "",
@@ -75,7 +73,7 @@ export const useTaskEditModal = (task: Task, onClose: () => void) => {
       const { queryKey } = getGetProgressTasksTaskIdQueryOptions(task.id);
       qc.invalidateQueries({ queryKey });
       onClose();
-      refetch();
+
       toast.success("更新完了", { description: "タスクを更新しました" });
     } catch (e) {
       const err = extractErrorMessage(e);
