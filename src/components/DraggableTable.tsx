@@ -1,21 +1,24 @@
 // components/DraggableTable.tsx
+/* eslint-disable func-style */
 
 import {
+  Children,
   cloneElement,
   createContext,
+  isValidElement,
   type ReactNode,
   useContext,
   useEffect,
   useMemo,
-  useState} from "react";
-import { Children, isValidElement } from "react";
+  useState
+} from "react";
 
 import {
   closestCenter,
   DndContext,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import { restrictToFirstScrollableAncestor,restrictToVerticalAxis } from "@dnd-kit/modifiers"; 
+import { restrictToFirstScrollableAncestor, restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
   arrayMove,
   SortableContext,
@@ -93,9 +96,9 @@ export function DraggableTable<T>({
     const newItems = arrayMove(items, oldIndex, newIndex);
     onReorder(newItems);
   };
-// TableRowにドラッグハンドルを追加するヘルパー関数
+  // TableRowにドラッグハンドルを追加するヘルパー関数
   function addDragHandleToTableRow(row: ReactNode) {
-    const tableRow =row as React.ReactElement<{ children: ReactNode }>;
+    const tableRow = row as React.ReactElement<{ children: ReactNode }>;
     // TableRowコンポーネントでない場合はそのまま返す
     if (!isValidElement(tableRow) || tableRow.type !== TableRow) {
       return row;
@@ -104,7 +107,7 @@ export function DraggableTable<T>({
     // TableRowの先頭にドラッグハンドル用のTableHeadを追加
     const dragHandle = (
       <TableHead key="drag-header" className="w-6 px-2 py-2">
-        
+
       </TableHead>
     );
 
@@ -116,25 +119,25 @@ export function DraggableTable<T>({
     });
   }
   return (
-    <DraggableTableContext.Provider value={{ items, getId, onReorder,useGrabHandle } satisfies DraggableTableContextType<T>}>
-      <DndContext 
-        collisionDetection={closestCenter} 
+    <DraggableTableContext.Provider value={{ items, getId, onReorder, useGrabHandle } satisfies DraggableTableContextType<T>}>
+      <DndContext
+        collisionDetection={closestCenter}
         onDragStart={() => setDragging(true)}
-        onDragEnd={handleDragEnd} 
+        onDragEnd={handleDragEnd}
         onDragCancel={() => setDragging(false)}
         modifiers={[restrictToVerticalAxis, restrictToFirstScrollableAncestor]}
-      > 
+      >
         <Table className={className}>
-          {Children.map(children, (child) => {        
+          {Children.map(children, (child) => {
             if (!useGrabHandle) {
               return child;               // ドラッグハンドルが不要な場合は何も変更しない
             }
             if (isValidElement(child) && child.type === TableHeader) {     // TableHeaderコンポーネントかどうかをチェック
               const header = child as React.ReactElement<{ children: ReactNode }>;
-                return cloneElement(header, {
-                  children: Children.map(header.props.children, (row) => addDragHandleToTableRow(row))
-                });
-            }else{
+              return cloneElement(header, {
+                children: Children.map(header.props.children, (row) => addDragHandleToTableRow(row))
+              });
+            } else {
               return child
             }
           })}
@@ -178,12 +181,14 @@ type DraggableRowProps = {
   id: string | number;
   children: ReactNode;
   className?: string;
+  disabled?: boolean;
 };
 
 export function DraggableRow({
   id,
   children,
   className,
+  disabled = false,
 }: DraggableRowProps) {
   const {
     attributes,
@@ -205,22 +210,26 @@ export function DraggableRow({
     <TableRow
       ref={setNodeRef}
       style={style}
-      className={`${
-        useGrabHandle ? "cursor-default group" : "cursor-move"  //useGrabHandle=trueの場合はホバー用にグループ化する
-      } ${className ?? ""}`}
+      className={`${useGrabHandle ? "cursor-default group" : "cursor-move"  //useGrabHandle=trueの場合はホバー用にグループ化する
+        } ${className ?? ""}`}
       {...(!useGrabHandle ? { ...attributes, ...listeners } : {})} // ← 行全体で使う時のみ渡す
     >
 
       {useGrabHandle && (
         <TableCell className="w-6 px-2 py-2">
-          <div
-            {...attributes}
-            {...listeners}
-            className="cursor-grab text-gray-500 hover:text-black hidden group-hover:block"
-            title="ドラッグして並び替え"
-          >
+          {disabled ? (
+            <div></div>
+          ) : (
+            <div
+              {...attributes}
+              {...listeners}
+              className="cursor-grab text-gray-500 hover:text-black hidden group-hover:block"
+              title="ドラッグして並び替え"
+            >
               <GripVertical className="h-4 w-4 text-muted-foreground" />
-          </div>
+            </div>
+          )}
+
         </TableCell>
       )}
       {children}

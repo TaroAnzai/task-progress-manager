@@ -12,7 +12,7 @@ import type { Task, TaskUpdateStatus as TaskUpdateStatusType } from '@/api/gener
 import { TaskUpdateStatus } from "@/api/generated/taskProgressAPI.schemas";
 
 import { useAlertDialog } from '@/context/useAlertDialog';
-import { useTasks } from '@/context/useTasks'
+import { useTasks } from '@/context/useTasks';
 import { useUser } from '@/context/useUser';
 
 import { StatusBadgeCell } from "./StatusBadgeCell";
@@ -44,7 +44,6 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
           const { queryKey } = getGetProgressTasksQueryOptions();
           qc.invalidateQueries({ queryKey });
         }
-
       },
       onError: (error, _variables, context) => {
         openAlertDialog({

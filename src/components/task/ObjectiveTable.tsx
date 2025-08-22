@@ -174,7 +174,7 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
           {objectives
             .filter((task) => task.status !== ObjectiveStatus.SAVED)
             .map((obj) => (
-              <DraggableRow key={obj.id} id={obj.id}>
+              <DraggableRow key={obj.id} id={obj.id} disabled={!can("objective.update", { taskId: taskId })}>
                 <ObjectiveRow
                   taskId={taskId}
                   objective={obj}
