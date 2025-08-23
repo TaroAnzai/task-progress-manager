@@ -10,23 +10,19 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useState
-} from "react";
+  useState,
+} from 'react';
 
-import {
-  closestCenter,
-  DndContext,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import { restrictToFirstScrollableAncestor, restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { closestCenter, DndContext, type DragEndEvent } from '@dnd-kit/core';
+import { restrictToFirstScrollableAncestor, restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   arrayMove,
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical } from 'lucide-react';
 
 import {
   Table,
@@ -35,8 +31,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-
+} from '@/components/ui/table';
 
 // -------------------- Context --------------------
 
@@ -54,7 +49,7 @@ const DraggableTableContext = createContext<unknown>(null);
 // 型安全にcontextを取得するフック
 function useDraggableTableContext<T>(): DraggableTableContextType<T> {
   const ctx = useContext(DraggableTableContext);
-  if (!ctx) throw new Error("DraggableTableは親で定義してください");
+  if (!ctx) throw new Error('DraggableTableは親で定義してください');
   return ctx as DraggableTableContextType<T>;
 }
 
@@ -82,9 +77,9 @@ export function DraggableTable<T>({
 
   useEffect(() => {
     const root = document.documentElement;
-    if (dragging) root.classList.add("during-drag");
-    else root.classList.remove("during-drag");
-    return () => root.classList.remove("during-drag");
+    if (dragging) root.classList.add('during-drag');
+    else root.classList.remove('during-drag');
+    return () => root.classList.remove('during-drag');
   }, [dragging]);
   const handleDragEnd = (event: DragEndEvent) => {
     setDragging(false);
@@ -105,21 +100,16 @@ export function DraggableTable<T>({
     }
 
     // TableRowの先頭にドラッグハンドル用のTableHeadを追加
-    const dragHandle = (
-      <TableHead key="drag-header" className="w-6 px-2 py-2">
-
-      </TableHead>
-    );
+    const dragHandle = <TableHead key="drag-header" className="w-6 px-1 py-1"></TableHead>;
 
     return cloneElement(tableRow, {
-      children: [
-        dragHandle,
-        ...Children.toArray(tableRow.props.children),
-      ],
+      children: [dragHandle, ...Children.toArray(tableRow.props.children)],
     });
   }
   return (
-    <DraggableTableContext.Provider value={{ items, getId, onReorder, useGrabHandle } satisfies DraggableTableContextType<T>}>
+    <DraggableTableContext.Provider
+      value={{ items, getId, onReorder, useGrabHandle } satisfies DraggableTableContextType<T>}
+    >
       <DndContext
         collisionDetection={closestCenter}
         onDragStart={() => setDragging(true)}
@@ -130,20 +120,21 @@ export function DraggableTable<T>({
         <Table className={className}>
           {Children.map(children, (child) => {
             if (!useGrabHandle) {
-              return child;               // ドラッグハンドルが不要な場合は何も変更しない
+              return child; // ドラッグハンドルが不要な場合は何も変更しない
             }
-            if (isValidElement(child) && child.type === TableHeader) {     // TableHeaderコンポーネントかどうかをチェック
+            if (isValidElement(child) && child.type === TableHeader) {
+              // TableHeaderコンポーネントかどうかをチェック
               const header = child as React.ReactElement<{ children: ReactNode }>;
               return cloneElement(header, {
-                children: Children.map(header.props.children, (row) => addDragHandleToTableRow(row))
+                children: Children.map(header.props.children, (row) =>
+                  addDragHandleToTableRow(row)
+                ),
               });
             } else {
-              return child
+              return child;
             }
           })}
         </Table>
-
-
       </DndContext>
     </DraggableTableContext.Provider>
   );
@@ -156,11 +147,7 @@ type DraggableTableBodyProps = {
   className?: string;
 };
 
-export function DraggableTableBody({
-  children,
-  className,
-}: DraggableTableBodyProps) {
-
+export function DraggableTableBody({ children, className }: DraggableTableBodyProps) {
   const ids = Children.toArray(children)
     .filter(isValidElement)
     .map((child) => {
@@ -184,20 +171,10 @@ type DraggableRowProps = {
   disabled?: boolean;
 };
 
-export function DraggableRow({
-  id,
-  children,
-  className,
-  disabled = false,
-}: DraggableRowProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+export function DraggableRow({ id, children, className, disabled = false }: DraggableRowProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
   const { useGrabHandle } = useDraggableTableContext();
 
   const style: React.CSSProperties = {
@@ -210,13 +187,13 @@ export function DraggableRow({
     <TableRow
       ref={setNodeRef}
       style={style}
-      className={`${useGrabHandle ? "cursor-default group" : "cursor-move"  //useGrabHandle=trueの場合はホバー用にグループ化する
-        } ${className ?? ""}`}
+      className={`${
+        useGrabHandle ? 'cursor-default group' : 'cursor-move' //useGrabHandle=trueの場合はホバー用にグループ化する
+      } ${className ?? ''}`}
       {...(!useGrabHandle ? { ...attributes, ...listeners } : {})} // ← 行全体で使う時のみ渡す
     >
-
       {useGrabHandle && (
-        <TableCell className="w-6 px-2 py-2">
+        <TableCell className="w-6 px-1 py-1">
           {disabled ? (
             <div></div>
           ) : (
@@ -229,7 +206,6 @@ export function DraggableRow({
               <GripVertical className="h-4 w-4 text-muted-foreground" />
             </div>
           )}
-
         </TableCell>
       )}
       {children}

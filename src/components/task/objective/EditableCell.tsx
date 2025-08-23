@@ -1,7 +1,7 @@
 // src/components/task/objective/EditableCell.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { Input } from "@/components/ui/input";
+import { Textarea } from '@/components/ui/textarea';
 
 type EditableCellProps = {
   value: string;
@@ -29,32 +29,36 @@ export const EditableCell = ({ value, onSave, className, disabled }: EditableCel
     finishEditing();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
       handleSave();
-    } else if (e.key === "Escape") {
+    } else if (e.key === 'Escape') {
       setEditing(false);
       setInputValue(value); // 元に戻す
     }
   };
 
   return editing ? (
-    <Input
+    <Textarea
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}
       onBlur={handleSave}
-      onKeyUp={handleKeyDown}
+      onKeyDown={handleKeyDown}
       autoFocus
     />
+  ) : disabled ? (
+    <div
+      onClick={() => setEditing(false)}
+      className={`text-left w-full min-h-[1.5rem] ${className} whitespace-pre-wrap`}
+    >
+      {value || '+'}
+    </div>
   ) : (
-    disabled ? (
-      <div onClick={() => setEditing(false)} className={`text-left w-full min-h-[1.5rem] ${className}`}>
-        {value || "+"}
-      </div>
-    ) : (
-      <div onClick={() => setEditing(true)} className={`cursor-pointer text-left w-full min-h-[1.5rem] ${className}`}>
-        {value || "+"}
-      </div >
-    )
+    <div
+      onClick={() => setEditing(true)}
+      className={`cursor-pointer text-left w-full min-h-[1.5rem] ${className} whitespace-pre-wrap`}
+    >
+      {value || '+'}
+    </div>
   );
 };

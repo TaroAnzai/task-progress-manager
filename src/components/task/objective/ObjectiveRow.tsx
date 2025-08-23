@@ -1,31 +1,38 @@
 // src/components/task/ObjectiveRow.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
-import {
-  TableCell,
-} from "@/components/ui/table";
+import { TableCell } from '@/components/ui/table';
 
 import {
   getGetProgressUpdatesObjectiveIdQueryOptions,
   useDeleteProgressUpdatesProgressId,
   useGetProgressUpdatesObjectiveIdLatestProgress,
-  usePostProgressUpdatesObjectiveId
-} from "@/api/generated/taskProgressAPI";
-import type { Objective, ObjectiveInput, ObjectiveUpdate, ObjectiveUpdateStatus as updateStatusType, ProgressInput } from "@/api/generated/taskProgressAPI.schemas";
-import { ObjectiveStatus, ProgressStatus as StatusType } from "@/api/generated/taskProgressAPI.schemas";
+  usePostProgressUpdatesObjectiveId,
+} from '@/api/generated/taskProgressAPI';
+import type {
+  Objective,
+  ObjectiveInput,
+  ObjectiveUpdate,
+  ObjectiveUpdateStatus as updateStatusType,
+  ProgressInput,
+} from '@/api/generated/taskProgressAPI.schemas';
+import {
+  ObjectiveStatus,
+  ProgressStatus as StatusType,
+} from '@/api/generated/taskProgressAPI.schemas';
 
-import { useAlertDialog } from "@/context/useAlertDialog";
-import { useTasks } from "@/context/useTasks";
+import { useAlertDialog } from '@/context/useAlertDialog';
+import { useTasks } from '@/context/useTasks';
 
-import { SingleUserSelectModal } from "../SingleUserSelectModal";
-import { StatusBadgeCell } from "../StatusBadgeCell";
+import { SingleUserSelectModal } from '../SingleUserSelectModal';
+import { StatusBadgeCell } from '../StatusBadgeCell';
 
-import { DateCell } from "./DateCell";
-import { EditableCell } from "./EditableCell";
-import { ProgressListModal } from "./ProgressListModal";
+import { DateCell } from './DateCell';
+import { EditableCell } from './EditableCell';
+import { ProgressListModal } from './ProgressListModal';
 
 interface ObjectiveRowProps {
   taskId: number;
@@ -34,16 +41,11 @@ interface ObjectiveRowProps {
   onUpdate: (objId: number, updates: ObjectiveUpdate) => Promise<void>;
 }
 
-export const ObjectiveRow = ({
-  taskId,
-  objective,
-  onSaveNew,
-  onUpdate,
-}: ObjectiveRowProps) => {
+export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: ObjectiveRowProps) => {
   const qc = useQueryClient();
   const { can } = useTasks();
   const isNew = !objective;
-  const [title, setTitle] = useState(objective?.title ?? "");
+  const [title, setTitle] = useState(objective?.title ?? '');
   const [dueDate, setDueDate] = useState(objective?.due_date ?? undefined);
   const [status, setStatus] = useState<StatusType>(objective?.status ?? ObjectiveStatus.UNDEFINED);
   const [isUserSelectModalOpen, setIsUserSelectModalOpen] = useState(false);
@@ -53,50 +55,50 @@ export const ObjectiveRow = ({
   const { openAlertDialog } = useAlertDialog();
   const { data, refetch: refetchLatestProgress } = useGetProgressUpdatesObjectiveIdLatestProgress(
     objective?.id ?? 0,
-    { query: { enabled: !!objective, } }
-  )
-  const latest_progress = data?.detail ?? "";
-  const latest_report_date = data?.report_date ?? "";
-  const { mutate: postProgressMutation } = usePostProgressUpdatesObjectiveId(
-    {
-      mutation: {
-        onSuccess: (_data, variables) => {
-          toast.success("進捗を更新しました");
-          refetchLatestProgress();
-          const { queryKey } =
-            getGetProgressUpdatesObjectiveIdQueryOptions(variables.objectiveId, {});
-          qc.invalidateQueries({ queryKey });
-        },
-        onError: (err) => {
-          openAlertDialog({
-            title: "進捗登録失敗",
-            description: err,
-            showCancel: false
-          });
-        }
-      }
-    })
+    { query: { enabled: !!objective } }
+  );
+  const latest_progress = data?.detail ?? '';
+  const latest_report_date = data?.report_date ?? '';
+  const { mutate: postProgressMutation } = usePostProgressUpdatesObjectiveId({
+    mutation: {
+      onSuccess: (_data, variables) => {
+        toast.success('進捗を更新しました');
+        refetchLatestProgress();
+        const { queryKey } = getGetProgressUpdatesObjectiveIdQueryOptions(
+          variables.objectiveId,
+          {}
+        );
+        qc.invalidateQueries({ queryKey });
+      },
+      onError: (err) => {
+        openAlertDialog({
+          title: '進捗登録失敗',
+          description: err,
+          showCancel: false,
+        });
+      },
+    },
+  });
   //進捗削除
-  const { mutate: deleteProgressMutation } = useDeleteProgressUpdatesProgressId(
-    {
-      mutation: {
-        onSuccess: () => {
-          toast.success("進捗を削除しました");
-          refetchLatestProgress();
-          if (objective) {
-            const { queryKey } = getGetProgressUpdatesObjectiveIdQueryOptions(objective.id, {});
-            qc.invalidateQueries({ queryKey });
-          }
-        },
-        onError: () => {
-          openAlertDialog({
-            title: "進捗登録失敗",
-            description: "このデータを削除してもよろしいですか？",
-            showCancel: false
-          });
+  const { mutate: deleteProgressMutation } = useDeleteProgressUpdatesProgressId({
+    mutation: {
+      onSuccess: () => {
+        toast.success('進捗を削除しました');
+        refetchLatestProgress();
+        if (objective) {
+          const { queryKey } = getGetProgressUpdatesObjectiveIdQueryOptions(objective.id, {});
+          qc.invalidateQueries({ queryKey });
         }
-      }
-    })
+      },
+      onError: () => {
+        openAlertDialog({
+          title: '進捗登録失敗',
+          description: 'このデータを削除してもよろしいですか？',
+          showCancel: false,
+        });
+      },
+    },
+  });
   const handleTitleSave = (newTitle: string) => {
     setTitle(newTitle);
     if (isNew) {
@@ -125,14 +127,14 @@ export const ObjectiveRow = ({
     }
   };
   const handleProgressSave = (newProgress: string) => {
-    if (newProgress === latest_progress || newProgress === "") {
+    if (newProgress === latest_progress || newProgress === '') {
       return false;
     }
     if (objective) {
       const data: ProgressInput = {
         detail: newProgress,
-        report_date: new Date().toISOString()
-      }
+        report_date: new Date().toISOString(),
+      };
       postProgressMutation({ objectiveId: objective.id, data: data });
     }
   };
@@ -143,54 +145,66 @@ export const ObjectiveRow = ({
   };
   useEffect(() => {
     if (objective) {
-      setTitle(objective.title ?? "");
+      setTitle(objective.title ?? '');
       setDueDate(objective.due_date ?? undefined);
       setStatus(objective.status);
     }
   }, [objective]);
   useEffect(() => {
-    if (!objective) return
-    setIsCanUpdate(can("objective.update", objective));
-    setIsCanEditProgress(can("progress.update", objective));
+    if (!objective) return;
+    setIsCanUpdate(can('objective.update', objective));
+    setIsCanEditProgress(can('progress.update', objective));
   }, [can, objective]);
   if (isNew) {
     return (
       <>
-        <TableCell className="w-8 px-2 py-2 select-none">
-        </TableCell>
+        <TableCell className="w-8 px-2 py-2 select-none"></TableCell>
         <TableCell className="px-3 py-2">
-          <EditableCell value={""} onSave={handleTitleSave} />
+          <EditableCell value={''} onSave={handleTitleSave} />
         </TableCell>
       </>
     );
   } else {
     return (
       <>
-        <TableCell className={`px-3 py-2 ${isCanUpdate ? "" : "bg-gray-50 cursor-not-allowed"}`}>
+        <TableCell
+          className={`w-xl px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}
+        >
           <EditableCell value={title} onSave={handleTitleSave} disabled={!isCanUpdate} />
         </TableCell>
-        <TableCell className={`px-3 py-2 ${isCanUpdate ? "" : "bg-gray-50 cursor-not-allowed"}`}>
+        <TableCell className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}>
           <DateCell value={dueDate} onSave={handleDateSave} disabled={!isCanUpdate} />
         </TableCell>
-        <TableCell className={`px-3 py-2 ${isCanUpdate ? "" : "bg-gray-50 cursor-not-allowed"}`}>
+        <TableCell className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}>
           <StatusBadgeCell value={status} onChange={handleStatusSave} disabled={!isCanUpdate} />
         </TableCell>
         <TableCell
-          className={`px-3 py-2 ${isCanUpdate ? "" : "bg-gray-50 cursor-not-allowed"}`}
+          className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}
           onClick={() => setIsUserSelectModalOpen(isCanUpdate)}
         >
-          {objective?.assigned_user_name ?? "-"}
+          {objective?.assigned_user_name ?? '-'}
         </TableCell>
-        <TableCell className={`px-3 py-2 ${isCanEditProgress ? "" : "bg-gray-50 cursor-not-allowed"}`}>
-          <EditableCell value={latest_progress} onSave={handleProgressSave} disabled={!isCanEditProgress} />
+        <TableCell
+          className={`px-3 py-2 ${isCanEditProgress ? '' : 'bg-gray-50 cursor-not-allowed'}`}
+        >
+          <EditableCell
+            value={latest_progress}
+            onSave={handleProgressSave}
+            disabled={!isCanEditProgress}
+          />
         </TableCell>
-        <TableCell className={`px-3 py-2 ${isCanEditProgress ? "" : "bg-gray-50 cursor-not-allowed"}`}>
+        <TableCell
+          className={`px-3 py-2 ${isCanEditProgress ? '' : 'bg-gray-50 cursor-not-allowed'}`}
+        >
           {latest_report_date}
         </TableCell>
         <TableCell className="px-3 py-2">
-          <button className="text-blue-600 hover:underline text-xs"
+          <button
+            className="text-blue-600 hover:underline text-xs"
             onClick={() => setIsProgressListModalOpen(true)}
-          >履歴</button>
+          >
+            履歴
+          </button>
         </TableCell>
 
         <SingleUserSelectModal
@@ -205,13 +219,15 @@ export const ObjectiveRow = ({
           <ProgressListModal
             open={isProgressListModalOpen}
             objective={objective}
-            onClose={() => { setIsProgressListModalOpen(false); }}
-            onDelete={(objective_id) => { handleProgressDelete(objective_id) }}
+            onClose={() => {
+              setIsProgressListModalOpen(false);
+            }}
+            onDelete={(objective_id) => {
+              handleProgressDelete(objective_id);
+            }}
           />
         )}
       </>
     );
   }
-
 };
-

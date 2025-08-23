@@ -1,27 +1,34 @@
 //src\components\task\taskSettingOrderModal\TaskOrderSettingModal.tsx
-import { useEffect, useState } from "react"
+import { useEffect, useState } from 'react';
 
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner"
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from '@/components/ui/button';
 import {
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-import { getGetProgressTasksTaskIdQueryOptions, useDeleteProgressTasksTaskId, usePostProgressTaskOrders, usePutProgressTasksTaskId } from "@/api/generated/taskProgressAPI"
-import type { Task, TaskUpdateStatus } from "@/api/generated/taskProgressAPI.schemas"
+import {
+  getGetProgressTasksTaskIdQueryOptions,
+  useDeleteProgressTasksTaskId,
+  usePostProgressTaskOrders,
+  usePutProgressTasksTaskId,
+} from '@/api/generated/taskProgressAPI';
+import type { Task, TaskUpdateStatus } from '@/api/generated/taskProgressAPI.schemas';
 
-import { DraggableRow, DraggableTable, DraggableTableBody } from "@/components/DraggableTable";
+import { DraggableRow, DraggableTable, DraggableTableBody } from '@/components/DraggableTable';
 
-import { SCOPE_LABELS } from "@/context/roleLabels"
-import { useAlertDialog } from "@/context/useAlertDialog";
-import { useTasks } from "@/context/useTasks"
-import { useUser } from "@/context/useUser"
+import { SCOPE_LABELS } from '@/context/roleLabels';
+import { useAlertDialog } from '@/context/useAlertDialog';
+import { useTasks } from '@/context/useTasks';
+import { useUser } from '@/context/useUser';
 
 import { StatusBadgeCell } from '../StatusBadgeCell';
 interface TaskSettingModalProps {
@@ -42,38 +49,37 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
     }
   }, [tasks]);
 
-
   const { mutate: postProgressTaskOrders } = usePostProgressTaskOrders({
     mutation: {
       onSuccess: () => {
-        toast.success("順序を更新しました");
+        toast.success('順序を更新しました');
         refetchTasks();
       },
       onError: (error) => {
         openAlertDialog({
-          title: "Error",
+          title: 'Error',
           description: error,
-          confirmText: "閉じる",
+          confirmText: '閉じる',
           showCancel: false,
         });
-      }
-    }
+      },
+    },
   });
   const { mutate: deleteProgressTasksTaskId } = useDeleteProgressTasksTaskId({
     mutation: {
       onSuccess: () => {
-        toast.success("タスクを削除しました");
+        toast.success('タスクを削除しました');
         refetchTasks();
       },
       onError: (error) => {
         openAlertDialog({
-          title: "Error",
+          title: 'Error',
           description: error,
-          confirmText: "閉じる",
+          confirmText: '閉じる',
           showCancel: false,
         });
-      }
-    }
+      },
+    },
   });
   const { mutate: updateTask } = usePutProgressTasksTaskId({
     mutation: {
@@ -86,26 +92,26 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
           task.id === variables.taskId ? changedTaskData : task
         );
         setItems(newTasks);
-        return { prevTasks }
+        return { prevTasks };
       },
       onSuccess: (_data, variables) => {
-        toast.success("タスクを更新しました");
+        toast.success('タスクを更新しました');
         const { queryKey } = getGetProgressTasksTaskIdQueryOptions(variables.taskId);
         qc.invalidateQueries({ queryKey });
         refetchTasks();
       },
       onError: (error, _variables, context) => {
         openAlertDialog({
-          title: "Error",
+          title: 'Error',
           description: error,
-          confirmText: "閉じる",
-          showCancel: false
-        })
+          confirmText: '閉じる',
+          showCancel: false,
+        });
         if (context?.prevTasks) {
           setItems(context.prevTasks);
-        };
-      }
-    }
+        }
+      },
+    },
   });
 
   const handleUpdateTaskStatus = (task_id: number, status: TaskUpdateStatus) => {
@@ -115,24 +121,23 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
     updateTask({ taskId: task_id, data: payload });
   };
 
-
   const handleRender = (items: Task[]) => {
     setItems(items);
-    if (!user) return
-    const newTasksArray = items.map((task) => task.id,)
+    if (!user) return;
+    const newTasksArray = items.map((task) => task.id);
     postProgressTaskOrders({ data: { task_ids: newTasksArray, user_id: user.id } });
-  }
+  };
 
   const handleDerete = (id: number) => {
     deleteProgressTasksTaskId({ taskId: id });
-  }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={onClose} >
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col" >
-        <DialogHeader className="flex-shrink-0" >
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>タスクの並び替え・削除 </DialogTitle>
-          < DialogDescription > ドラッグしてタスク並び替・削除ボタンで削除 </DialogDescription>
+          <DialogDescription> ドラッグしてタスク並び替・削除ボタンで削除 </DialogDescription>
         </DialogHeader>
 
         <DraggableTable
@@ -143,44 +148,48 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
         >
           <TableHeader className="sticky top-0 z-10 bg-white">
             <TableRow>
-              <TableHead className="w-[100px]">タスク名</TableHead>
-              <TableHead>作成者</TableHead>
-              <TableHead>期限</TableHead>
-              <TableHead>ステータス</TableHead>
-              <TableHead>アクセス権限</TableHead>
-              <TableHead className="text-right">削除</TableHead>
+              <TableHead className="">タスク名</TableHead>
+              <TableHead className="w-[100px] text-center">作成者</TableHead>
+              <TableHead className="w-[100px] text-center">期限</TableHead>
+              <TableHead className="w-[100px] text-center">ステータス</TableHead>
+              <TableHead className="w-[100px] text-center">アクセス権限</TableHead>
+              <TableHead className="w-[70px] text-center">削除</TableHead>
             </TableRow>
           </TableHeader>
           <DraggableTableBody>
             {items?.map((task) => (
               <DraggableRow key={task.id} id={task.id}>
-                <TableCell className="font-medium">{task.title}</TableCell>
+                <TableCell className="max-w-xs truncate">{task.title}</TableCell>
                 <TableCell>{task.create_user_name}</TableCell>
-                <TableCell>{task.due_date}</TableCell>
-                <TableCell>
+                <TableCell className="text-center">{task.due_date}</TableCell>
+                <TableCell className="text-center">
                   <StatusBadgeCell
-                    value={task.status ?? "UNDEFINED"}
-                    onChange={(newStatus) => { handleUpdateTaskStatus(task.id, newStatus) }}
-                    disabled={!can("task.update", task)}
+                    value={task.status ?? 'UNDEFINED'}
+                    onChange={(newStatus) => {
+                      handleUpdateTaskStatus(task.id, newStatus);
+                    }}
+                    disabled={!can('task.update', task)}
                   />
                 </TableCell>
-                <TableCell>{task.user_access_level ? SCOPE_LABELS[task.user_access_level] : ""}</TableCell>
-                <TableCell className="text-right">
-                  {can("task.delete", task) &&
-                    <Button variant="destructive" size="sm" onClick={() => handleDerete(task.id)}>削除</Button>
-                  }
+                <TableCell className="text-center">
+                  {task.user_access_level ? SCOPE_LABELS[task.user_access_level] : ''}
+                </TableCell>
+                <TableCell className="text-center">
+                  {can('task.delete', task) && (
+                    <Button variant="destructive" size="sm" onClick={() => handleDerete(task.id)}>
+                      削除
+                    </Button>
+                  )}
                 </TableCell>
               </DraggableRow>
-            ))
-            }
+            ))}
           </DraggableTableBody>
-
         </DraggableTable>
 
         <DialogFooter>
           <Button onClick={onClose}>閉じる</Button>
         </DialogFooter>
       </DialogContent>
-    </Dialog >
+    </Dialog>
   );
 };
