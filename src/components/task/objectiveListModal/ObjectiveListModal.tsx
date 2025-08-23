@@ -1,9 +1,16 @@
 //src\components\task\taskSettingOrderModal\TaskOrderSettingModal.tsx
-import { useQueryClient } from "@tanstack/react-query";
-import {toast} from "sonner"
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   Table,
   TableBody,
@@ -11,90 +18,130 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from '@/components/ui/table';
 
-import {getGetProgressObjectivesTasksTaskIdQueryOptions,useGetProgressObjectivesTasksTaskId, usePutProgressObjectivesObjectiveId} from "@/api/generated/taskProgressAPI"
-import type { Objective,ObjectiveUpdateStatus as updateStatusType,Task } from "@/api/generated/taskProgressAPI.schemas"
+import {
+  getGetProgressObjectivesTasksTaskIdQueryOptions,
+  useDeleteProgressObjectivesObjectiveId,
+  useGetProgressObjectivesTasksTaskId,
+  usePutProgressObjectivesObjectiveId,
+} from '@/api/generated/taskProgressAPI';
+import type {
+  Objective,
+  ObjectiveUpdateStatus as updateStatusType,
+  Task,
+} from '@/api/generated/taskProgressAPI.schemas';
 
-import { useAlertDialog } from "@/context/useAlertDialog";
+import { useAlertDialog } from '@/context/useAlertDialog';
 
 import { StatusBadgeCell } from '../StatusBadgeCell';
 interface ObjectiveListModalProps {
-    open: boolean;
-    task: Task
-    onClose: () => void;
+  open: boolean;
+  task: Task;
+  onClose: () => void;
 }
 
 export const ObjectiveListModal = ({ open, task, onClose }: ObjectiveListModalProps) => {
   const qc = useQueryClient();
-  const {openAlertDialog} = useAlertDialog();
+  const { openAlertDialog } = useAlertDialog();
 
-  const { data, isLoading} = useGetProgressObjectivesTasksTaskId(task.id);
-  const {mutate:updateObjective} = usePutProgressObjectivesObjectiveId({
+  const { data, isLoading } = useGetProgressObjectivesTasksTaskId(task.id);
+  const { mutate: updateObjective } = usePutProgressObjectivesObjectiveId({
     mutation: {
       onSuccess: () => {
-        toast.success("オブジェクティブを更新しました");
+        toast.success('オブジェクティブを更新しました');
         const { queryKey } = getGetProgressObjectivesTasksTaskIdQueryOptions(task.id);
         qc.invalidateQueries({ queryKey });
       },
       onError: (error) => {
         openAlertDialog({
-          title: "Error",
+          title: 'Error',
           description: error,
-          confirmText: "閉じる",
-          showCancel: false
-        })
-      }
-    }
-  })
+          confirmText: '閉じる',
+          showCancel: false,
+        });
+      },
+    },
+  });
+  const { mutate: deleteObjective } = useDeleteProgressObjectivesObjectiveId({
+    mutation: {
+      onSuccess: () => {
+        toast.success('オブジェクティブを削除しました');
+        const { queryKey } = getGetProgressObjectivesTasksTaskIdQueryOptions(task.id);
+        qc.invalidateQueries({ queryKey });
+      },
+      onError: (error) => {
+        openAlertDialog({
+          title: 'Error',
+          description: error,
+          confirmText: '閉じる',
+          showCancel: false,
+        });
+      },
+    },
+  });
+  const handleUpdateTaskStatus = (objId: number, newStatus: updateStatusType) => {
+    updateObjective({ objectiveId: objId, data: { status: newStatus } });
+  };
+  const handleDeleteObjective = (objective_id: number) => {
+    console.log('handleDeleteObjective', objective_id);
+    deleteObjective({ objectiveId: objective_id });
+  };
 
-  const handleUpdateTaskStatus=(objId:number,newStatus:updateStatusType) => {
-    updateObjective({objectiveId:objId,data:{status:newStatus}});
+  if (isLoading) {
+    return <div>loading...</div>;
   }
-  const handleDeleteObjective=(objective_id:number) => {
-    console.log("handleDeleteObjective",objective_id);
+  if (!data?.objectives) {
+    return <div>no objectives</div>;
   }
-
- 
-  if(isLoading){ return <div>loading...</div>}
-  if(!data?.objectives){ return <div>no objectives</div>}
   return (
-    <Dialog open={open} onOpenChange={onClose} >
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col" >
-        <DialogHeader className="flex-shrink-0" >
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>オブジェクティブの一覧 </DialogTitle>
-          < DialogDescription > ステータス変更と完全削除 </DialogDescription>
+          <DialogDescription> ステータス変更と完全削除 </DialogDescription>
         </DialogHeader>
-          <Table>
-            <TableHeader className="sticky top-0 z-10 bg-white">
-              <TableRow>
-                <TableHead className="px-3 py-2">オブジェクティブ</TableHead>
-                <TableHead className="px-3 py-2">期限</TableHead>
-                <TableHead className="px-3 py-2">ステータス</TableHead>
-                <TableHead className="px-3 py-2">担当者</TableHead>
-                <TableHead className="px-3 py-2">削除</TableHead>
-              </TableRow>
+        <Table>
+          <TableHeader className="sticky top-0 z-10 bg-white">
+            <TableRow>
+              <TableHead className="px-3 py-2">オブジェクティブ</TableHead>
+              <TableHead className="px-3 py-2">期限</TableHead>
+              <TableHead className="px-3 py-2">ステータス</TableHead>
+              <TableHead className="px-3 py-2">担当者</TableHead>
+              <TableHead className="px-3 py-2">削除</TableHead>
+            </TableRow>
           </TableHeader>
           <TableBody>
-            {data.objectives.map((obj:Objective) => (
+            {data.objectives.map((obj: Objective) => (
               <TableRow key={obj.id}>
                 <TableCell className="font-medium">{obj.title}</TableCell>
                 <TableCell>{obj.due_date}</TableCell>
                 <TableCell>
-                  <StatusBadgeCell value={obj.status } onChange={(newStatus)=>{handleUpdateTaskStatus(obj.id, newStatus)}}/>
+                  <StatusBadgeCell
+                    value={obj.status}
+                    onChange={(newStatus) => {
+                      handleUpdateTaskStatus(obj.id, newStatus);
+                    }}
+                  />
                 </TableCell>
                 <TableCell>{obj.assigned_user_name}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="destructive" size="sm" onClick={() => handleDeleteObjective(obj.id)}>削除</Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDeleteObjective(obj.id)}
+                  >
+                    削除
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
         <DialogFooter>
-            <Button onClick={onClose}>閉じる</Button>
+          <Button onClick={onClose}>閉じる</Button>
         </DialogFooter>
       </DialogContent>
-    </Dialog >
+    </Dialog>
   );
 };
