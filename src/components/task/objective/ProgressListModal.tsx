@@ -47,19 +47,19 @@ export const ProgressListModal = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">進捗</TableHead>
-              <TableHead>登録者</TableHead>
-              <TableHead>登録日</TableHead>
-              <TableHead className="text-right">削除</TableHead>
+              <TableHead className="">進捗</TableHead>
+              <TableHead className="w-[100px] text-center">登録者</TableHead>
+              <TableHead className="w-[100px] text-center">登録日</TableHead>
+              <TableHead className="w-[70px] text-center">削除</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data?.map((update) => (
               <TableRow key={update.id}>
-                <TableCell className="font-medium">{update.detail}</TableCell>
-                <TableCell>{update.updated_by}</TableCell>
-                <TableCell>{update.report_date}</TableCell>
-                <TableCell className="text-right">
+                <TableCell className="font-medium whitespace-pre-wrap">{update.detail}</TableCell>
+                <TableCell className="text-center">{update.updated_by}</TableCell>
+                <TableCell className="text-center">{update.report_date}</TableCell>
+                <TableCell className="text-center">
                   {can('progress.delete', objective) && (
                     <Button variant="destructive" size="sm" onClick={() => onDelete(update.id)}>
                       削除

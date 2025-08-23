@@ -105,18 +105,18 @@ export const ObjectiveListModal = ({ open, task, onClose }: ObjectiveListModalPr
           <TableHeader className="sticky top-0 z-10 bg-white">
             <TableRow>
               <TableHead className="px-3 py-2">オブジェクティブ</TableHead>
-              <TableHead className="px-3 py-2">期限</TableHead>
-              <TableHead className="px-3 py-2">ステータス</TableHead>
-              <TableHead className="px-3 py-2">担当者</TableHead>
-              <TableHead className="px-3 py-2">削除</TableHead>
+              <TableHead className="w-[100px] text-center px-3 py-2">期限</TableHead>
+              <TableHead className="w-[100px] text-center px-3 py-2">ステータス</TableHead>
+              <TableHead className="w-[100px] text-center px-3 py-2">担当者</TableHead>
+              <TableHead className="w-[70px] text-center px-3 py-2">削除</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.objectives.map((obj: Objective) => (
               <TableRow key={obj.id}>
                 <TableCell className="font-medium">{obj.title}</TableCell>
-                <TableCell>{obj.due_date}</TableCell>
-                <TableCell>
+                <TableCell className="text-center">{obj.due_date}</TableCell>
+                <TableCell className="text-center">
                   <StatusBadgeCell
                     value={obj.status}
                     onChange={(newStatus) => {
@@ -124,8 +124,8 @@ export const ObjectiveListModal = ({ open, task, onClose }: ObjectiveListModalPr
                     }}
                   />
                 </TableCell>
-                <TableCell>{obj.assigned_user_name}</TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-center">{obj.assigned_user_name}</TableCell>
+                <TableCell className="text-center">
                   <Button
                     variant="destructive"
                     size="sm"

@@ -44,6 +44,7 @@ export const EditableCell = ({ value, onSave, className, disabled }: EditableCel
       onChange={(e) => setInputValue(e.target.value)}
       onBlur={handleSave}
       onKeyDown={handleKeyDown}
+      className="h-[40px] min-h-0"
       autoFocus
     />
   ) : disabled ? (
