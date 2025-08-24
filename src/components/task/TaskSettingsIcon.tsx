@@ -19,10 +19,10 @@ import { TaskSettingModal } from './taskSettingModal/TaskSettingModal';
 
 interface TaskSettingsIconProps {
   task: Task;
-  user: UserWithScopes | null;
+  isUpdateTask: boolean;
 }
 
-export const TaskSettingsIcon = ({ task }: TaskSettingsIconProps) => {
+export const TaskSettingsIcon = ({ task, isUpdateTask }: TaskSettingsIconProps) => {
   const [openSetting, setOpenSetting] = useState(false);
   const [openScope, setOpenScope] = useState(false);
   const [openObjectiveModal, setOpenObjectiveModal] = useState(false);
@@ -42,10 +42,10 @@ export const TaskSettingsIcon = ({ task }: TaskSettingsIconProps) => {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" className="w-44">
-          <DropdownMenuItem onClick={() => setOpenSetting(true)}>
+          <DropdownMenuItem disabled={!isUpdateTask} onClick={() => setOpenSetting(true)}>
             設定
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setOpenScope(true)}>
+          <DropdownMenuItem disabled={!isUpdateTask} onClick={() => setOpenScope(true)}>
             スコープ設定
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setOpenObjectiveModal(true)}>
@@ -55,27 +55,18 @@ export const TaskSettingsIcon = ({ task }: TaskSettingsIconProps) => {
       </DropdownMenu>
 
       {/* 設定モーダル */}
-      <TaskSettingModal
-        open={openSetting}
-        task={task}
-        onClose={() => setOpenSetting(false)}
-      />
+      <TaskSettingModal open={openSetting} task={task} onClose={() => setOpenSetting(false)} />
 
       {/* スコープ設定モーダル */}
-      <TaskScopeModal
-        open={openScope}
-        task={task}
-        onClose={() => setOpenScope(false)}
-      />
+      <TaskScopeModal open={openScope} task={task} onClose={() => setOpenScope(false)} />
 
       {/* オブジェクティブ一覧モーダル */}
       <ObjectiveListModal
         open={openObjectiveModal}
         task={task}
         onClose={() => setOpenObjectiveModal(false)}
+        canUpdate={isUpdateTask}
       />
     </>
   );
 };
-
-

@@ -19,7 +19,6 @@ import { TaskUpdateStatus } from '@/api/generated/taskProgressAPI.schemas';
 
 import { useAlertDialog } from '@/context/useAlertDialog';
 import { useTasks } from '@/context/useTasks';
-import { useUser } from '@/context/useUser';
 
 import { StatusBadgeCell } from './StatusBadgeCell';
 import { TaskSettingsIcon } from './TaskSettingsIcon';
@@ -30,7 +29,6 @@ interface TaskHeaderProps {
 
 export const TaskHeader = ({ task }: TaskHeaderProps) => {
   const qc = useQueryClient();
-  const { user } = useUser();
   const { refetch: refetchTasks, can } = useTasks();
   const { openAlertDialog } = useAlertDialog();
   const [status, setStatus] = useState<TaskUpdateStatusType>(
@@ -101,13 +99,9 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
           disabled={!isUpdateTask}
         />
       </div>
-      {isUpdateTask ? (
-        <div className="shrink-0">
-          <TaskSettingsIcon task={task} user={user} />
-        </div>
-      ) : (
-        <div className="w-[36px]"></div>
-      )}
+      <div className="shrink-0">
+        <TaskSettingsIcon task={task} isUpdateTask={isUpdateTask} />
+      </div>
     </div>
   );
 };

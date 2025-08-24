@@ -38,10 +38,11 @@ import { StatusBadgeCell } from '../StatusBadgeCell';
 interface ObjectiveListModalProps {
   open: boolean;
   task: Task;
+  canUpdate: boolean;
   onClose: () => void;
 }
 
-export const ObjectiveListModal = ({ open, task, onClose }: ObjectiveListModalProps) => {
+export const ObjectiveListModal = ({ open, task, canUpdate, onClose }: ObjectiveListModalProps) => {
   const qc = useQueryClient();
   const { openAlertDialog } = useAlertDialog();
 
@@ -119,6 +120,7 @@ export const ObjectiveListModal = ({ open, task, onClose }: ObjectiveListModalPr
                 <TableCell className="text-center">
                   <StatusBadgeCell
                     value={obj.status}
+                    disabled={!canUpdate}
                     onChange={(newStatus) => {
                       handleUpdateTaskStatus(obj.id, newStatus);
                     }}
@@ -130,6 +132,7 @@ export const ObjectiveListModal = ({ open, task, onClose }: ObjectiveListModalPr
                     variant="destructive"
                     size="sm"
                     onClick={() => handleDeleteObjective(obj.id)}
+                    disabled={!canUpdate}
                   >
                     削除
                   </Button>
