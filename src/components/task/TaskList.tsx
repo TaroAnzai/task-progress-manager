@@ -4,8 +4,8 @@ import { TaskStatus } from '@/api/generated/taskProgressAPI.schemas';
 
 import { useTasks } from '@/context/useTasks';
 
-import { TaskCard } from './TaskCard';
 import type { FilterAccessLevel } from '@/pages/TaskPage';
+import { TaskCard } from './TaskCard';
 
 interface TaskListProps {
   isExpandParent?: boolean;
@@ -13,7 +13,7 @@ interface TaskListProps {
 }
 
 export const TaskList = ({ isExpandParent, viewMode }: TaskListProps) => {
-  const { tasks } = useTasks();
+  const { tasks, isLoading } = useTasks();
   // Filter out tasks with status SAVED
   const notSavedTasks = tasks.filter((task) => task.status !== TaskStatus.SAVED);
 
@@ -23,7 +23,7 @@ export const TaskList = ({ isExpandParent, viewMode }: TaskListProps) => {
       (task.user_access_level && viewMode[task.user_access_level]) ||
       (task.is_assigned && viewMode['ASSIGNED'])
   );
-
+  if (isLoading) return <div>Loading...</div>;
   return (
     <div className="space-y-4">
       {filteredTasks.map((task) => (
