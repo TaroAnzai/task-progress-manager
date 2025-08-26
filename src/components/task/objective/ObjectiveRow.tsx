@@ -1,10 +1,10 @@
 // src/components/task/ObjectiveRow.tsx
 import { useEffect, useState } from 'react';
 
-import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-
 import { TableCell } from '@/components/ui/table';
+import { useQueryClient } from '@tanstack/react-query';
+import { Mail } from 'lucide-react';
+import { toast } from 'sonner';
 
 import {
   getGetProgressUpdatesObjectiveIdQueryOptions,
@@ -16,8 +16,8 @@ import type {
   Objective,
   ObjectiveInput,
   ObjectiveUpdate,
-  ObjectiveUpdateStatus as updateStatusType,
   ProgressInput,
+  ObjectiveUpdateStatus as updateStatusType,
 } from '@/api/generated/taskProgressAPI.schemas';
 import {
   ObjectiveStatus,
@@ -28,6 +28,8 @@ import { useAlertDialog } from '@/context/useAlertDialog';
 import { useTasks } from '@/context/useTasks';
 
 import { SingleUserSelectModal } from '../SingleUserSelectModal';
+import { ReminderSettingModal } from '../reminderSettingModal/ReminderSettingModal';
+
 import { StatusBadgeCell } from '../StatusBadgeCell';
 
 import { DateCell } from './DateCell';
@@ -50,6 +52,7 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
   const [status, setStatus] = useState<StatusType>(objective?.status ?? ObjectiveStatus.UNDEFINED);
   const [isUserSelectModalOpen, setIsUserSelectModalOpen] = useState(false);
   const [isProgressListModalOpen, setIsProgressListModalOpen] = useState(false);
+  const [isRemainderSettingModalOpen, setIsRemainderSettingModalOpen] = useState(false);
   const [isCanUpdate, setIsCanUpdate] = useState(false);
   const [isCanEditProgress, setIsCanEditProgress] = useState(false);
   const { openAlertDialog } = useAlertDialog();
@@ -206,7 +209,14 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
             履歴
           </button>
         </TableCell>
-
+        <TableCell className="px-3 py-2">
+          <button
+            className="text-blue-600 hover:underline text-xs"
+            onClick={() => setIsRemainderSettingModalOpen(true)}
+          >
+            <Mail />
+          </button>
+        </TableCell>
         <SingleUserSelectModal
           taskId={taskId}
           open={isUserSelectModalOpen}
@@ -224,6 +234,15 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
             }}
             onDelete={(objective_id) => {
               handleProgressDelete(objective_id);
+            }}
+          />
+        )}
+        {objective && (
+          <ReminderSettingModal
+            open={isRemainderSettingModalOpen}
+            objective_id={objective.id}
+            onClose={() => {
+              setIsRemainderSettingModalOpen(false);
             }}
           />
         )}

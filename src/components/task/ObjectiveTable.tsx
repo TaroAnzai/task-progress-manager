@@ -166,6 +166,7 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
             <TableHead className="px-3 py-2">進捗</TableHead>
             <TableHead className="w-[100px] px-3 py-2">報告日</TableHead>
             <TableHead className="w-[60px] px-3 py-2">履歴</TableHead>
+            <TableHead className="w-[60px] px-3 py-2">Mail</TableHead>
           </TableRow>
         </TableHeader>
         <DraggableTableBody>
