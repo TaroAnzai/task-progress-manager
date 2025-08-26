@@ -1,14 +1,15 @@
 
 import type { ObjectiveReminderSetting } from '@/api/generated/taskProgressAPI.schemas';
-import { Card } from '@/components/ui/card';
+import { Card, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableHead, TableRow } from '@/components/ui/table';
 interface RemainderSettingModalProps {
   reminderSettings: ObjectiveReminderSetting[];
 }
 export const ReminderTable = () => {
   return (
-    <Card>
-      <Table>
+    <Card className='mr-4 p-4'>
+      <CardTitle>設定一覧</CardTitle>
+      <Table className='mt-4'>
         <TableHead>
           <TableRow>
             <TableHead>条件</TableHead>
