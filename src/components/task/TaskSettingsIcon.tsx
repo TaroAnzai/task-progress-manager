@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import type { Task, UserWithScopes } from '@/api/generated/taskProgressAPI.schemas';
+import type { Task } from '@/api/generated/taskProgressAPI.schemas';
 
 import { ObjectiveListModal } from './objectiveListModal/ObjectiveListModal';
 import { TaskScopeModal } from './taskScopeModal/TaskScopeModal.tsx';

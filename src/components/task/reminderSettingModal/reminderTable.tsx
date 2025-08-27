@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/table';
 import { REMINDER_CONDITION_LABELS, REMINDER_FREQUENCY_LABELS } from '@/context/reminderLabels';
 interface RemainderSettingModalProps {
+  isLoading: boolean;
   reminderSettings: ObjectiveReminderSettingListOutput | undefined;
   onClick: (id: number) => void;
 }
@@ -21,6 +22,7 @@ export const ReminderTable = ({ reminderSettings, onClick }: RemainderSettingMod
       <Table className="mt-4">
         <TableHeader>
           <TableRow>
+            <TableHead>#</TableHead>
             <TableHead>条件</TableHead>
             <TableHead>経過日数</TableHead>
             <TableHead>頻度</TableHead>
@@ -32,6 +34,7 @@ export const ReminderTable = ({ reminderSettings, onClick }: RemainderSettingMod
         <TableBody>
           {reminderSettings.items.map((r) => (
             <TableRow key={r.id} onClick={() => onClick(r.id)}>
+              <TableCell>{r.id}</TableCell>
               <TableCell>{REMINDER_CONDITION_LABELS[r.condition_type]}</TableCell>
               <TableCell>{r.threshold_days}</TableCell>
               <TableCell>{REMINDER_FREQUENCY_LABELS[r.frequency_type]}</TableCell>

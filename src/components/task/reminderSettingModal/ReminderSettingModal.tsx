@@ -1,5 +1,11 @@
 //src/components/taskr/remainderSettingModal/RemainderSettingModal.tsx
-import { useState } from 'react';
+import {
+  useDeleteProgressRemindersSettingId,
+  useGetProgressObjectivesObjectiveIdReminders,
+  usePatchProgressRemindersSettingId,
+  usePostProgressObjectivesObjectiveIdReminders,
+} from '@/api/generated/taskProgressAPI';
+import type { ObjectiveReminderSettingInput } from '@/api/generated/taskProgressAPI.schemas';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,16 +15,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { useAlertDialog } from '@/context/useAlertDialog';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { ObjectiveReminderSettingForm } from './objectiveReminderSettingForm';
 import { ReminderTable } from './reminderTable';
-import {
-  useDeleteProgressRemindersSettingId,
-  useGetProgressObjectivesObjectiveIdReminders,
-  usePostProgressObjectivesObjectiveIdReminders,
-} from '@/api/generated/taskProgressAPI';
-import { toast } from 'sonner';
-import { useAlertDialog } from '@/context/useAlertDialog';
-import type { ObjectiveReminderSettingInput } from '@/api/generated/taskProgressAPI.schemas';
 
 interface RemainderSettingModalProps {
   open: boolean;
@@ -40,7 +41,7 @@ export const ReminderSettingModal = ({
   } = useGetProgressObjectivesObjectiveIdReminders(objective_id);
   const { mutate: postReminder } = usePostProgressObjectivesObjectiveIdReminders({
     mutation: {
-      onSuccess: (data) => {
+      onSuccess: () => {
         toast.success('Reminderを登録しました');
         refetch();
       },
@@ -55,9 +56,26 @@ export const ReminderSettingModal = ({
       },
     },
   });
+  const { mutate: updateReminder } = usePatchProgressRemindersSettingId({
+    mutation: {
+      onSuccess: () => {
+        toast.success('Reminderを更新しました');
+        refetch();
+      },
+      onError: (error) => {
+        openAlertDialog({
+          title: 'Error',
+          description: error,
+          confirmText: '閉じる',
+          showCancel: false,
+        });
+        console.error('Error update reminder:', error);
+      },
+    },
+  })
   const { mutate: deleteReminder } = useDeleteProgressRemindersSettingId({
     mutation: {
-      onSuccess: (data) => {
+      onSuccess: () => {
         toast.success('Reminderを削除しました');
         refetch();
       },
@@ -74,7 +92,11 @@ export const ReminderSettingModal = ({
   });
 
   const handleCreateReminder = (data: ObjectiveReminderSettingInput) => {
-    postReminder({ objectiveId: objective_id, data: data });
+    if (selectedReminderId) {
+      updateReminder({ settingId: selectedReminderId, data: data })
+    } else {
+      postReminder({ objectiveId: objective_id, data: data });
+    }
   };
   const handleDeleteReminder = (setting_id: number | undefined) => {
     deleteReminder({ settingId: setting_id! });
@@ -88,7 +110,7 @@ export const ReminderSettingModal = ({
           <DialogDescription>リマインドを設定します</DialogDescription>
         </DialogHeader>
         <div className="">
-          <ReminderTable reminderSettings={reminderSettings} onClick={setSelectedReminderId} />
+          <ReminderTable isLoading={isLoading} reminderSettings={reminderSettings} onClick={setSelectedReminderId} />
           <ObjectiveReminderSettingForm
             reminderData={reminderSettings?.items.find((r) => r.id === selectedReminderId) || null}
             onSubmit={(data) => {
@@ -97,6 +119,7 @@ export const ReminderSettingModal = ({
             onDelete={(setting_id) => {
               handleDeleteReminder(setting_id);
             }}
+            onReset={() => setSelectedReminderId(null)}
           />
         </div>
         <DialogFooter>

@@ -34,14 +34,6 @@ import {
   ObjectiveReminderSettingFrequencyType,
 } from '@/api/generated/taskProgressAPI.schemas.ts';
 import { REMINDER_CONDITION_LABELS, REMINDER_FREQUENCY_LABELS } from '@/context/reminderLabels';
-import { fa } from 'zod/v4/locales';
-// ========== 型 ==========
-/**
- * APIスキーマ（Orval出力）を使う場合は以下を利用:
- * import { ObjectiveReminderSettingInput } from "@/api/generated/taskProgressAPI.schemas";
- * 今回は提示の型に準拠します。
- */
-
 // ========== 定数 ==========
 const CONDITION_OPTIONS = Object.values(ObjectiveReminderSettingConditionType);
 
@@ -55,20 +47,28 @@ const schema = z
   .object({
     condition_type: z.enum(['NO_UPDATE', 'OVERDUE'], { error: '条件タイプは必須です' }),
     frequency_type: z.enum(['ONCE', 'INTERVAL'], { error: '頻度は必須です' }),
-    threshold_days: z.union([z.number().int().min(0), z.null(), z.undefined()]).optional(),
-    interval_days: z.union([z.number().int().min(1), z.null(), z.undefined()]).optional(),
+    threshold_days: z
+      .number()
+      .int()
+      .min(0, '日数は0以上で必須です')
+      .optional()
+      .refine((val) => val !== undefined, '日数は0以上で必須です'),
+    interval_days: z.union([z.number().int().min(1), z.undefined()]).optional(),
     send_time_local: z
       .string()
       .regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'HH:mm 形式で入力してください')
       .optional()
-      .or(z.literal('').transform(() => undefined)),
+      .or(z.literal('').transform(() => undefined))
+      .refine((val) => val !== undefined, '通知時間は必須です'),
     is_active: z.boolean().optional(),
   })
   .superRefine((val, ctx) => {
+
+
     if (val.frequency_type === 'INTERVAL') {
       if (!val.interval_days || val.interval_days < 1) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           path: ['interval_days'],
           message: '繰り返し間隔（日）は1以上で必須です。',
         });
@@ -84,6 +84,7 @@ type Props = {
   submitting?: boolean;
   onSubmit: (data: ObjectiveReminderSettingInput) => void;
   onDelete: (setting_id: number | undefined) => void;
+  onReset: () => void;
 };
 
 // ========== コンポーネント ==========
@@ -92,10 +93,11 @@ export const ObjectiveReminderSettingForm = ({
   submitting,
   onSubmit,
   onDelete,
+  onReset,
 }: Props) => {
   const defaultValues = {
-    condition_type: 'NO_UPDATE' as const,
-    frequency_type: 'ONCE' as const,
+    condition_type: undefined,
+    frequency_type: undefined,
     threshold_days: undefined,
     interval_days: undefined,
     send_time_local: undefined,
@@ -113,12 +115,9 @@ export const ObjectiveReminderSettingForm = ({
       form.reset({
         condition_type: reminderData.condition_type ?? 'NO_UPDATE',
         frequency_type: reminderData.frequency_type ?? 'ONCE',
-        threshold_days: reminderData.threshold_days === undefined ? 7 : reminderData.threshold_days,
-        interval_days: reminderData.interval_days === undefined ? null : reminderData.interval_days,
-        send_time_local:
-          reminderData.send_time_local === undefined
-            ? '09:00'
-            : (reminderData.send_time_local ?? undefined),
+        threshold_days: reminderData.threshold_days ?? undefined,
+        interval_days: reminderData.interval_days ?? undefined,
+        send_time_local: reminderData.send_time_local ? reminderData.send_time_local.slice(0, 5) : undefined,
         is_active: reminderData.is_active ?? true,
       });
     }
@@ -139,7 +138,7 @@ export const ObjectiveReminderSettingForm = ({
 
   return (
     <Card className="mt-4 mr-4 p-4">
-      <CardTitle>目標リマインド設定</CardTitle>
+      <CardTitle>目標リマインド設定({reminderData?.id ?? "新規"})</CardTitle>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 px-6 py-4 w-full">
           {/* 条件設定行 */}
@@ -153,7 +152,7 @@ export const ObjectiveReminderSettingForm = ({
                   <FormLabel className="text-sm">条件タイプ</FormLabel>
                   <Select
                     onValueChange={(v) => field.onChange(v as typeof field.value)}
-                    value={field.value}
+                    value={form.watch('condition_type') ?? ""}
                   >
                     <FormControl>
                       <SelectTrigger className="h-9">
@@ -184,7 +183,6 @@ export const ObjectiveReminderSettingForm = ({
                     <Input
                       type="number"
                       inputMode="numeric"
-                      min={0}
                       placeholder="例: 7"
                       className="h-9"
                       value={field.value === null || field.value === undefined ? '' : field.value}
@@ -207,7 +205,7 @@ export const ObjectiveReminderSettingForm = ({
                   <FormLabel className="text-sm">頻度</FormLabel>
                   <Select
                     onValueChange={(v) => field.onChange(v as typeof field.value)}
-                    value={field.value}
+                    value={form.watch('frequency_type') ?? ""}
                   >
                     <FormControl>
                       <SelectTrigger className="h-9">
@@ -237,7 +235,6 @@ export const ObjectiveReminderSettingForm = ({
                     <Input
                       type="number"
                       inputMode="numeric"
-                      min={1}
                       placeholder="例: 3"
                       className="h-9"
                       value={field.value === null || field.value === undefined ? '' : field.value}
@@ -315,7 +312,7 @@ export const ObjectiveReminderSettingForm = ({
               <Button type="button" onClick={() => onDelete(reminderData?.id)}>
                 削除
               </Button>
-              <Button type="button" onClick={() => form.reset(defaultValues)}>
+              <Button type="button" onClick={() => { onReset(); form.reset(); }}>
                 クリア
               </Button>
               <Button type="submit" disabled={submitting}>
