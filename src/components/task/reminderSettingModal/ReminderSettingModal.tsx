@@ -45,6 +45,7 @@ export const ReminderSettingModal = ({
         toast.success('Reminderを登録しました');
         setSelectedReminderId(null);
         refetch();
+        setSelectedReminderId(null);
       },
       onError: (error) => {
         openAlertDialog({
@@ -80,6 +81,7 @@ export const ReminderSettingModal = ({
       onSuccess: () => {
         toast.success('Reminderを削除しました');
         refetch();
+        setSelectedReminderId(null);
       },
       onError: (error) => {
         openAlertDialog({

@@ -82,6 +82,7 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
       },
       onSuccess: () => {
         toast.success('Objectiveを更新しました');
+        refetchObjectives();
       },
       onError: (e, _vars, context) => {
         const err = extractErrorMessage(e);
