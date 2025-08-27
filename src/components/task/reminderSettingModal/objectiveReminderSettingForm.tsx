@@ -85,15 +85,16 @@ type Props = {
   onSubmit: (data: ObjectiveReminderSettingInput) => void;
   onDelete: (setting_id: number | undefined) => void;
   onReset: () => void;
+  isRegistering: boolean;
 };
 
 // ========== コンポーネント ==========
 export const ObjectiveReminderSettingForm = ({
   reminderData,
-  submitting,
   onSubmit,
   onDelete,
   onReset,
+  isRegistering,
 }: Props) => {
   const defaultValues = {
     condition_type: undefined,
@@ -309,14 +310,17 @@ export const ObjectiveReminderSettingForm = ({
             </div>
             {/* 送信ボタン */}
             <div className="col-span-2 flex gap-4 pt-2 justify-end items-end">
-              <Button type="button" onClick={() => onDelete(reminderData?.id)}>
+              <Button type="submit" disabled={isRegistering}>
+                {reminderData ?
+                  isRegistering ? '更新中' : ' 更新 ' :
+                  isRegistering ? '作成中' : ' 作成 '
+                }
+              </Button>
+              <Button type="button" onClick={() => onDelete(reminderData?.id)} disabled={isRegistering || !reminderData}>
                 削除
               </Button>
-              <Button type="button" onClick={() => { onReset(); form.reset(); }}>
+              <Button type="button" onClick={() => { onReset(); form.reset(); }} disabled={isRegistering}>
                 クリア
-              </Button>
-              <Button type="submit" disabled={submitting}>
-                {submitting ? '保存中...' : '保存'}
               </Button>
             </div>
           </div>

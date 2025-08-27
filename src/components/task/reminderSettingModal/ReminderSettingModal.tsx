@@ -39,10 +39,11 @@ export const ReminderSettingModal = ({
     isLoading,
     refetch,
   } = useGetProgressObjectivesObjectiveIdReminders(objective_id);
-  const { mutate: postReminder } = usePostProgressObjectivesObjectiveIdReminders({
+  const { mutate: postReminder, isPending: isCreating } = usePostProgressObjectivesObjectiveIdReminders({
     mutation: {
       onSuccess: () => {
         toast.success('Reminderを登録しました');
+        setSelectedReminderId(null);
         refetch();
       },
       onError: (error) => {
@@ -56,10 +57,11 @@ export const ReminderSettingModal = ({
       },
     },
   });
-  const { mutate: updateReminder } = usePatchProgressRemindersSettingId({
+  const { mutate: updateReminder, isPending: isUpdating } = usePatchProgressRemindersSettingId({
     mutation: {
       onSuccess: () => {
         toast.success('Reminderを更新しました');
+        setSelectedReminderId(null);
         refetch();
       },
       onError: (error) => {
@@ -73,7 +75,7 @@ export const ReminderSettingModal = ({
       },
     },
   })
-  const { mutate: deleteReminder } = useDeleteProgressRemindersSettingId({
+  const { mutate: deleteReminder, isPending: isDeleting } = useDeleteProgressRemindersSettingId({
     mutation: {
       onSuccess: () => {
         toast.success('Reminderを削除しました');
@@ -99,6 +101,7 @@ export const ReminderSettingModal = ({
     }
   };
   const handleDeleteReminder = (setting_id: number | undefined) => {
+    if (!setting_id) return;
     deleteReminder({ settingId: setting_id! });
   };
 
@@ -113,6 +116,7 @@ export const ReminderSettingModal = ({
           <ReminderTable isLoading={isLoading} reminderSettings={reminderSettings} onClick={setSelectedReminderId} />
           <ObjectiveReminderSettingForm
             reminderData={reminderSettings?.items.find((r) => r.id === selectedReminderId) || null}
+            isRegistering={isCreating || isUpdating || isDeleting}
             onSubmit={(data) => {
               handleCreateReminder(data);
             }}

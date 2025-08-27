@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 
 import { TableCell } from '@/components/ui/table';
 import { useQueryClient } from '@tanstack/react-query';
-import { Mail } from 'lucide-react';
+
+import { FileStack, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
@@ -206,7 +207,7 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
             className="text-blue-600 hover:underline text-xs"
             onClick={() => setIsProgressListModalOpen(true)}
           >
-            履歴
+            <FileStack />
           </button>
         </TableCell>
         <TableCell className="px-3 py-2">
