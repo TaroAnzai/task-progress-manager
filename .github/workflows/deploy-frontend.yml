@@ -29,6 +29,7 @@ jobs:
       - name: Install dependencies and build
         run: |
           npm ci
+          npm run generate:api
           npm run build --mode production
 
       # 成果物(dist)をレンタルサーバーにアップロード
