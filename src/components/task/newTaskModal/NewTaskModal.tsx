@@ -7,15 +7,19 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
-import { usePostProgressTasks } from '@/api/generated/taskProgressAPI';
+import { usePostProgressTasks, usePostProgressObjectives } from '@/api/generated/taskProgressAPI';
 
 import { useTasks } from '@/context/useTasks';
+import { AiSuggestModal } from '../aiSuggestModal/AiSuggestModal';
+import type { ObjectiveItem } from '@/api/generated/taskProgressAPI.schemas';
+import { extractErrorMessage } from '@/utils/errorHandler';
 
 interface TaskSettingModalProps {
   open: boolean;
@@ -28,9 +32,36 @@ export const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [openAiSuggestModal, setOpenAiSuggestModal] = useState(false);
 
-  const createTaskMutation = usePostProgressTasks();
-
+  const { mutate: createTask, mutateAsync: createTaskAsync } = usePostProgressTasks({
+    mutation: {
+      onSuccess: () => {
+        toast('作成完了', { description: '新しいタスクを作成しました' });
+        refetch();
+        clearForm();
+        onClose();
+      },
+      onError: (err) => {
+        console.error('タスク保存失敗', err);
+        toast('保存失敗', { description: 'タスクの保存に失敗しました' });
+      },
+    },
+  });
+  //新規登録関数
+  const { mutate: postObjective } = usePostProgressObjectives({
+    mutation: {
+      onSuccess: () => {
+        toast.success('Objectiveを登録しました');
+        //refetchObjectives();
+      },
+      onError: (e) => {
+        const err = extractErrorMessage(e);
+        console.error('Objective登録失敗:', err);
+        toast.error('Objective登録に失敗しました', { description: err });
+      },
+    },
+  });
   const clearForm = () => {
     setTitle('');
     setDescription('');
@@ -48,51 +79,63 @@ export const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
       description: description.trim(),
       due_date: dueDate || undefined,
     };
-
-    try {
-      await createTaskMutation.mutateAsync({ data: payload });
-      toast('作成完了', { description: '新しいタスクを作成しました' });
-      refetch();
-      clearForm();
-      onClose();
-    } catch (err) {
-      console.error('タスク保存失敗', err);
-      toast('保存失敗', { description: 'タスクの保存に失敗しました' });
-    }
+    createTask({ data: payload });
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       handleSave();
     }
   };
+  const handleAdaptAiSuggest = async (aiTitle: string, objectives: ObjectiveItem[]) => {
+    setOpenAiSuggestModal(false);
+    const payload = {
+      title: aiTitle.trim(),
+      description: description.trim(),
+      due_date: dueDate || undefined,
+    };
+    const response = await createTaskAsync({ data: payload });
+    const taskId = response.task?.id;
+    if (taskId) {
+      objectives.map((objective) => postObjective({ data: { ...objective, task_id: taskId } }));
+    }
+    onClose();
+  };
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>"新規タスク作成"</DialogTitle>
-          <DialogDescription></DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>"新規タスク作成"</DialogTitle>
+            <DialogDescription></DialogDescription>
+          </DialogHeader>
 
-        <div className="space-y-4">
-          <Textarea
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="タスク名"
-            rows={1}
-            className="h-auto min-h-0 resize-none overflow-hidden"
-          />
+          <div className="space-y-4">
+            <Textarea
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="タスク名"
+              rows={1}
+              className="h-auto min-h-0 resize-none overflow-hidden"
+            />
 
-          <Textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="タスクの説明"
-            className="h-auto min-h-0"
-          />
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="タスクの説明"
+              className="h-auto min-h-0"
+            />
 
-          <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-
-          <div className="flex justify-end gap-2 pt-4">
+            <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+          </div>
+          <DialogFooter>
+            <Button
+              className="mr-auto"
+              variant="secondary"
+              onClick={() => setOpenAiSuggestModal(true)}
+            >
+              "AI提案"
+            </Button>
             <Button
               variant="outline"
               onClick={() => {
@@ -103,9 +146,21 @@ export const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
               キャンセル
             </Button>
             <Button onClick={handleSave}>"作成"</Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {openAiSuggestModal && (
+        <AiSuggestModal
+          title={title}
+          discription={description}
+          dueDate={dueDate}
+          open={openAiSuggestModal}
+          onClose={() => {
+            setOpenAiSuggestModal(false);
+          }}
+          onAdapt={handleAdaptAiSuggest}
+        />
+      )}
+    </>
   );
 };
