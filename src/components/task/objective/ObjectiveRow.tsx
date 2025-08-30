@@ -1,11 +1,11 @@
 // src/components/task/ObjectiveRow.tsx
 import { useEffect, useState } from 'react';
 
-import { TableCell } from '@/components/ui/table';
 import { useQueryClient } from '@tanstack/react-query';
-
 import { FileStack, Mail } from 'lucide-react';
 import { toast } from 'sonner';
+
+import { TableCell } from '@/components/ui/table';
 
 import {
   getGetProgressUpdatesObjectiveIdQueryOptions,
@@ -17,8 +17,8 @@ import type {
   Objective,
   ObjectiveInput,
   ObjectiveUpdate,
-  ProgressInput,
   ObjectiveUpdateStatus as updateStatusType,
+  ProgressInput,
 } from '@/api/generated/taskProgressAPI.schemas';
 import {
   ObjectiveStatus,
@@ -28,9 +28,8 @@ import {
 import { useAlertDialog } from '@/context/useAlertDialog';
 import { useTasks } from '@/context/useTasks';
 
-import { SingleUserSelectModal } from '../SingleUserSelectModal';
 import { ReminderSettingModal } from '../reminderSettingModal/ReminderSettingModal';
-
+import { SingleUserSelectModal } from '../SingleUserSelectModal';
 import { StatusBadgeCell } from '../StatusBadgeCell';
 
 import { DateCell } from './DateCell';

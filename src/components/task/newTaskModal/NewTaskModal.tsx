@@ -14,12 +14,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
-import { usePostProgressTasks, usePostProgressObjectives } from '@/api/generated/taskProgressAPI';
+import { usePostProgressObjectives,usePostProgressTasks } from '@/api/generated/taskProgressAPI';
+import type { ObjectiveItem } from '@/api/generated/taskProgressAPI.schemas';
+
+import { extractErrorMessage } from '@/utils/errorHandler';
 
 import { useTasks } from '@/context/useTasks';
+
 import { AiSuggestModal } from '../aiSuggestModal/AiSuggestModal';
-import type { ObjectiveItem } from '@/api/generated/taskProgressAPI.schemas';
-import { extractErrorMessage } from '@/utils/errorHandler';
 
 interface TaskSettingModalProps {
   open: boolean;

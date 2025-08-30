@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button';
 import { NewTaskModal } from '@/components/task/newTaskModal/NewTaskModal';
 import { TaskOrderSettingModal } from '@/components/task/taskSettingOrderModal/TaskOrderSettingModal';
 import { TestModal } from '@/components/TestModal';
-import { ViewSelectorPopup } from './ViewSelectorPopup';
+
 import type { FilterAccessLevel } from '@/pages/TaskPage';
+
+import { ViewSelectorPopup } from './ViewSelectorPopup';
 interface TaskControlPanelProps {
   onAllExpand: () => void;
   onAllCollapse: () => void;

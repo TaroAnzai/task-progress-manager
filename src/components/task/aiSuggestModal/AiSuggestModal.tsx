@@ -1,4 +1,7 @@
-import { use, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+import { ClockLoader } from 'react-spinners';
+import TextareaAutosize from 'react-textarea-autosize';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -9,12 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 
 import { type AISuggestInput, type ObjectiveItem } from '@/api/generated/taskProgressAPI.schemas';
+
 import { useAiResultPolling, useCreateAiSuggestJob } from './AiSuggestHooks';
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import TextareaAutosize from 'react-textarea-autosize';
-import { ClockLoader } from 'react-spinners';
 interface AiSuggestModalProps {
   title: string;
   discription: string;
@@ -37,9 +39,8 @@ export const AiSuggestModal = ({
   const [newTitle, setNewTitle] = useState('');
   const [newObjectives, setNewObjectives] = useState<ObjectiveItem[] | null>(null);
   const createJob = useCreateAiSuggestJob();
-  const { data: taskTileData, isFetching: isFetchingTitle } = useAiResultPolling(titleJobId);
-  const { data: objectiveData, isFetching: isFetchingObjective } =
-    useAiResultPolling(objectiveJobId);
+  const { data: taskTileData } = useAiResultPolling(titleJobId);
+  const { data: objectiveData } = useAiResultPolling(objectiveJobId);
   const hasTitleExecutedRef = useRef(false);
   const hasObjectiveExecutedRef = useRef(false);
 
@@ -134,14 +135,12 @@ export const AiSuggestModal = ({
         ) : (
           <Table>
             <TableBody>
-              {newObjectives?.map((o, index) => {
-                return (
-                  <TableRow key={index}>
-                    <TableCell>{o.title}</TableCell>
-                    <TableCell>{o.due_date}</TableCell>
-                  </TableRow>
-                );
-              })}
+              {newObjectives?.map((o, index) => (
+                <TableRow key={index}>
+                  <TableCell>{o.title}</TableCell>
+                  <TableCell>{o.due_date}</TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         )}

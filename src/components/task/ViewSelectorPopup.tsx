@@ -1,12 +1,14 @@
 // src/components/task/ViewSelectorPopup.tsx
 
 import { useState } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
 
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
 import type { TaskUserAccessLevel } from '@/api/generated/taskProgressAPI.schemas';
+
 import { SCOPE_LABELS } from '@/context/roleLabels';
 import type { FilterAccessLevel } from '@/pages/TaskPage';
 interface ViewSelectorPopupProps {

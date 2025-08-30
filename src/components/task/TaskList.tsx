@@ -3,8 +3,8 @@
 import { TaskStatus } from '@/api/generated/taskProgressAPI.schemas';
 
 import { useTasks } from '@/context/useTasks';
-
 import type { FilterAccessLevel } from '@/pages/TaskPage';
+
 import { TaskCard } from './TaskCard';
 
 interface TaskListProps {

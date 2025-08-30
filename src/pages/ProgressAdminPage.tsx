@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
-import { useGetProgressCompaniesCompanyId } from "@/api/generated/taskProgressAPI";
-import type { Company } from "@/api/generated/taskProgressAPI.schemas";
+import { useGetProgressCompaniesCompanyId } from '@/api/generated/taskProgressAPI';
+import type { Company } from '@/api/generated/taskProgressAPI.schemas';
 
-import { CompanyRegisterDialog } from "@/components/admin/CompanyRegisterDialog";
-import { CompanySelectorDialog } from "@/components/admin/CompanySelectorDialog";
-import { AdminOrganizationComponent } from "@/components/admin/organization/AdminOrganizationComponent";
-import { AdminUserComponent } from "@/components/admin/user/AdminUserComponent";
+import { CompanyRegisterDialog } from '@/components/admin/CompanyRegisterDialog';
+import { CompanySelectorDialog } from '@/components/admin/CompanySelectorDialog';
+import { AdminOrganizationComponent } from '@/components/admin/organization/AdminOrganizationComponent';
+import { AdminUserComponent } from '@/components/admin/user/AdminUserComponent';
 
-import { useUser } from "@/context/useUser";
+import { useUser } from '@/context/useUser';
 
 const AdminPageContent = () => {
   const { user, loading, hasAdminScope, getUserRole } = useUser();
@@ -38,10 +38,9 @@ const AdminPageContent = () => {
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      navigate("/login", { state: { from: location.pathname } });
+      navigate('/login', { state: { from: location.pathname } });
     }
   }, [loading, user, navigate, location.pathname]);
-
 
   if (loading) {
     return <p className="text-gray-500">読み込み中...</p>;
@@ -52,8 +51,9 @@ const AdminPageContent = () => {
   }
   return (
     <div className="p-4">
-      <p className="font-bold text-lg mb-4">👤 {user.name} (ID: {user.id}) organization:( {user.organization_name})
-        権限:({String(getUserRole())})
+      <p className="font-bold text-lg mb-4">
+        👤 {user.name} (ID: {user.id}) organization:( {user.organization_name}) 権限:(
+        {String(getUserRole())})
       </p>
       {hasAdminScope() ? (
         <>
@@ -75,7 +75,8 @@ const AdminPageContent = () => {
                   <div className="mt-4 space-y-2">
                     <AdminOrganizationComponent
                       companyName={selectedCompany.name}
-                      companyId={selectedCompany.id} />
+                      companyId={selectedCompany.id}
+                    />
                   </div>
                 </div>
               </div>
@@ -108,13 +109,10 @@ const AdminPageContent = () => {
           />
         </>
       )}
-
     </div>
   );
-}
+};
 
 export default function ProgressAdminPage() {
-  return (
-    <AdminPageContent />
-  );
+  return <AdminPageContent />;
 }

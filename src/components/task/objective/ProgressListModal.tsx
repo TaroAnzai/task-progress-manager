@@ -19,6 +19,7 @@ import {
 
 import { useGetProgressUpdatesObjectiveId } from '@/api/generated/taskProgressAPI';
 import type { Objective } from '@/api/generated/taskProgressAPI.schemas';
+
 import { useTasks } from '@/context/useTasks';
 interface ProgressListModalProps {
   open: boolean;

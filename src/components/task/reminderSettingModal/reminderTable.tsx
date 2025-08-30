@@ -1,4 +1,3 @@
-import type { ObjectiveReminderSettingListOutput } from '@/api/generated/taskProgressAPI.schemas';
 import { Card, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -8,6 +7,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+
+import type { ObjectiveReminderSettingListOutput } from '@/api/generated/taskProgressAPI.schemas';
+
 import { REMINDER_CONDITION_LABELS, REMINDER_FREQUENCY_LABELS } from '@/context/reminderLabels';
 interface RemainderSettingModalProps {
   isLoading: boolean;

@@ -39,16 +39,12 @@ export default tseslint.config([
 
     // プラグイン登録
     plugins: {
-      prettier: prettierPlugin, // Prettier を ESLint ルール化
       import: eslintPluginImport,
       'simple-import-sort': simpleImportSort,
     },
 
     // ルール
     rules: {
-      // ← "plugin:prettier/recommended" 相当（差分を ESLint エラーに）
-      'prettier/prettier': 'error',
-
       // import 並び替え/方針
       'import/order': 'off',
       'simple-import-sort/imports': [

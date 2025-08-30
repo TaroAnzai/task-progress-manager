@@ -2,19 +2,19 @@ import {
   useGetProgressAiResultJobId,
   usePostProgressAiSuggest,
 } from '@/api/generated/taskProgressAPI';
-import { AIResultStatus } from '@/api/generated/taskProgressAPI.schemas';
+import { AIResultStatus, type AISuggestInput } from '@/api/generated/taskProgressAPI.schemas';
 
 export const useCreateAiSuggestJob = () => {
   const { mutateAsync } = usePostProgressAiSuggest();
 
-  return async (input: any) => {
+  return async (input: AISuggestInput) => {
     const res = await mutateAsync({ data: input });
     return res.job_id; // { job_id: string }
   };
 };
 
-export const useAiResultPolling = (jobId: string | null) => {
-  return useGetProgressAiResultJobId(jobId ?? '', {
+export const useAiResultPolling = (jobId: string | null) =>
+  useGetProgressAiResultJobId(jobId ?? '', {
     query: {
       enabled: !!jobId, // jobIdがあるときだけ
       refetchInterval: (query) => {
@@ -25,4 +25,3 @@ export const useAiResultPolling = (jobId: string | null) => {
       },
     },
   });
-};

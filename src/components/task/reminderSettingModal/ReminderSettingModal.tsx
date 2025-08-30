@@ -1,11 +1,8 @@
 //src/components/taskr/remainderSettingModal/RemainderSettingModal.tsx
-import {
-  useDeleteProgressRemindersSettingId,
-  useGetProgressObjectivesObjectiveIdReminders,
-  usePatchProgressRemindersSettingId,
-  usePostProgressObjectivesObjectiveIdReminders,
-} from '@/api/generated/taskProgressAPI';
-import type { ObjectiveReminderSettingInput } from '@/api/generated/taskProgressAPI.schemas';
+import { useState } from 'react';
+
+import { toast } from 'sonner';
+
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -15,9 +12,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+
+import {
+  useDeleteProgressRemindersSettingId,
+  useGetProgressObjectivesObjectiveIdReminders,
+  usePatchProgressRemindersSettingId,
+  usePostProgressObjectivesObjectiveIdReminders,
+} from '@/api/generated/taskProgressAPI';
+import type { ObjectiveReminderSettingInput } from '@/api/generated/taskProgressAPI.schemas';
+
 import { useAlertDialog } from '@/context/useAlertDialog';
-import { useState } from 'react';
-import { toast } from 'sonner';
+
 import { ObjectiveReminderSettingForm } from './objectiveReminderSettingForm';
 import { ReminderTable } from './reminderTable';
 
