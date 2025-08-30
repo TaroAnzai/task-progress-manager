@@ -1,6 +1,7 @@
 import { config } from 'dotenv';
 
 config({ path: '.env.production' });
+
 export default {
   progressApi: {
     input: process.env.VITE_OPENAPI_URL,
