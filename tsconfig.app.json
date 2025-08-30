@@ -22,10 +22,13 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "baseUrl": "./src",        // ★追加
-    "paths": {                 // ★追加
+    "baseUrl": "./src", // ★追加
+    "paths": {
+      // ★追加
       "@/*": ["*"]
-    } 
+    },
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src"]
 }

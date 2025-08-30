@@ -3,11 +3,12 @@ import { useEffect, useState } from 'react';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { type TaskUserAccessLevel } from '@/api/generated/taskProgressAPI.schemas';
+
 import { TaskControlPanel } from '@/components/task/TaskControlPanel';
 import { TaskList } from '@/components/task/TaskList';
 
 import { useUser } from '@/context/useUser';
-import { type TaskUserAccessLevel } from '@/api/generated/taskProgressAPI.schemas';
 
 const STORAGE_KEY = 'task_view_mode';
 export type FilterAccessLevel = TaskUserAccessLevel | 'ASSIGNED';

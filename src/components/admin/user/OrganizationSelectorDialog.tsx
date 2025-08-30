@@ -23,8 +23,17 @@ interface Props {
   onSelect: (org: OrganizationSelectResult) => void;
 }
 
-export const OrganizationSelectorDialog: React.FC<Props> = ({ companyId, open, onClose, onSelect }) => {
-  const { data: treeData, isLoading, error } = useGetProgressOrganizationsTree({ company_id: companyId });
+export const OrganizationSelectorDialog: React.FC<Props> = ({
+  companyId,
+  open,
+  onClose,
+  onSelect,
+}) => {
+  const {
+    data: treeData,
+    isLoading,
+    error,
+  } = useGetProgressOrganizationsTree({ company_id: companyId });
 
   const handleClick = (node: OrganizationTree) => {
     if (!node.org_code || !node.name) return;
@@ -33,7 +42,7 @@ export const OrganizationSelectorDialog: React.FC<Props> = ({ companyId, open, o
 
   const renderTree = (nodes: OrganizationTree[]) => (
     <ul className="ml-4 space-y-1">
-      {nodes.map(node => (
+      {nodes.map((node) => (
         <li key={node.org_code}>
           <Button
             variant="ghost"
@@ -67,5 +76,3 @@ export const OrganizationSelectorDialog: React.FC<Props> = ({ companyId, open, o
     </Dialog>
   );
 };
-
-
