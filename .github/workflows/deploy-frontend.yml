@@ -30,7 +30,7 @@ jobs:
         run: |
           npm ci
           npm run generate:api
-          npm run build --mode production
+          npm run build
 
       # 成果物(dist)をレンタルサーバーにアップロード
       - name: Deploy via SCP
