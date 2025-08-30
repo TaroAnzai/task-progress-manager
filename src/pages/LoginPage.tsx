@@ -1,6 +1,9 @@
 import { useState } from 'react';
 
+import { Eye, EyeOff } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+
+import { Button } from '@/components/ui/button';
 
 import type { Login } from '@/api/generated/taskProgressAPI.schemas';
 import { usePostProgressSessions } from '@/api/generated/taskProgressAPI.ts';
@@ -9,7 +12,6 @@ import { extractErrorMessage } from '@/utils/errorHandler.ts';
 
 import { useAlertDialog } from '@/context/useAlertDialog';
 import { useUser } from '@/context/useUser';
-
 // 定数の定義
 const MESSAGES = {
   LOGIN_SUCCESS: 'ログイン成功',
@@ -96,18 +98,35 @@ interface InputFieldProps {
   required?: boolean;
 }
 
-const InputField = ({ label, type, value, onChange, required = false }: InputFieldProps) => (
-  <div>
-    <label className="block text-sm font-medium text-gray-700">{label}</label>
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-200 focus:border-blue-400"
-      required={required}
-    />
-  </div>
-);
+const InputField = ({ label, type, value, onChange, required = false }: InputFieldProps) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <div className="relative">
+        <input
+          type={type === 'password' ? (show ? 'text' : 'password') : type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-200 focus:border-blue-400"
+          required={required}
+        />
+        {type === 'password' && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 top-1/2 -translate-y-1/2"
+            onClick={() => setShow((v) => !v)}
+            aria-label={show ? 'パスワードを隠す' : 'パスワードを表示'}
+          >
+            {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
 
 // UI コンポーネント: ログインボタン
 interface LoginButtonProps {
