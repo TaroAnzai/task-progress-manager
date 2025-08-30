@@ -1,28 +1,28 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import type { Login } from "@/api/generated/taskProgressAPI.schemas";
-import { usePostProgressSessions } from "@/api/generated/taskProgressAPI.ts";
+import type { Login } from '@/api/generated/taskProgressAPI.schemas';
+import { usePostProgressSessions } from '@/api/generated/taskProgressAPI.ts';
 
-import { extractErrorMessage } from "@/utils/errorHandler.ts";
+import { extractErrorMessage } from '@/utils/errorHandler.ts';
 
-import { useAlertDialog } from "@/context/useAlertDialog";
-import { useUser } from "@/context/useUser";
+import { useAlertDialog } from '@/context/useAlertDialog';
+import { useUser } from '@/context/useUser';
 
 // 定数の定義
 const MESSAGES = {
-  LOGIN_SUCCESS: "ログイン成功",
-  LOGIN_FAILED: "ログイン失敗",
-  LOGIN_TITLE: "ログイン",
-  EMAIL_LABEL: "メールアドレス",
-  PASSWORD_LABEL: "パスワード",
-  LOGIN_BUTTON: "ログイン",
-  LOGIN_LOADING: "ログイン中...",
+  LOGIN_SUCCESS: 'ログイン成功',
+  LOGIN_FAILED: 'ログイン失敗',
+  LOGIN_TITLE: 'ログイン',
+  EMAIL_LABEL: 'メールアドレス',
+  PASSWORD_LABEL: 'パスワード',
+  LOGIN_BUTTON: 'ログイン',
+  LOGIN_LOADING: 'ログイン中...',
 } as const;
 
 const ROUTES = {
-  DEFAULT: "/",
+  DEFAULT: '/',
 } as const;
 
 // カスタムフック: ログイン処理の分離
@@ -41,11 +41,11 @@ const useLogin = () => {
       },
       onError: (error) => {
         const errorMessage = extractErrorMessage(error);
-        console.error("Login error:", errorMessage);
+        console.error('Login error:', errorMessage);
         openAlertDialog({
-          title: "エラー",
+          title: 'エラー',
           description: `${MESSAGES.LOGIN_FAILED}: ${errorMessage}`,
-          confirmText: "閉じる",
+          confirmText: '閉じる',
           showCancel: false,
         });
       },
@@ -57,16 +57,16 @@ const useLogin = () => {
     isLoading: mutation.isPending,
     from,
   };
-}
+};
 
 // カスタムフック: フォーム状態管理の分離
 const useLoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const resetForm = () => {
-    setEmail("");
-    setPassword("");
+    setEmail('');
+    setPassword('');
   };
 
   const getFormData = (): Login => ({
@@ -74,7 +74,7 @@ const useLoginForm = () => {
     password,
   });
 
-  const isFormValid = () => email.trim() !== "" && password !== "";
+  const isFormValid = () => email.trim() !== '' && password !== '';
 
   return {
     email,
@@ -85,23 +85,20 @@ const useLoginForm = () => {
     getFormData,
     isFormValid,
   };
-}
+};
 
 // UI コンポーネント: 入力フィールド
 interface InputFieldProps {
   label: string;
-  type: "email" | "password";
+  type: 'email' | 'password';
   value: string;
   onChange: (value: string) => void;
   required?: boolean;
 }
 
-const InputField = ({ label, type, value, onChange, required = false }: InputFieldProps) =>
-(
+const InputField = ({ label, type, value, onChange, required = false }: InputFieldProps) => (
   <div>
-    <label className="block text-sm font-medium text-gray-700">
-      {label}
-    </label>
+    <label className="block text-sm font-medium text-gray-700">{label}</label>
     <input
       type={type}
       value={value}
@@ -128,38 +125,28 @@ const LoginButton = ({ isLoading, isDisabled }: LoginButtonProps) => (
   </button>
 );
 
-
 // メインコンポーネント
 export default function LoginPage() {
   const { login, isLoading } = useLogin();
-  const {
-    email,
-    setEmail,
-    password,
-    setPassword,
-    getFormData,
-    isFormValid,
-  } = useLoginForm();
-
+  const { email, setEmail, password, setPassword, getFormData, isFormValid } = useLoginForm();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!isFormValid()) {
-      alert("メールアドレスとパスワードを入力してください");
+      alert('メールアドレスとパスワードを入力してください');
       return;
     }
 
     const loginData = getFormData();
+    console.log('Login data:', loginData);
     login({ data: loginData });
   };
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-sm">
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          {MESSAGES.LOGIN_TITLE}
-        </h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">{MESSAGES.LOGIN_TITLE}</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <InputField
@@ -178,10 +165,7 @@ export default function LoginPage() {
             required
           />
 
-          <LoginButton
-            isLoading={isLoading}
-            isDisabled={isLoading || !isFormValid()}
-          />
+          <LoginButton isLoading={isLoading} isDisabled={isLoading || !isFormValid()} />
         </form>
       </div>
     </div>
