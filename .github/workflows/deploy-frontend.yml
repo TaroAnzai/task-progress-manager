@@ -40,5 +40,6 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           port: 8022
-          source: dist/*
+          source: dist/**
           target: /home/r6441231/public_html/anzai-home.com/progress/
+          strip_components: 1
