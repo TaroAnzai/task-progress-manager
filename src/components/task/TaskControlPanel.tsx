@@ -1,5 +1,5 @@
 // src/components/task/TaskControlPanel.tsx
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { FileDown, FilePlus, Minus, PencilIcon, Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -32,21 +32,26 @@ export const TaskControlPanel = ({
   const [taskOrderModalOpen, setTaskOrderModalOpen] = useState(false);
   const [testModalOpen, setTestModalOpen] = useState(false);
   // ① 自動実行は無効化（ボタン押下で refetch）
-  const {
-    refetch: downloadFile,
-    isFetching,
-    error,
-  } = useGetProgressExportsExcel({
+  const { refetch: downloadFile, isFetching } = useGetProgressExportsExcel({
     query: { enabled: false, refetchOnWindowFocus: false },
   });
 
   const handleDownload = async () => {
     try {
-      const res= await downloadFile();
-      const data = res.data;
-      const headers = res.;
-      if(!data) return;
-      const cd = (data.headers?.['content-disposition'];
+      const res = await downloadFile();
+      if (!res.data || res.data instanceof Blob === false) {
+        toast.error('ファイルが取得できませんでした');
+        return;
+      }
+      const blob = res.data;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'tasks.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     } catch (e) {
       console.error(e);
     }
@@ -79,7 +84,7 @@ export const TaskControlPanel = ({
 
           <Button
             onClick={() => {
-              downloadFile();
+              handleDownload();
             }}
             variant="secondary"
             id="view-selecter-btn"

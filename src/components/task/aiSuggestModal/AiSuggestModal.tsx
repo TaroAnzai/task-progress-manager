@@ -66,8 +66,7 @@ export const AiSuggestModal = ({
       const makeTitleJobId = await createJob(payload);
       settTitleJobId(makeTitleJobId);
     })();
-    console.log('Run Title titleJobId', titleJobId, 'payload', payload);
-  }, [open, title, discription, dueDate]);
+  }, [open, title, discription, dueDate, createJob]);
 
   useEffect(() => {
     if (!taskTileData?.task_title_data) return;
@@ -97,8 +96,7 @@ export const AiSuggestModal = ({
       const makeObjJobId = await createJob(objPayload);
       setObjectiveJobId(makeObjJobId);
     })();
-    console.log('Run Title titleJobId', titleJobId, 'payload', objPayload);
-  }, [open, newTitle]);
+  }, [open, newTitle, discription, dueDate, createJob]);
   useEffect(() => {
     if (!objectiveData?.objectives_data?.objectives) return;
     const resObjectives = objectiveData.objectives_data.objectives;
