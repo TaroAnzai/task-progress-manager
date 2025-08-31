@@ -1,9 +1,12 @@
 // src/components/task/TaskControlPanel.tsx
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { EyeIcon, Minus, PencilIcon, Plus, PlusIcon } from 'lucide-react';
+import { FileDown, FilePlus, Minus, PencilIcon, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
+
+import { useGetProgressExportsExcel } from '@/api/generated/taskProgressAPI';
 
 import { NewTaskModal } from '@/components/task/newTaskModal/NewTaskModal';
 import { TaskOrderSettingModal } from '@/components/task/taskSettingOrderModal/TaskOrderSettingModal';
@@ -28,6 +31,26 @@ export const TaskControlPanel = ({
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
   const [taskOrderModalOpen, setTaskOrderModalOpen] = useState(false);
   const [testModalOpen, setTestModalOpen] = useState(false);
+  // ① 自動実行は無効化（ボタン押下で refetch）
+  const {
+    refetch: downloadFile,
+    isFetching,
+    error,
+  } = useGetProgressExportsExcel({
+    query: { enabled: false, refetchOnWindowFocus: false },
+  });
+
+  const handleDownload = async () => {
+    try {
+      const res= await downloadFile();
+      const data = res.data;
+      const headers = res.;
+      if(!data) return;
+      const cd = (data.headers?.['content-disposition'];
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <>
@@ -39,7 +62,7 @@ export const TaskControlPanel = ({
             }}
             className="flex items-center gap-1"
           >
-            <PlusIcon size={16} />
+            <FilePlus size={16} />
             新規
           </Button>
 
@@ -47,7 +70,7 @@ export const TaskControlPanel = ({
             onClick={() => {
               setTaskOrderModalOpen(true);
             }}
-            variant="secondary"
+            variant="outline"
             className="flex items-center gap-1"
           >
             <PencilIcon size={16} />
@@ -56,14 +79,20 @@ export const TaskControlPanel = ({
 
           <Button
             onClick={() => {
-              setTestModalOpen(true);
+              downloadFile();
             }}
-            variant="outline"
+            variant="secondary"
             id="view-selecter-btn"
             className="flex items-center gap-1"
           >
-            <EyeIcon size={16} />
-            表示切替
+            {isFetching ? (
+              <>'Excel出力中...'</>
+            ) : (
+              <>
+                <FileDown size={16} />
+                ダウンロード
+              </>
+            )}
           </Button>
         </div>
 
