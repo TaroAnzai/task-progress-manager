@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { isAxiosError } from "axios";
-import type { ReactNode } from "react";
+import { isAxiosError } from 'axios';
+import type { ReactNode } from 'react';
 
 import {
   AlertDialog,
@@ -12,39 +12,39 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
-import { extractErrorMessage } from "@/utils/errorHandler";
+import { extractErrorMessage } from '@/utils/errorHandler';
 
-import { AlertDialogContext, type DialogOptions } from "./AlertDialogContextBase";
+import { AlertDialogContext, type DialogOptions } from './AlertDialogContextBase';
 export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("確認");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState('確認');
+  const [description, setDescription] = useState('');
   const [descriptionNode, setDescriptionNode] = useState<ReactNode>(null);
-  const [onConfirm, setOnConfirm] = useState<() => void>(() => () => { });
-  const [onCancel, setOnCancel] = useState<() => void>(() => { });
-  const [confirmText, setConfirmText] = useState("OK");
-  const [cancelText, setCancelText] = useState("キャンセル");
+  const [onConfirm, setOnConfirm] = useState<() => void>(() => () => {});
+  const [onCancel, setOnCancel] = useState<() => void>(() => {});
+  const [confirmText, setConfirmText] = useState('OK');
+  const [cancelText, setCancelText] = useState('キャンセル');
   const [showCancel, setShowCancel] = useState(true);
 
   const openAlertDialog = ({
-    title = "確認",
-    description = "",
+    title = '確認',
+    description = '',
     descriptionNode = null,
     onConfirm,
     onCancel,
-    confirmText = "OK",
-    cancelText = "キャンセル",
+    confirmText = 'OK',
+    cancelText = 'キャンセル',
     showCancel = true,
   }: DialogOptions) => {
     setTitle(title);
     if (isAxiosError(description)) {
       setDescription(extractErrorMessage(description));
-    } else if (typeof description === "string") {
+    } else if (typeof description === 'string') {
       setDescription(description);
     } else {
-      setDescription("Unknown error");
+      setDescription('Unknown error');
     }
     setDescriptionNode(descriptionNode);
     setOnConfirm(() => () => {
@@ -89,4 +89,4 @@ export const AlertDialogProvider = ({ children }: { children: ReactNode }) => {
       </AlertDialog>
     </AlertDialogContext.Provider>
   );
-}
+};
