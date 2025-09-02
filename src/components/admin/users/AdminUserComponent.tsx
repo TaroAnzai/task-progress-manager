@@ -9,37 +9,36 @@ import { useGetProgressUsersAdmin } from '@/api/generated/taskProgressAPI';
 import type { UserSchemaForAdmin } from '@/api/generated/taskProgressAPI.schemas';
 import { AccessScopeRole } from '@/api/generated/taskProgressAPI.schemas';
 
-import { useAlertDialog } from "@/context/useAlertDialog";
+import { useAlertDialog } from '@/context/useAlertDialog';
 import { useUser } from '@/context/useUser.ts';
 
-import { BulkTextInputForm } from "../import/BulkTextInputForm";
-import { useBulkUserRegistration } from "../import/useBulkUserRegister.ts";
+import { BulkTextInputForm } from '../import/BulkTextInputForm.tsx';
+import { useBulkUserRegistration } from '../import/useBulkUserRegister.ts';
 
-import type { UserFormState } from './types';
-import { UserForm } from './UserForm';
-import { UserTable } from './UserTable';
+import type { UserFormState } from './types.ts';
+import { UserForm } from './UserForm.tsx';
+import { UserTable } from './UserTable.tsx';
 
 interface AdminUserComponentProps {
   companyId: number;
 }
 
-
 export const AdminUserComponent: React.FC<AdminUserComponentProps> = ({ companyId }) => {
   const { hasAdminScope } = useUser();
   const [editingUser, setEditingUser] = useState<UserFormState | null>(null);
-  const { registerFromLines: userRegister, loading, errors } = useBulkUserRegistration(companyId)
+  const { registerFromLines: userRegister, loading, errors } = useBulkUserRegistration(companyId);
   const { openAlertDialog } = useAlertDialog();
 
   useEffect(() => {
     if (errors.length > 0) {
       openAlertDialog({
-        title: "エラー",
-        description: errors.join("\n"),
-        confirmText: "閉じる",
+        title: 'エラー',
+        description: errors.join('\n'),
+        confirmText: '閉じる',
         showCancel: false,
       });
     }
-  }, [errors, openAlertDialog])
+  }, [errors, openAlertDialog]);
   const {
     data: users,
     isLoading,
@@ -48,11 +47,13 @@ export const AdminUserComponent: React.FC<AdminUserComponentProps> = ({ companyI
   } = useGetProgressUsersAdmin({ company_id: companyId });
 
   const handleEditUser = useCallback((user: UserSchemaForAdmin) => {
-    const matchedScope = user.access_scopes?.find(s => s.organization_id === user.organization_id);
+    const matchedScope = user.access_scopes?.find(
+      (s) => s.organization_id === user.organization_id
+    );
     setEditingUser({
       id: user.id,
       name: user.name,
-      email: user.email ?? "",
+      email: user.email ?? '',
       //organization_code: user.organization_code,
       organization_id: user.organization_id,
       role: matchedScope?.role ?? AccessScopeRole.MEMBER,
@@ -115,5 +116,3 @@ export const AdminUserComponent: React.FC<AdminUserComponentProps> = ({ companyI
     </div>
   );
 };
-
-

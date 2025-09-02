@@ -10,7 +10,8 @@ import type { Company } from '@/api/generated/taskProgressAPI.schemas';
 import { CompanyRegisterDialog } from '@/components/admin/CompanyRegisterDialog';
 import { CompanySelectorDialog } from '@/components/admin/CompanySelectorDialog';
 import { AdminOrganizationComponent } from '@/components/admin/organization/AdminOrganizationComponent';
-import { AdminUserComponent } from '@/components/admin/user/AdminUserComponent';
+import { UserSettingComponent } from '@/components/admin/user/UserSettingComponent';
+import { AdminUserComponent } from '@/components/admin/users/AdminUserComponent';
 
 import { useUser } from '@/context/useUser';
 
@@ -55,6 +56,10 @@ const AdminPageContent = () => {
         👤 {user.name} (ID: {user.id}) organization:( {user.organization_name}) 権限:(
         {String(getUserRole())})
       </p>
+      <div className="flex justify-center space-y-6">
+        <UserSettingComponent className="" user={user} />
+      </div>
+
       {hasAdminScope() ? (
         <>
           {user.is_superuser && (

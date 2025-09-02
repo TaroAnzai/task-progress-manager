@@ -1,5 +1,7 @@
 // src/components/layout/Header.tsx
 
+import { Link } from 'react-router-dom';
+
 import { useDeleteProgressSessionsCurrent } from '@/api/generated/taskProgressAPI';
 
 import { useUser } from '@/context/useUser';
@@ -21,20 +23,20 @@ export const Header = () => {
     <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
       <h1 className="text-lg font-bold">進捗管理システム</h1>
       <nav className="flex gap-4">
-        <a href="" className="hover:underline">
+        <Link to="/" className="hover:underline">
           タスク一覧
-        </a>
-        <a href="admin" className="hover:underline">
+        </Link>
+        <Link to="admin" className="hover:underline">
           設定
-        </a>
+        </Link>
         {isLoggedIn ? (
           <button onClick={handleLogout} className="hover:underline text-left">
             ログアウト
           </button>
         ) : (
-          <a href="login" className="hover:underline">
+          <Link to="login" className="hover:underline">
             ログイン
-          </a>
+          </Link>
         )}
       </nav>
     </header>
