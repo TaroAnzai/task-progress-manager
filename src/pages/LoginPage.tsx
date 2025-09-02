@@ -12,6 +12,7 @@ import { extractErrorMessage } from '@/utils/errorHandler.ts';
 
 import { useAlertDialog } from '@/context/useAlertDialog';
 import { useUser } from '@/context/useUser';
+
 // 定数の定義
 const MESSAGES = {
   LOGIN_SUCCESS: 'ログイン成功',
@@ -43,7 +44,6 @@ const useLogin = () => {
       },
       onError: (error) => {
         const errorMessage = extractErrorMessage(error);
-        console.error('Login error:', errorMessage);
         openAlertDialog({
           title: 'エラー',
           description: `${MESSAGES.LOGIN_FAILED}: ${errorMessage}`,
@@ -135,13 +135,13 @@ interface LoginButtonProps {
 }
 
 const LoginButton = ({ isLoading, isDisabled }: LoginButtonProps) => (
-  <button
+  <Button
     type="submit"
-    className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+    className="w-full py-2  transition disabled:opacity-50 disabled:cursor-not-allowed"
     disabled={isDisabled}
   >
     {isLoading ? MESSAGES.LOGIN_LOADING : MESSAGES.LOGIN_BUTTON}
-  </button>
+  </Button>
 );
 
 // メインコンポーネント
@@ -158,12 +158,11 @@ export default function LoginPage() {
     }
 
     const loginData = getFormData();
-    console.log('Login data:', loginData);
     login({ data: loginData });
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
+    <div className="flex flex-col justify-center items-center h-screen bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-sm">
         <h1 className="text-2xl font-bold mb-6 text-center">{MESSAGES.LOGIN_TITLE}</h1>
 
@@ -186,6 +185,18 @@ export default function LoginPage() {
 
           <LoginButton isLoading={isLoading} isDisabled={isLoading || !isFormValid()} />
         </form>
+        <div className="flex flex-col items-end mt-4">
+          <div className="flex flex-col">
+            <a href="/progress/signup" className=" hover:underline ml-2">
+              新規登録
+            </a>
+          </div>
+          <div>
+            <a href="/progress/reset" className=" hover:underline ml-2">
+              パスワードを忘れた場合
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );

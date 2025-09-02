@@ -31,7 +31,7 @@ export default defineConfig(({ command }) => {
 
   return {
     plugins: [react()],
-    base: '/progress/',
+    base: '/progress',
     server: serverConfig,
     resolve: {
       alias: {
