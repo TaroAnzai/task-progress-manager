@@ -51,7 +51,7 @@ export default function PasswordConfirmPage() {
       mutation: {
         onSuccess: () => {
           toast.success('新しいパスワードを設定しました');
-          navigate('/progress/login');
+          navigate('/login');
         },
         onError: (err) => {
           console.error(err);
