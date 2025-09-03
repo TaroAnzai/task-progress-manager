@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { Check, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
@@ -32,13 +32,20 @@ const calcStrength = (pw: string) => {
 interface UserSettingComponentProps {
   user: User;
   className?: string;
+  refetchUser: () => void;
 }
 
-export const UserSettingComponent = ({ user, className }: UserSettingComponentProps) => {
+export const UserSettingComponent = ({
+  user,
+  className,
+  refetchUser,
+}: UserSettingComponentProps) => {
   const [newName, setNewName] = useState('');
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
   const [password2, setPassword2] = useState('');
+  const nameFromRef = useRef<HTMLFormElement | null>(null);
+  const pwFromRef = useRef<HTMLFormElement | null>(null);
   const strength = useMemo(() => calcStrength(password), [password]);
   const canSubmit = password.length >= 8 && password === password2;
   const { mutate: putUser, isPending } = usePutProgressUsersUserId({
@@ -46,9 +53,15 @@ export const UserSettingComponent = ({ user, className }: UserSettingComponentPr
       onSuccess: (_data, val) => {
         if ('name' in val.data) {
           toast.success('ユーザー名を変更しました');
+          refetchUser();
+          nameFromRef.current?.reset();
+          setNewName('');
         }
         if ('password' in val.data) {
           toast.success('パスワードを変更しました');
+          pwFromRef.current?.reset();
+          setPassword('');
+          setPassword2('');
         }
         console.log('success');
       },
@@ -69,7 +82,7 @@ export const UserSettingComponent = ({ user, className }: UserSettingComponentPr
   const onSubmitName = (e: React.FormEvent) => {
     e.preventDefault();
     const payload = {
-      name: user.name,
+      name: newName,
     };
     putUser({ userId: user.id, data: payload });
   };
@@ -81,7 +94,7 @@ export const UserSettingComponent = ({ user, className }: UserSettingComponentPr
           <CardDescription>ユーザー名を変更します。</CardDescription>
         </CardHeader>
         <CardContent>
-          <form id="nameFrom" onSubmit={onSubmitName}>
+          <form ref={nameFromRef} id="nameFrom" onSubmit={onSubmitName}>
             <div className="space-y-2">
               <Label htmlFor="newName">ユーザー名</Label>
               <Input
@@ -106,7 +119,7 @@ export const UserSettingComponent = ({ user, className }: UserSettingComponentPr
           <CardDescription>パスワードの変更をします。</CardDescription>
         </CardHeader>
         <CardContent>
-          <form id="pwForm" onSubmit={onSubmitPW} className="">
+          <form ref={pwFromRef} id="pwForm" onSubmit={onSubmitPW} className="">
             <div className="space-y-2">
               <Label htmlFor="password">新しいパスワード</Label>
               <div className="relative">

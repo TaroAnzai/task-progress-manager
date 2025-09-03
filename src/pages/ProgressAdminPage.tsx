@@ -16,7 +16,7 @@ import { AdminUserComponent } from '@/components/admin/users/AdminUserComponent'
 import { useUser } from '@/context/useUser';
 
 const AdminPageContent = () => {
-  const { user, loading, hasAdminScope, getUserRole } = useUser();
+  const { user, loading, hasAdminScope, getUserRole, refetchUser } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -57,7 +57,7 @@ const AdminPageContent = () => {
         {String(getUserRole())})
       </p>
       <div className="flex justify-center space-y-6">
-        <UserSettingComponent className="" user={user} />
+        <UserSettingComponent className="" user={user} refetchUser={refetchUser} />
       </div>
 
       {hasAdminScope() ? (
