@@ -1,6 +1,6 @@
 // src/components/admin/user/UserTable.tsx
 
-import { toast } from "sonner";
+import { toast } from 'sonner';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -8,7 +8,7 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components
 import { useDeleteProgressUsersUserId } from '@/api/generated/taskProgressAPI';
 import type { UserSchemaForAdmin } from '@/api/generated/taskProgressAPI.schemas';
 
-import { extractErrorMessage } from "@/utils/errorHandler";
+import { useAlertDialog } from '@/context/useAlertDialog';
 
 import { UserTableRow } from './UserTableRow';
 
@@ -21,16 +21,34 @@ interface Props {
 }
 
 export const UserTable: React.FC<Props> = ({ users, isLoading, error, onEditUser, onRefresh }) => {
-  const { mutateAsync: deleteUser } = useDeleteProgressUsersUserId();
+  const { openAlertDialog } = useAlertDialog();
+  const { mutate: deleteUser } = useDeleteProgressUsersUserId({
+    mutation: {
+      onSuccess: () => {
+        toast.success('ユーザーを削除しました');
+        onRefresh();
+      },
+      onError: (error) => {
+        openAlertDialog({
+          title: 'Error',
+          description: error,
+          confirmText: '閉じる',
+          showCancel: false,
+        });
+        console.error(error);
+      },
+    },
+  });
+
   const handleDelete = async (userId: number) => {
-    if (!confirm('本当にこのユーザーを削除しますか？')) return;
-    try {
-      await deleteUser({ userId });
-      onRefresh();
-    } catch (err) {
-      toast.error(`${extractErrorMessage(err)}`);
-      console.error(err);
-    }
+    openAlertDialog({
+      title: 'ユーザーの削除',
+      description: '本当にこのユーザーを削除しますか？',
+      confirmText: '削除する',
+      onConfirm: () => {
+        deleteUser({ userId });
+      },
+    });
   };
 
   if (isLoading) {
@@ -64,7 +82,7 @@ export const UserTable: React.FC<Props> = ({ users, isLoading, error, onEditUser
         </TableRow>
       </TableHeader>
       <TableBody>
-        {users.map(user => (
+        {users.map((user) => (
           <UserTableRow
             key={user.id}
             user={user}
@@ -76,4 +94,3 @@ export const UserTable: React.FC<Props> = ({ users, isLoading, error, onEditUser
     </Table>
   );
 };
-

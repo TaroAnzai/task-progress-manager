@@ -34,8 +34,8 @@ export const CompanySelectorDialog = ({ open, onClose, onSelect }: CompanySelect
   const { mutate: deleteCompanyMutation, isPending: isDeleting } =
     useDeleteProgressCompaniesCompanyId({
       mutation: {
-        onSuccess: () => {
-          toast.success('会社を削除しました');
+        onSuccess: (data) => {
+          toast.success(`会社を削除しました${data}`);
           refetch();
         },
         onError: (error) => {
@@ -72,13 +72,19 @@ export const CompanySelectorDialog = ({ open, onClose, onSelect }: CompanySelect
   const handleRestore = (companyId: number) => {
     restoreCompaniyMutate({ companyId });
   };
-  const handleDelete = async (companyId: number, companyName: string) => {
+
+  const handleDelete = async (companyId: number, companyName: string, force?: boolean) => {
+    const title = force ? '完全に削除しますか?' : '本当に削除しますか?';
+    const discription = `「${companyName}」を削除してもよろしいですか？\n ${
+      force ? '完全削除した会社は復元できません。' : '削除した会社は復元できます。'
+    }`;
+    const confirmText = force ? '完全削除' : '削除';
     openAlertDialog({
-      title: '会社の削除',
-      description: `「${companyName}」を削除してもよろしいですか？`,
-      confirmText: '削除する',
+      title: title,
+      description: discription,
+      confirmText: confirmText,
       onConfirm: () => {
-        deleteCompanyMutation({ companyId });
+        deleteCompanyMutation({ companyId, params: { force } });
       },
     });
   };
@@ -123,8 +129,8 @@ export const CompanySelectorDialog = ({ open, onClose, onSelect }: CompanySelect
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={() => handleDelete(company.id, company.name, company.name)}
-                  disabled={isDeleting || isRestoring || company.is_deleted}
+                  onClick={() => handleDelete(company.id, company.name, true)}
+                  disabled={isDeleting || isRestoring || !company.is_deleted}
                 >
                   完全削除
                 </Button>
