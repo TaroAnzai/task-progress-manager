@@ -90,6 +90,13 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
         <h4 className="md:w-[50%] text-base font-semibold leading-snug text-gray-800 whitespace-pre-wrap">
           {task.title}
         </h4>
+        <span className="text-sm text-gray-500 mr-1 flex">
+          [作成者:&nbsp;
+          <span className="w-[90px] truncate overflow-hidden text-ellipsis whitespace-nowrap">
+            {task.create_user_name}
+          </span>
+          ]
+        </span>
         <span className="w-[150px] text-sm text-gray-500 whitespace-nowrap">
           [期限: {dueDateStr}]
         </span>

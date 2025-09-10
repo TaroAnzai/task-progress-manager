@@ -68,7 +68,7 @@ export const TaskControlPanel = ({
             className="flex items-center gap-1"
           >
             <FilePlus size={16} />
-            新規
+            タスク新規作成
           </Button>
 
           <Button
@@ -79,7 +79,7 @@ export const TaskControlPanel = ({
             className="flex items-center gap-1"
           >
             <PencilIcon size={16} />
-            編集
+            表示順変更・削除
           </Button>
 
           <Button

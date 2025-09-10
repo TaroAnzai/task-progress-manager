@@ -21,7 +21,7 @@ export const TaskList = ({ isExpandParent, viewMode }: TaskListProps) => {
   const filteredTasks = notSavedTasks.filter(
     (task) =>
       (task.user_access_level && viewMode[task.user_access_level]) ||
-      (task.is_assigned && viewMode['ASSIGNED'])
+      (task.has_assigned_objective && viewMode['ASSIGNED'])
   );
   if (isLoading) return <div>Loading...</div>;
   return (
