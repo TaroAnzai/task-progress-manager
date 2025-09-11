@@ -1,6 +1,6 @@
 // src/components/task/ViewSelectorPopup.tsx
 
-import { useState } from 'react';
+import type { CheckedState } from '@radix-ui/react-checkbox';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -17,10 +17,13 @@ interface ViewSelectorPopupProps {
 }
 
 export const ViewSelectorPopup = ({ viewMode, onChange }: ViewSelectorPopupProps) => {
-  const [open, setOpen] = useState(false);
+  const handleOpenChange = (checked: CheckedState, key: FilterAccessLevel) => {
+    const newViewMode = { ...viewMode, [key]: checked === true };
+    onChange(newViewMode);
+  };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline">表示選択</Button>
       </PopoverTrigger>
@@ -32,8 +35,7 @@ export const ViewSelectorPopup = ({ viewMode, onChange }: ViewSelectorPopupProps
               id={key}
               checked={viewMode[key as TaskUserAccessLevel]}
               onCheckedChange={(checked) => {
-                const newViewMode = { ...viewMode, [key]: checked === true };
-                onChange(newViewMode);
+                handleOpenChange(checked, key as TaskUserAccessLevel);
               }}
             />
             <Label htmlFor={key}>{label}</Label>
@@ -46,8 +48,7 @@ export const ViewSelectorPopup = ({ viewMode, onChange }: ViewSelectorPopupProps
             id="ASSIGNED"
             checked={viewMode['ASSIGNED']}
             onCheckedChange={(checked) => {
-              const newViewMode = { ...viewMode, ['ASSIGNED']: checked === true };
-              onChange(newViewMode);
+              handleOpenChange(checked, 'ASSIGNED');
             }}
           />
           <Label htmlFor="ASSIGNED">担当者</Label>

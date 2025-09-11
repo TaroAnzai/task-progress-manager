@@ -47,7 +47,7 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
 
   useEffect(() => {
     if (data?.objectives) setObjectives(data.objectives);
-  }, [data]);
+  }, [data?.objectives]);
 
   //新規登録関数
   const { mutate: postObjective } = usePostProgressObjectives({

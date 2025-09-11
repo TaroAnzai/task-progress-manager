@@ -1,5 +1,4 @@
 // src/components/task/StatusBadgeCell.tsx
-import { useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -34,33 +33,21 @@ type Props = {
 };
 
 export const StatusBadgeCell = ({ value, onChange, disabled = false }: Props) => {
-  const [open, setOpen] = useState(false);
-  const [status, setStatus] = useState(value);
-
   const handleSelect = (status: updateStatusType) => {
     if (onChange) onChange(status);
-    setStatus(status);
-    setOpen(false);
   };
 
-  useEffect(() => {
-    setStatus(value);
-  }, [value]);
-
   return (
-    <Popover
-      open={open}
-      onOpenChange={(nextOpen) => {
-        if (!disabled) setOpen(nextOpen);
-      }}
-    >
+    <Popover>
       <PopoverTrigger asChild>
-        <Badge
-          className={`min-w-[60px] justify-center ${!disabled ? 'cursor-pointer' : 'cursor-default'}  ${STATUS_COLORS[status]} `}
-          variant="outline"
-        >
-          {STATUS_LABELS[status] ?? status}
-        </Badge>
+        <Button variant="ghost" disabled={disabled}>
+          <Badge
+            className={`min-w-[60px] justify-center ${!disabled ? 'cursor-pointer' : 'cursor-not-allowed'}  ${STATUS_COLORS[value]} `}
+            variant="outline"
+          >
+            {STATUS_LABELS[value] ?? value}
+          </Badge>
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="p-2 w-40">
         {Object.entries(STATUS_LABELS).map(([status, label]) => (

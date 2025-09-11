@@ -3,6 +3,7 @@
 import { TaskStatus } from '@/api/generated/taskProgressAPI.schemas';
 
 import { useTasks } from '@/context/useTasks';
+import { useUser } from '@/context/useUser';
 import type { FilterAccessLevel } from '@/pages/TaskPage';
 
 import { TaskCard } from './TaskCard';
@@ -14,6 +15,7 @@ interface TaskListProps {
 
 export const TaskList = ({ isExpandParent, viewMode }: TaskListProps) => {
   const { tasks, isLoading } = useTasks();
+  const { user } = useUser();
   // Filter out tasks with status SAVED
   const notSavedTasks = tasks.filter((task) => task.status !== TaskStatus.SAVED);
 
@@ -21,8 +23,10 @@ export const TaskList = ({ isExpandParent, viewMode }: TaskListProps) => {
   const filteredTasks = notSavedTasks.filter(
     (task) =>
       (task.user_access_level && viewMode[task.user_access_level]) ||
+      (task.created_by === user?.id && viewMode['OWNER']) ||
       (task.has_assigned_objective && viewMode['ASSIGNED'])
   );
+
   if (isLoading) return <div>Loading...</div>;
   return (
     <div className="space-y-4">
