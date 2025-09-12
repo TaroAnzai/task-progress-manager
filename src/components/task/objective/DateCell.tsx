@@ -1,20 +1,21 @@
 // src/components/task/objective/DateCell.tsx
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
-import { Input } from "@/components/ui/input";
+import { Input } from '@/components/ui/input';
 
 type DateCellProps = {
   value?: string | null;
   onSave: (newDate: string | undefined) => void;
   disabled?: boolean;
+  objective_id: number;
 };
 
-export const DateCell = ({ value, onSave, disabled }: DateCellProps) => {
-  const [inputValue, setInputValue] = useState(value ?? "");
+export const DateCell = ({ value, onSave, disabled, objective_id }: DateCellProps) => {
+  const [inputValue, setInputValue] = useState(value ?? '');
   const isFromCalender = useRef(true);
 
   useEffect(() => {
-    setInputValue(value ?? "");
+    setInputValue(value ?? '');
   }, [value]);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -26,7 +27,7 @@ export const DateCell = ({ value, onSave, disabled }: DateCellProps) => {
   // エンターキーが押されたときに値を検証して保存するハンドラ
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     isFromCalender.current = false;
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       setInputValue(inputValue);
       onSave(inputValue);
       (e.target as HTMLInputElement).blur();
@@ -34,16 +35,16 @@ export const DateCell = ({ value, onSave, disabled }: DateCellProps) => {
     }
   };
   const handleBlur = () => {
-    setInputValue(value ?? "");
+    setInputValue(value ?? '');
     isFromCalender.current = true;
   };
 
   return (
     <Input
-      id="due_date"
+      id={String(objective_id)}
       name="due_date"
       type="date"
-      value={inputValue || ""}
+      value={inputValue || ''}
       onChange={handleInputChange}
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}

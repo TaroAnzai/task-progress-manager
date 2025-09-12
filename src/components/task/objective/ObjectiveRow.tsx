@@ -176,7 +176,12 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
           <EditableCell value={title} onSave={handleTitleSave} disabled={!isCanUpdate} />
         </TableCell>
         <TableCell className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}>
-          <DateCell value={dueDate} onSave={handleDateSave} disabled={!isCanUpdate} />
+          <DateCell
+            value={dueDate}
+            onSave={handleDateSave}
+            disabled={!isCanUpdate}
+            objective_id={objective?.id}
+          />
         </TableCell>
         <TableCell className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}>
           <StatusBadgeCell value={status} onChange={handleStatusSave} disabled={!isCanUpdate} />
