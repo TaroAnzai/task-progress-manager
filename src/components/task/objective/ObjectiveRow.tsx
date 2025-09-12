@@ -147,7 +147,6 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
     }
   };
   useEffect(() => {
-    console.log('objective', objective?.id);
     if (objective) {
       setTitle(objective.title ?? '');
       setDueDate(objective.due_date ?? undefined);

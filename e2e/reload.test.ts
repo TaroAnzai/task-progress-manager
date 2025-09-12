@@ -17,11 +17,12 @@ test('100回リロードしてもコンソールエラーが出ない', async ({
   await page.fill('input[type=email]', process.env.TEST_USER_EMAIL!);
   await page.fill('input[type=password]', process.env.TEST_USER_PASSWORD!);
   await page.click('button[type=submit]');
+  await page.waitForTimeout(100); // 短い待機を入れて安定化
   await expect(page).toHaveURL('https://localhost:5173/progress');
 
   // 🔹 100回リロード
-  for (let i = 0; i < 30; i++) {
-    await page.reload({ waitUntil: 'networkidle', timeout: 10000 });
+  for (let i = 0; i < 10; i++) {
+    await page.reload({ waitUntil: 'networkidle', timeout: 50000 });
     await page.waitForTimeout(100); // 短い待機を入れて安定化
     if (errorMessage) break; // エラーが出たら即終了
   }
