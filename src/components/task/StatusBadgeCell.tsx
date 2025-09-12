@@ -1,6 +1,5 @@
 // src/components/task/StatusBadgeCell.tsx
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
@@ -45,28 +44,15 @@ export const StatusBadgeCell = ({ value, onChange, disabled = false }: Props) =>
   const statusLabel = STATUS_LABELS[currentStatus as StatusType] || String(currentStatus) || '不明';
   const statusColor = STATUS_COLORS[currentStatus as StatusType] || 'bg-muted';
 
-  // disabledの場合はPopoverを使わずに単純なBadgeを返す
-  if (disabled) {
-    return (
-      <Badge
-        className={`min-w-[60px] justify-center cursor-not-allowed ${statusColor}`}
-        variant="outline"
-      >
-        {statusLabel}
-      </Badge>
-    );
-  }
-
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" className="p-1 h-auto">
-          <Badge
-            className={`min-w-[60px] justify-center cursor-pointer ${statusColor}`}
-            variant="outline"
-          >
-            {statusLabel}
-          </Badge>
+        <Button
+          variant="outline"
+          className={`min-w-[80px] h-6 justify-center cursor-pointer ${statusColor}`}
+          disabled={disabled}
+        >
+          {statusLabel}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-2 w-40" align="center" side="bottom">
