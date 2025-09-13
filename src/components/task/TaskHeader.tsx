@@ -1,5 +1,4 @@
 // src/components/task/TaskHeader.tsx
-
 import { useEffect, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
@@ -15,7 +14,6 @@ import type {
   Task,
   TaskUpdateStatus as TaskUpdateStatusType,
 } from '@/api/generated/taskProgressAPI.schemas';
-import { TaskUpdateStatus } from '@/api/generated/taskProgressAPI.schemas';
 
 import { useAlertDialog } from '@/context/useAlertDialog';
 import { useTasks } from '@/context/useTasks';
@@ -29,46 +27,48 @@ interface TaskHeaderProps {
 
 export const TaskHeader = ({ task }: TaskHeaderProps) => {
   const qc = useQueryClient();
-  const { refetch: refetchTasks, can } = useTasks();
   const { openAlertDialog } = useAlertDialog();
-  const [status, setStatus] = useState<TaskUpdateStatusType>(
-    task.status ?? TaskUpdateStatus.UNDEFINED
-  );
+  const { can } = useTasks();
   const [isUpdateTask, setIsUpdateTask] = useState(false);
+
   const { mutate: updateTask } = usePutProgressTasksTaskId({
     mutation: {
-      onMutate: (variables) => {
-        if (variables.data.status) setStatus(variables.data.status);
-        const prevStatus = status;
-        return { prevStatus };
+      onMutate: async (variables) => {
+        await qc.cancelQueries({ queryKey: ['task', task.id] });
+        const prevTask = qc.getQueryData<Task>(['task', task.id]);
+
+        // 楽観的更新
+        qc.setQueryData<Task>(['task', task.id], {
+          ...task,
+          ...variables.data,
+        });
+
+        return { prevTask };
       },
-      onSuccess: () => {
-        toast.success('タスクを更新しました');
-        refetchTasks();
-        setStatus(status);
-        //     if (variables.data.status === TaskUpdateStatus.SAVED) {
-        const { queryKey } = getGetProgressTasksTaskIdQueryOptions(task.id);
-        qc.invalidateQueries({ queryKey });
-        //   }
-      },
-      onError: (error, _variables, context) => {
+      onError: (_err, _vars, context) => {
+        if (context?.prevTask) {
+          qc.setQueryData(['task', task.id], context.prevTask);
+        }
         openAlertDialog({
           title: 'Error',
-          description: error,
-          confirmText: '閉じる',
+          description: 'タスク更新に失敗しました',
+          confirmText: '閉じる',
           showCancel: false,
         });
-        if (!context?.prevStatus) return;
-        setStatus(context.prevStatus);
+      },
+      onSuccess: () => {
+        toast.success('ステータスを更新しました');
+      },
+      onSettled: () => {
+        const { queryKey } = getGetProgressTasksTaskIdQueryOptions(task.id);
+        qc.invalidateQueries({ queryKey });
+        qc.invalidateQueries({ queryKey: ['tasks'] });
       },
     },
   });
 
   const handleUpdateTaskStatus = (status: TaskUpdateStatusType) => {
-    const payload = {
-      status: status,
-    };
-    updateTask({ taskId: task.id, data: payload });
+    updateTask({ taskId: task.id, data: { status } });
   };
 
   const dueDateStr = task.due_date
@@ -78,11 +78,6 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
   useEffect(() => {
     setIsUpdateTask(can('task.update', task));
   }, [can, task]);
-  useEffect(() => {
-    if (task.status) {
-      setStatus(task.status);
-    }
-  }, [task.status]);
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 w-full">
@@ -101,7 +96,7 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
           [期限: {dueDateStr}]
         </span>
         <StatusBadgeCell
-          value={status}
+          value={task.status ?? 'UNDEFINED'}
           onChange={handleUpdateTaskStatus}
           disabled={!isUpdateTask}
         />

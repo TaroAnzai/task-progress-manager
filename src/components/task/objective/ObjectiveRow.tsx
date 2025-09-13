@@ -43,10 +43,9 @@ interface ObjectiveRowProps {
   onUpdate: (objId: number, updates: ObjectiveUpdate) => Promise<void>;
 }
 
-export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: ObjectiveRowProps) => {
+export const ObjectiveRow = ({ taskId, objective, onUpdate }: ObjectiveRowProps) => {
   const qc = useQueryClient();
   const { can } = useTasks();
-  const isNew = !objective;
   const [title, setTitle] = useState(objective?.title ?? '');
   const [dueDate, setDueDate] = useState(objective?.due_date ?? undefined);
   const [status, setStatus] = useState<StatusType>(objective?.status ?? ObjectiveStatus.UNDEFINED);
@@ -104,9 +103,7 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
   });
   const handleTitleSave = (newTitle: string) => {
     setTitle(newTitle);
-    if (isNew) {
-      onSaveNew({ task_id: taskId, title: newTitle, due_date: dueDate });
-    } else if (objective) {
+    if (objective) {
       onUpdate(objective.id, { title: newTitle });
     }
   };
@@ -152,106 +149,96 @@ export const ObjectiveRow = ({ taskId, objective, onSaveNew, onUpdate }: Objecti
       setDueDate(objective.due_date ?? undefined);
       setStatus(objective.status);
     }
-  }, [objective]);
+  }, []);
   useEffect(() => {
     if (!objective) return;
     setIsCanUpdate(can('objective.update', objective));
     setIsCanEditProgress(can('progress.update', objective));
   }, [can, objective]);
-  if (isNew) {
-    return (
-      <>
-        <TableCell className="w-8 px-2 py-2 select-none"></TableCell>
-        <TableCell className="px-3 py-2">
-          <EditableCell value={''} onSave={handleTitleSave} />
-        </TableCell>
-      </>
-    );
-  } else {
-    return (
-      <>
-        <TableCell
-          className={`w-xl px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}
+
+  if (!objective) return null;
+
+  return (
+    <>
+      <TableCell className={`w-xl px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}>
+        <EditableCell value={title} onSave={handleTitleSave} disabled={!isCanUpdate} />
+      </TableCell>
+      <TableCell className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}>
+        <DateCell
+          value={dueDate}
+          onSave={handleDateSave}
+          disabled={!isCanUpdate}
+          objective_id={objective?.id}
+        />
+      </TableCell>
+      <TableCell className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}>
+        <StatusBadgeCell value={status} onChange={handleStatusSave} disabled={!isCanUpdate} />
+      </TableCell>
+      <TableCell
+        className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}
+        onClick={() => setIsUserSelectModalOpen(isCanUpdate)}
+      >
+        {objective?.assigned_user_name ?? '-'}
+      </TableCell>
+      <TableCell
+        className={`px-3 py-2 ${isCanEditProgress ? '' : 'bg-gray-50 cursor-not-allowed'}`}
+      >
+        <EditableCell
+          value={latest_progress}
+          onSave={handleProgressSave}
+          disabled={!isCanEditProgress}
+        />
+      </TableCell>
+      <TableCell
+        className={`px-3 py-2 ${isCanEditProgress ? '' : 'bg-gray-50 cursor-not-allowed'}`}
+      >
+        {latest_report_date}
+      </TableCell>
+      <TableCell className="px-3 py-2">
+        <button
+          className="text-blue-600 hover:underline text-xs"
+          onClick={() => setIsProgressListModalOpen(true)}
         >
-          <EditableCell value={title} onSave={handleTitleSave} disabled={!isCanUpdate} />
-        </TableCell>
-        <TableCell className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}>
-          <DateCell
-            value={dueDate}
-            onSave={handleDateSave}
-            disabled={!isCanUpdate}
-            objective_id={objective?.id}
-          />
-        </TableCell>
-        <TableCell className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}>
-          <StatusBadgeCell value={status} onChange={handleStatusSave} disabled={!isCanUpdate} />
-        </TableCell>
-        <TableCell
-          className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}
-          onClick={() => setIsUserSelectModalOpen(isCanUpdate)}
+          <FileStack />
+        </button>
+      </TableCell>
+      <TableCell className="px-3 py-2">
+        <button
+          className="text-blue-600 hover:underline text-xs"
+          onClick={() => setIsRemainderSettingModalOpen(true)}
         >
-          {objective?.assigned_user_name ?? '-'}
-        </TableCell>
-        <TableCell
-          className={`px-3 py-2 ${isCanEditProgress ? '' : 'bg-gray-50 cursor-not-allowed'}`}
-        >
-          <EditableCell
-            value={latest_progress}
-            onSave={handleProgressSave}
-            disabled={!isCanEditProgress}
-          />
-        </TableCell>
-        <TableCell
-          className={`px-3 py-2 ${isCanEditProgress ? '' : 'bg-gray-50 cursor-not-allowed'}`}
-        >
-          {latest_report_date}
-        </TableCell>
-        <TableCell className="px-3 py-2">
-          <button
-            className="text-blue-600 hover:underline text-xs"
-            onClick={() => setIsProgressListModalOpen(true)}
-          >
-            <FileStack />
-          </button>
-        </TableCell>
-        <TableCell className="px-3 py-2">
-          <button
-            className="text-blue-600 hover:underline text-xs"
-            onClick={() => setIsRemainderSettingModalOpen(true)}
-          >
-            <Mail />
-          </button>
-        </TableCell>
-        <SingleUserSelectModal
-          taskId={taskId}
-          open={isUserSelectModalOpen}
-          onClose={() => setIsUserSelectModalOpen(false)}
-          onConfirm={(newUserId) => {
-            handleAssinedUserSave(newUserId.id);
+          <Mail />
+        </button>
+      </TableCell>
+      <SingleUserSelectModal
+        taskId={taskId}
+        open={isUserSelectModalOpen}
+        onClose={() => setIsUserSelectModalOpen(false)}
+        onConfirm={(newUserId) => {
+          handleAssinedUserSave(newUserId.id);
+        }}
+      />
+      {objective && (
+        <ProgressListModal
+          open={isProgressListModalOpen}
+          objective={objective}
+          onClose={() => {
+            setIsProgressListModalOpen(false);
+          }}
+          onDelete={(objective_id) => {
+            handleProgressDelete(objective_id);
           }}
         />
-        {objective && (
-          <ProgressListModal
-            open={isProgressListModalOpen}
-            objective={objective}
-            onClose={() => {
-              setIsProgressListModalOpen(false);
-            }}
-            onDelete={(objective_id) => {
-              handleProgressDelete(objective_id);
-            }}
-          />
-        )}
-        {objective && (
-          <ReminderSettingModal
-            open={isRemainderSettingModalOpen}
-            objective_id={objective.id}
-            onClose={() => {
-              setIsRemainderSettingModalOpen(false);
-            }}
-          />
-        )}
-      </>
-    );
-  }
+      )}
+      {objective && (
+        <ReminderSettingModal
+          open={isRemainderSettingModalOpen}
+          objective_id={objective.id}
+          onClose={() => {
+            setIsRemainderSettingModalOpen(false);
+          }}
+        />
+      )}
+    </>
+  );
 };

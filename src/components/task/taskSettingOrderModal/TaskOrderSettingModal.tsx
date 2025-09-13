@@ -1,8 +1,8 @@
 //src\components\task\taskSettingOrderModal\TaskOrderSettingModal.tsx
-import { useEffect, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { set } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -16,12 +16,17 @@ import {
 import { TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 import {
+  getGetProgressTasksQueryOptions,
   getGetProgressTasksTaskIdQueryOptions,
   useDeleteProgressTasksTaskId,
   usePostProgressTaskOrders,
   usePutProgressTasksTaskId,
 } from '@/api/generated/taskProgressAPI';
-import type { Task, TaskUpdateStatus } from '@/api/generated/taskProgressAPI.schemas';
+import type {
+  Task,
+  TaskListResponse,
+  TaskUpdateStatus,
+} from '@/api/generated/taskProgressAPI.schemas';
 
 import { DraggableRow, DraggableTable, DraggableTableBody } from '@/components/DraggableTable';
 
@@ -38,77 +43,85 @@ interface TaskSettingModalProps {
 
 export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) => {
   const qc = useQueryClient();
-  const { tasks, refetch: refetchTasks, can } = useTasks();
+  const { tasks, refetch: refetchTasks, setTasks, can } = useTasks();
   const { user } = useUser();
   const { openAlertDialog } = useAlertDialog();
-  const [items, setItems] = useState<Task[]>([]);
 
-  useEffect(() => {
-    if (tasks) {
-      setItems(tasks);
-    }
-  }, [tasks]);
-
+  // 並び替え
   const { mutate: postProgressTaskOrders } = usePostProgressTaskOrders({
     mutation: {
+      onMutate: (variables) => {
+        const prevTasks = tasks ?? [];
+        if (variables.data.task_ids) {
+          const newOrder = variables.data.task_ids;
+          const newTasks = prevTasks
+            .slice()
+            .sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
+
+          const { queryKey } = getGetProgressTasksQueryOptions();
+          setTasks(newTasks);
+          qc.setQueryData(queryKey, newTasks as TaskListResponse);
+        }
+        return { prevTasks };
+      },
       onSuccess: () => {
         toast.success('順序を更新しました');
-        refetchTasks();
       },
-      onError: (error) => {
-        openAlertDialog({
-          title: 'Error',
-          description: error,
-          confirmText: '閉じる',
-          showCancel: false,
-        });
+      onError: (_e, _v, ctx) => {
+        if (ctx?.prevTasks) {
+          const { queryKey } = getGetProgressTasksQueryOptions();
+          qc.setQueryData(queryKey, ctx.prevTasks as TaskListResponse);
+        }
       },
     },
   });
-  const { mutate: deleteProgressTasksTaskId } = useDeleteProgressTasksTaskId({
-    mutation: {
-      onSuccess: () => {
-        toast.success('タスクを削除しました');
-        refetchTasks();
-      },
-      onError: (error) => {
-        openAlertDialog({
-          title: 'Error',
-          description: error,
-          confirmText: '閉じる',
-          showCancel: false,
-        });
-      },
-    },
-  });
+
+  // ステータス変更
   const { mutate: updateTask } = usePutProgressTasksTaskId({
     mutation: {
       onMutate: (variables) => {
-        const prevTasks = items;
-        const prevTaskData = items.find((item) => item.id === variables.taskId);
-        if (!prevTaskData) return { prevTasks };
-        const changedTaskData = { ...prevTaskData, ...variables.data };
-        const newTasks = items.map((task) =>
-          task.id === variables.taskId ? changedTaskData : task
-        );
-        setItems(newTasks);
+        const prevTasks = tasks ?? [];
+        const { taskId, data } = variables;
+        const newTasks = prevTasks.map((t) => (t.id === taskId ? { ...t, ...data } : t));
+
+        const { queryKey } = getGetProgressTasksQueryOptions();
+        qc.setQueryData(queryKey, newTasks as TaskListResponse);
         return { prevTasks };
       },
-      onSuccess: (_data, variables) => {
+      onSuccess: () => {
         toast.success('タスクを更新しました');
-        const { queryKey } = getGetProgressTasksTaskIdQueryOptions(variables.taskId);
+        const { queryKey } = getGetProgressTasksQueryOptions();
         qc.invalidateQueries({ queryKey });
-        refetchTasks();
       },
-      onError: (error, _variables, context) => {
-        openAlertDialog({
-          title: 'Error',
-          description: error,
-          confirmText: '閉じる',
-          showCancel: false,
-        });
-        if (context?.prevTasks) {
-          setItems(context.prevTasks);
+      onError: (_e, _v, ctx) => {
+        if (ctx?.prevTasks) {
+          const { queryKey } = getGetProgressTasksQueryOptions();
+          qc.setQueryData(queryKey, ctx.prevTasks as TaskListResponse);
+        }
+      },
+    },
+  });
+
+  // 削除
+  const { mutate: deleteProgressTasksTaskId } = useDeleteProgressTasksTaskId({
+    mutation: {
+      onMutate: (variables) => {
+        const prevTasks = tasks ?? [];
+        const newTasks = prevTasks.filter((t) => t.id !== variables.taskId);
+
+        const { queryKey } = getGetProgressTasksQueryOptions();
+        qc.setQueryData(queryKey, newTasks as TaskListResponse);
+        return { prevTasks };
+      },
+      onSuccess: () => {
+        toast.success('タスクを削除しました');
+        const { queryKey } = getGetProgressTasksQueryOptions();
+        qc.invalidateQueries({ queryKey });
+      },
+      onError: (_e, _v, ctx) => {
+        if (ctx?.prevTasks) {
+          const { queryKey } = getGetProgressTasksQueryOptions();
+          qc.setQueryData(queryKey, ctx.prevTasks as TaskListResponse);
         }
       },
     },
@@ -141,23 +154,17 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
         </DialogHeader>
 
         <DraggableTable
-          items={items}
+          items={tasks ?? []}
           getId={(item) => item.id}
           useGrabHandle={true}
-          onReorder={handleRender}
+          onReorder={(newItems) => {
+            if (!user) return;
+            const newTasksArray = newItems.map((task) => task.id);
+            postProgressTaskOrders({ data: { task_ids: newTasksArray, user_id: user.id } });
+          }}
         >
-          <TableHeader className="sticky top-0 z-10 bg-white">
-            <TableRow>
-              <TableHead className="">タスク名</TableHead>
-              <TableHead className="w-[100px] text-center">作成者</TableHead>
-              <TableHead className="w-[100px] text-center">期限</TableHead>
-              <TableHead className="w-[100px] text-center">ステータス</TableHead>
-              <TableHead className="w-[100px] text-center">アクセス権限</TableHead>
-              <TableHead className="w-[70px] text-center">削除</TableHead>
-            </TableRow>
-          </TableHeader>
           <DraggableTableBody>
-            {items?.map((task) => (
+            {tasks?.map((task) => (
               <DraggableRow key={task.id} id={task.id}>
                 <TableCell className="max-w-xs truncate">{task.title}</TableCell>
                 <TableCell>{task.create_user_name}</TableCell>
@@ -165,9 +172,7 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
                 <TableCell className="text-center">
                   <StatusBadgeCell
                     value={task.status ?? 'UNDEFINED'}
-                    onChange={(newStatus) => {
-                      handleUpdateTaskStatus(task.id, newStatus);
-                    }}
+                    onChange={(newStatus) => handleUpdateTaskStatus(task.id, newStatus)}
                     disabled={!can('task.update', task)}
                   />
                 </TableCell>
@@ -176,7 +181,11 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
                 </TableCell>
                 <TableCell className="text-center">
                   {can('task.delete', task) && (
-                    <Button variant="destructive" size="sm" onClick={() => handleDerete(task.id)}>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => deleteProgressTasksTaskId({ taskId: task.id })}
+                    >
                       削除
                     </Button>
                   )}

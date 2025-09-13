@@ -29,7 +29,9 @@ import { extractErrorMessage } from '@/utils/errorHandler';
 import { useTasks } from '@/context/useTasks';
 import { useUser } from '@/context/useUser';
 
+import { NewObjectiveRow } from './objective/NewObjectiveRow';
 import { ObjectiveRow } from './objective/ObjectiveRow';
+
 interface ObjectiveTableProps {
   taskId: number;
 }
@@ -43,11 +45,7 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
     isLoading,
     refetch: refetchObjectives,
   } = useGetProgressObjectivesTasksTaskId(taskId);
-  const [objectives, setObjectives] = useState<Objective[]>(data?.objectives ?? []);
-
-  useEffect(() => {
-    if (data?.objectives) setObjectives(data.objectives);
-  }, [data?.objectives]);
+  console.log('TaskID', taskId);
 
   //新規登録関数
   const { mutate: postObjective } = usePostProgressObjectives({
@@ -72,12 +70,17 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
         );
         if (!previousData?.objectives) return { previousData };
         //楽観的更新
-        const optimisticObjective: Objective[] = previousData.objectives.map((obj) =>
+        const optimisticObjectives: Objective[] = previousData.objectives.map((obj) =>
           obj.id === variables.objectiveId ? { ...obj, ...variables.data } : obj
         );
-        if (!optimisticObjective) return { previousData };
-        setObjectives(optimisticObjective);
-        qc.setQueryData(getGetProgressObjectivesTasksTaskIdQueryKey(taskId), optimisticObjective);
+        if (!optimisticObjectives) return { previousData };
+        qc.setQueryData(
+          getGetProgressObjectivesTasksTaskIdQueryKey(taskId),
+          (old: ObjectivesList | undefined) =>
+            old
+              ? { ...old, objectives: optimisticObjectives }
+              : { objectives: optimisticObjectives }
+        );
         return { previousData };
       },
       onSuccess: () => {
@@ -88,25 +91,77 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
         const err = extractErrorMessage(e);
         console.error(`Objectiveの更新に失敗しました`, e);
         toast.error('Objective更新に失敗しました', { description: err });
-        setObjectives(context?.previousData?.objectives ?? []);
+        if (context?.previousData) {
+          qc.setQueryData(
+            getGetProgressObjectivesTasksTaskIdQueryKey(taskId),
+            context.previousData
+          );
+        }
       },
     },
   });
 
-  //オブジェクトの並び登録関数
+  // ✅ 並び順更新：楽観的更新を追加
   const { mutate: postObjectivesOrderMutation } = usePostProgressTasksTaskIdObjectivesOrder({
     mutation: {
+      // ドロップ直後に即UI反映
+      onMutate: async (variables) => {
+        const queryKey = getGetProgressObjectivesTasksTaskIdQueryKey(taskId);
+        await qc.cancelQueries({ queryKey });
+
+        const previousData = qc.getQueryData<ObjectivesList | undefined>(queryKey);
+
+        // 既存キャッシュが無ければ何もしない
+        if (!previousData?.objectives) {
+          return { previousData, queryKey };
+        }
+
+        // ① 既存オブジェクトをID→オブジェクトのMapに
+        const byId = new Map(previousData.objectives.map((o) => [o.id, o]));
+
+        // ② 受け取った order に従って並べ替え（存在しないIDは除外）
+        const order = variables.data?.order ?? [];
+        const reordered: Objective[] = order
+          .map((id) => byId.get(id))
+          .filter((o): o is Objective => !!o);
+
+        // ③ 万一 order に含まれない要素があれば末尾に付ける（保険）
+        if (reordered.length < previousData.objectives.length) {
+          const missing = previousData.objectives.filter((o) => !order.includes(o.id));
+          reordered.push(...missing);
+        }
+
+        // ④ キャッシュを ObjectivesList 形式で上書き（ここが重要！）
+        qc.setQueryData(queryKey, (old: ObjectivesList | undefined) =>
+          old ? { ...old, objectives: reordered } : { objectives: reordered }
+        );
+
+        // ロールバック用
+        return { previousData, queryKey };
+      },
+
+      // 失敗時は元に戻す
+      onError: (_err, _vars, ctx) => {
+        if (ctx?.previousData) {
+          qc.setQueryData(ctx.queryKey, ctx.previousData);
+        }
+        toast.error('順序更新に失敗しました');
+      },
+
+      // 成功時のトースト
       onSuccess: () => {
         toast.success('順序を更新しました');
-        refetchObjectives();
       },
-      onError: (e) => {
-        const err = extractErrorMessage(e);
-        toast.error('順序更新に失敗しました', { description: err });
-        refetchObjectives(); //登録失敗時に元の並びに戻す
+
+      // 最終的にサーバー真実と同期（UIは既に並び替わっている）
+      onSettled: (_d, _e, _v, ctx) => {
+        if (ctx?.queryKey) {
+          qc.invalidateQueries({ queryKey: ctx.queryKey });
+        }
       },
     },
   });
+
   //早期リターン
   if (!user) return;
   if (isLoading) {
@@ -145,14 +200,13 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
   // ドロップ時の並べ替え
   const handleRender = (newObj: Objective[]) => {
     const newObjectives = newObj.map((o) => o.id);
-    setObjectives(newObj);
     postObjectivesOrderMutation({ taskId: taskId, data: { order: newObjectives } });
   };
-
+  if (!data?.objectives) return null;
   return (
     <div className="overflow-x-auto">
       <DraggableTable
-        items={objectives}
+        items={data.objectives}
         getId={(item) => item.id}
         useGrabHandle={true}
         onReorder={handleRender}
@@ -171,7 +225,7 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
           </TableRow>
         </TableHeader>
         <DraggableTableBody>
-          {objectives
+          {data.objectives
             .filter((task) => task.status !== ObjectiveStatus.SAVED)
             .map((obj) => (
               <DraggableRow
@@ -191,13 +245,7 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
           {/* 常に表示される新規入力行 */}
           {can('objective.create', { taskId: taskId }) && (
             <TableRow>
-              <ObjectiveRow
-                key="new"
-                taskId={taskId}
-                objective={null}
-                onSaveNew={handleSaveNew}
-                onUpdate={handleUpdate}
-              />
+              <NewObjectiveRow key="new" taskId={taskId} onSaveNew={handleSaveNew} />
             </TableRow>
           )}
         </DraggableTableBody>

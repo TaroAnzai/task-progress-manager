@@ -1,5 +1,7 @@
 // src/components/task/StatusBadgeCell.tsx
 
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
@@ -33,19 +35,21 @@ type Props = {
 };
 
 export const StatusBadgeCell = ({ value, onChange, disabled = false }: Props) => {
+  const [open, setOpen] = useState(false);
+
   const handleSelect = (status: updateStatusType) => {
     if (onChange) {
       onChange(status);
     }
+    setOpen(false); // ✅ 選択後に閉じる
   };
 
-  // valueがnullやundefinedの場合のフォールバック
   const currentStatus = value || 'UNDEFINED';
   const statusLabel = STATUS_LABELS[currentStatus as StatusType] || String(currentStatus) || '不明';
   const statusColor = STATUS_COLORS[currentStatus as StatusType] || 'bg-muted';
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"

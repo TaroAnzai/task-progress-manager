@@ -1,24 +1,28 @@
-import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { useGetProgressTasks } from "@/api/generated/taskProgressAPI";
-import type { Objective, Task, TaskListResponse } from "@/api/generated/taskProgressAPI.schemas";
+import { useGetProgressTasks } from '@/api/generated/taskProgressAPI';
+import type { Objective, Task, TaskListResponse } from '@/api/generated/taskProgressAPI.schemas';
 
 import { can as rawCan, type LevelResolver } from '@/acl/can';
 import type { AccessLevel, Action } from '@/acl/policy';
-import { useUser } from "@/context/useUser";
+import { useUser } from '@/context/useUser';
 
-import { TaskContext } from "./TaskContextBase";
-type Subject = Task | Objective | { taskId: number }
+import { TaskContext } from './TaskContextBase';
+type Subject = Task | Objective | { taskId: number };
 export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useUser();
   const currentUserId = user?.id;
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { data, isLoading: loading, isFetching, refetch } =
-    useGetProgressTasks<TaskListResponse>({
-      query: { enabled: !!user?.id }, // ログイン後に実行
-    });
+  const {
+    data,
+    isLoading: loading,
+    isFetching,
+    refetch,
+  } = useGetProgressTasks<TaskListResponse>({
+    query: { enabled: !!user?.id }, // ログイン後に実行
+  });
 
   useEffect(() => {
     setIsLoading(loading || isFetching || !user?.id);
@@ -37,7 +41,10 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     return m;
   }, [tasks]);
 
-  const levelOf: LevelResolver = useCallback((taskId: number) => accessMap.get(taskId), [accessMap]);
+  const levelOf: LevelResolver = useCallback(
+    (taskId: number) => accessMap.get(taskId),
+    [accessMap]
+  );
   const can = useCallback(
     (action: Action, subject: Subject) => rawCan(action, subject, levelOf, currentUserId),
     [levelOf, currentUserId]
@@ -52,8 +59,10 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   );
 
   return (
-    <TaskContext.Provider value={{ tasks, isLoading, refetch, setTasks, levelOf, can, getDisabledProps }}>
+    <TaskContext.Provider
+      value={{ tasks, isLoading, refetch, setTasks, levelOf, can, getDisabledProps }}
+    >
       {children}
     </TaskContext.Provider>
   );
-}
+};

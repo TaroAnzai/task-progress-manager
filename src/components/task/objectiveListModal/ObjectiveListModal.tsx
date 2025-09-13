@@ -46,7 +46,7 @@ export const ObjectiveListModal = ({ open, task, canUpdate, onClose }: Objective
   const qc = useQueryClient();
   const { openAlertDialog } = useAlertDialog();
 
-  const { data, isLoading } = useGetProgressObjectivesTasksTaskId(task.id);
+  const { data } = useGetProgressObjectivesTasksTaskId(task.id);
   const { mutate: updateObjective } = usePutProgressObjectivesObjectiveId({
     mutation: {
       onSuccess: () => {
@@ -89,12 +89,6 @@ export const ObjectiveListModal = ({ open, task, canUpdate, onClose }: Objective
     deleteObjective({ objectiveId: objective_id });
   };
 
-  if (isLoading) {
-    return <div>loading...</div>;
-  }
-  if (!data?.objectives) {
-    return <div>no objectives</div>;
-  }
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
@@ -113,7 +107,7 @@ export const ObjectiveListModal = ({ open, task, canUpdate, onClose }: Objective
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.objectives.map((obj: Objective) => (
+            {data?.objectives?.map((obj: Objective) => (
               <TableRow key={obj.id}>
                 <TableCell className="font-medium">{obj.title}</TableCell>
                 <TableCell className="text-center">{obj.due_date}</TableCell>
