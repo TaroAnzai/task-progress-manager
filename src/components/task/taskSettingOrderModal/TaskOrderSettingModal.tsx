@@ -2,7 +2,6 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { set } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -13,11 +12,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TableCell } from '@/components/ui/table';
 
 import {
   getGetProgressTasksQueryOptions,
-  getGetProgressTasksTaskIdQueryOptions,
   useDeleteProgressTasksTaskId,
   usePostProgressTaskOrders,
   usePutProgressTasksTaskId,
@@ -31,7 +29,6 @@ import type {
 import { DraggableRow, DraggableTable, DraggableTableBody } from '@/components/DraggableTable';
 
 import { SCOPE_LABELS } from '@/context/roleLabels';
-import { useAlertDialog } from '@/context/useAlertDialog';
 import { useTasks } from '@/context/useTasks';
 import { useUser } from '@/context/useUser';
 
@@ -43,9 +40,8 @@ interface TaskSettingModalProps {
 
 export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) => {
   const qc = useQueryClient();
-  const { tasks, refetch: refetchTasks, setTasks, can } = useTasks();
+  const { tasks, can } = useTasks();
   const { user } = useUser();
-  const { openAlertDialog } = useAlertDialog();
 
   // 並び替え
   const { mutate: postProgressTaskOrders } = usePostProgressTaskOrders({
@@ -59,7 +55,6 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
             .sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
 
           const { queryKey } = getGetProgressTasksQueryOptions();
-          setTasks(newTasks);
           qc.setQueryData(queryKey, newTasks as TaskListResponse);
         }
         return { prevTasks };
@@ -135,7 +130,6 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
   };
 
   const handleRender = (items: Task[]) => {
-    setItems(items);
     if (!user) return;
     const newTasksArray = items.map((task) => task.id);
     postProgressTaskOrders({ data: { task_ids: newTasksArray, user_id: user.id } });
@@ -159,8 +153,7 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
           useGrabHandle={true}
           onReorder={(newItems) => {
             if (!user) return;
-            const newTasksArray = newItems.map((task) => task.id);
-            postProgressTaskOrders({ data: { task_ids: newTasksArray, user_id: user.id } });
+            handleRender(newItems);
           }}
         >
           <DraggableTableBody>
@@ -181,11 +174,7 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
                 </TableCell>
                 <TableCell className="text-center">
                   {can('task.delete', task) && (
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => deleteProgressTasksTaskId({ taskId: task.id })}
-                    >
+                    <Button variant="destructive" size="sm" onClick={() => handleDerete(task.id)}>
                       削除
                     </Button>
                   )}
