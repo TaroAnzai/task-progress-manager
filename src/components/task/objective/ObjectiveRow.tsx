@@ -152,6 +152,7 @@ export const ObjectiveRow = ({ taskId, objective, onUpdate }: ObjectiveRowProps)
       setDueDate(objective.due_date ?? undefined);
       setStatus(objective.status);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
     if (!objective) return;
