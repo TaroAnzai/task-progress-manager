@@ -55,18 +55,23 @@ export const TaskSettingsIcon = ({ task, isUpdateTask }: TaskSettingsIconProps) 
       </DropdownMenu>
 
       {/* 設定モーダル */}
-      <TaskSettingModal open={openSetting} task={task} onClose={() => setOpenSetting(false)} />
-
+      {openSetting && (
+        <TaskSettingModal open={openSetting} task={task} onClose={() => setOpenSetting(false)} />
+      )}
       {/* スコープ設定モーダル */}
-      <TaskScopeModal open={openScope} task={task} onClose={() => setOpenScope(false)} />
+      {openScope && (
+        <TaskScopeModal open={openScope} task={task} onClose={() => setOpenScope(false)} />
+      )}
 
       {/* オブジェクティブ一覧モーダル */}
-      <ObjectiveListModal
-        open={openObjectiveModal}
-        task={task}
-        onClose={() => setOpenObjectiveModal(false)}
-        canUpdate={isUpdateTask}
-      />
+      {openObjectiveModal && (
+        <ObjectiveListModal
+          open={openObjectiveModal}
+          task={task}
+          onClose={() => setOpenObjectiveModal(false)}
+          canUpdate={isUpdateTask}
+        />
+      )}
     </>
   );
 };

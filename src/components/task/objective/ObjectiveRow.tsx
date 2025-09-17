@@ -59,6 +59,9 @@ export const ObjectiveRow = ({ taskId, objective, onUpdate }: ObjectiveRowProps)
     objective?.id ?? 0,
     { query: { enabled: !!objective } }
   );
+  // const data = { detail: '', report_date: '' };
+  // const refetchLatestProgress = () => {};
+
   const latest_progress = data?.detail ?? '';
   const latest_report_date = data?.report_date ?? '';
   const { mutate: postProgressMutation } = usePostProgressUpdatesObjectiveId({

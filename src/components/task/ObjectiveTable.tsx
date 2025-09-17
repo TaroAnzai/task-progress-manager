@@ -44,7 +44,6 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
     isLoading,
     refetch: refetchObjectives,
   } = useGetProgressObjectivesTasksTaskId(taskId);
-  console.log('TaskID', taskId);
 
   //新規登録関数
   const { mutate: postObjective } = usePostProgressObjectives({
