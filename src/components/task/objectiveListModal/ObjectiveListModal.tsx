@@ -85,7 +85,6 @@ export const ObjectiveListModal = ({ open, task, canUpdate, onClose }: Objective
     updateObjective({ objectiveId: objId, data: { status: newStatus } });
   };
   const handleDeleteObjective = (objective_id: number) => {
-    console.log('handleDeleteObjective', objective_id);
     deleteObjective({ objectiveId: objective_id });
   };
 

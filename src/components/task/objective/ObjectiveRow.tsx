@@ -1,5 +1,5 @@
 // src/components/task/ObjectiveRow.tsx
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { FileStack, Mail } from 'lucide-react';
@@ -19,10 +19,6 @@ import type {
   ObjectiveUpdate,
   ObjectiveUpdateStatus as updateStatusType,
   ProgressInput,
-} from '@/api/generated/taskProgressAPI.schemas';
-import {
-  ObjectiveStatus,
-  ProgressStatus as StatusType,
 } from '@/api/generated/taskProgressAPI.schemas';
 
 import { useAlertDialog } from '@/context/useAlertDialog';
@@ -46,24 +42,15 @@ interface ObjectiveRowProps {
 export const ObjectiveRow = ({ taskId, objective, onUpdate }: ObjectiveRowProps) => {
   const qc = useQueryClient();
   const { can } = useTasks();
-  const [title, setTitle] = useState(objective?.title ?? '');
-  const [dueDate, setDueDate] = useState(objective?.due_date ?? undefined);
-  const [status, setStatus] = useState<StatusType>(objective?.status ?? ObjectiveStatus.UNDEFINED);
   const [isUserSelectModalOpen, setIsUserSelectModalOpen] = useState(false);
   const [isProgressListModalOpen, setIsProgressListModalOpen] = useState(false);
   const [isRemainderSettingModalOpen, setIsRemainderSettingModalOpen] = useState(false);
-  const [isCanUpdate, setIsCanUpdate] = useState(false);
-  const [isCanEditProgress, setIsCanEditProgress] = useState(false);
   const { openAlertDialog } = useAlertDialog();
   const { data, refetch: refetchLatestProgress } = useGetProgressUpdatesObjectiveIdLatestProgress(
     objective?.id ?? 0,
     { query: { enabled: !!objective } }
   );
-  // const data = { detail: '', report_date: '' };
-  // const refetchLatestProgress = () => {};
 
-  const latest_progress = data?.detail ?? '';
-  const latest_report_date = data?.report_date ?? '';
   const { mutate: postProgressMutation } = usePostProgressUpdatesObjectiveId({
     mutation: {
       onSuccess: (_data, variables) => {
@@ -105,21 +92,17 @@ export const ObjectiveRow = ({ taskId, objective, onUpdate }: ObjectiveRowProps)
     },
   });
   const handleTitleSave = (newTitle: string) => {
-    setTitle(newTitle);
     if (objective) {
       onUpdate(objective.id, { title: newTitle });
     }
   };
 
   const handleDateSave = (newDate: string | undefined) => {
-    setDueDate(newDate);
     if (objective) {
       onUpdate(objective.id, { due_date: newDate });
     }
   };
   const handleStatusSave = (newStatus: updateStatusType) => {
-    const status = newStatus ?? StatusType.UNDEFINED;
-    setStatus(status);
     if (objective) {
       onUpdate(objective.id, { status: newStatus });
     }
@@ -146,37 +129,36 @@ export const ObjectiveRow = ({ taskId, objective, onUpdate }: ObjectiveRowProps)
       deleteProgressMutation({ progressId: progressId });
     }
   };
-  useEffect(() => {
-    if (objective) {
-      setTitle(objective.title ?? '');
-      setDueDate(objective.due_date ?? undefined);
-      setStatus(objective.status);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  useEffect(() => {
-    if (!objective) return;
-    setIsCanUpdate(can('objective.update', objective));
-    setIsCanEditProgress(can('progress.update', objective));
-  }, [can, objective]);
 
   if (!objective) return null;
+  const latest_progress = data?.detail ?? '';
+  const latest_report_date = data?.report_date ?? '';
+  const isCanUpdate = can('objective.update', objective);
+  const isCanEditProgress = can('progress.update', objective);
 
   return (
     <>
       <TableCell className={`w-xl px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}>
-        <EditableCell value={title} onSave={handleTitleSave} disabled={!isCanUpdate} />
+        <EditableCell
+          value={objective.title ?? ''}
+          onSave={handleTitleSave}
+          disabled={!isCanUpdate}
+        />
       </TableCell>
       <TableCell className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}>
         <DateCell
-          value={dueDate}
+          value={objective.due_date ?? undefined}
           onSave={handleDateSave}
           disabled={!isCanUpdate}
           objective_id={objective?.id}
         />
       </TableCell>
       <TableCell className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}>
-        <StatusBadgeCell value={status} onChange={handleStatusSave} disabled={!isCanUpdate} />
+        <StatusBadgeCell
+          value={objective.status}
+          onChange={handleStatusSave}
+          disabled={!isCanUpdate}
+        />
       </TableCell>
       <TableCell
         className={`px-3 py-2 ${isCanUpdate ? '' : 'bg-gray-50 cursor-not-allowed'}`}
