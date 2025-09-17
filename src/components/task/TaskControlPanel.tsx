@@ -111,13 +111,18 @@ export const TaskControlPanel = ({
           </Button>
         </div>
       </div>
-      <NewTaskModal open={newTaskModalOpen} onClose={() => setNewTaskModalOpen(false)} />
-      <TaskOrderSettingModal
-        open={taskOrderModalOpen}
-        onClose={() => {
-          setTaskOrderModalOpen(false);
-        }}
-      />
+      {newTaskModalOpen && (
+        <NewTaskModal open={newTaskModalOpen} onClose={() => setNewTaskModalOpen(false)} />
+      )}
+      {taskOrderModalOpen && (
+        <TaskOrderSettingModal
+          open={taskOrderModalOpen}
+          onClose={() => {
+            setTaskOrderModalOpen(false);
+          }}
+        />
+      )}
+
       <TestModal
         open={testModalOpen}
         onClose={() => {

@@ -1,5 +1,7 @@
 // src/components/task/TaskList.tsx
 
+import { ClipLoader } from 'react-spinners';
+
 import { TaskStatus } from '@/api/generated/taskProgressAPI.schemas';
 
 import { useTasks } from '@/context/useTasks';
@@ -27,7 +29,13 @@ export const TaskList = ({ isExpandParent, viewMode }: TaskListProps) => {
       (task.has_assigned_objective && viewMode['ASSIGNED'])
   );
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full w-full">
+        <ClipLoader color="#36d7b7" size={100} />
+      </div>
+    );
+  }
   return (
     <div className="space-y-4">
       {filteredTasks.map((task) => (
