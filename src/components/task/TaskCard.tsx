@@ -10,7 +10,7 @@ import { ObjectiveTable } from './ObjectiveTable';
 import { TaskHeader } from './TaskHeader';
 interface TaskCardProps {
   taskId: number;
-  isExpandParent?: boolean
+  isExpandParent?: boolean;
 }
 
 const storageKey = (id: number) => `objective_visibility_${id}`;
@@ -21,7 +21,6 @@ export const TaskCard = ({ taskId, isExpandParent }: TaskCardProps) => {
     return s ? JSON.parse(s) : true;
   }, [taskId]);
 
-
   const toggle = () => setAndStore(!isExpand);
 
   const [isExpand, setIsExpand] = useState<boolean>(initial);
@@ -31,7 +30,7 @@ export const TaskCard = ({ taskId, isExpandParent }: TaskCardProps) => {
   };
 
   useEffect(() => {
-    if (typeof isExpandParent === "boolean" && isExpand !== isExpandParent) {
+    if (typeof isExpandParent === 'boolean' && isExpand !== isExpandParent) {
       setAndStore(isExpandParent);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -43,20 +42,14 @@ export const TaskCard = ({ taskId, isExpandParent }: TaskCardProps) => {
       <div className="flex items-start justify-between px-4 py-2 border-b">
         <TaskHeader task={task} />
         <div className="h-9 flex items-center">
-          <button
-            onClick={toggle}
-            className="text-sm text-blue-600 hover:underline"
-          >
+          <button onClick={toggle} className="text-sm text-blue-600 hover:underline">
             {isExpand ? <Minus className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
           </button>
         </div>
-
       </div>
-      <div className={`px-4 py-2" ${isExpand ? "block" : "hidden"}`} >
+      <div className={`px-4 py-2" ${isExpand ? 'block' : 'hidden'}`}>
         <ObjectiveTable taskId={taskId} />
       </div>
     </div>
   );
 };
-
-

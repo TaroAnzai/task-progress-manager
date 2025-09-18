@@ -2,7 +2,7 @@
 
 import { ClipLoader } from 'react-spinners';
 
-import { TaskStatus } from '@/api/generated/taskProgressAPI.schemas';
+import { type Task, TaskStatus } from '@/api/generated/taskProgressAPI.schemas';
 
 import { useTasks } from '@/context/useTasks';
 import { useUser } from '@/context/useUser';
@@ -16,10 +16,11 @@ interface TaskListProps {
 }
 
 export const TaskList = ({ isExpandParent, viewMode }: TaskListProps) => {
-  const { tasks, isLoading } = useTasks();
+  const { tasks: taskList, isLoading } = useTasks();
   const { user } = useUser();
   // Filter out tasks with status SAVED
-  const notSavedTasks = tasks.filter((task) => task.status !== TaskStatus.SAVED);
+  const tasks = taskList ? (taskList as Task[]) : [];
+  const notSavedTasks = tasks?.filter((task) => task.status !== TaskStatus.SAVED);
 
   // Further filter tasks based on user access level
   const filteredTasks = notSavedTasks.filter(

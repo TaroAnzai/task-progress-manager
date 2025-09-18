@@ -59,7 +59,15 @@ export const StatusBadgeCell = ({ value, onChange, disabled = false }: Props) =>
           {statusLabel}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-2 w-40" align="center" side="bottom">
+      <PopoverContent
+        className="p-2 w-40"
+        align="center"
+        side="bottom"
+        onCloseAutoFocus={(e) => {
+          e.preventDefault(); // デフォルトのフォーカス戻しを無効化
+          document.getElementById('status-trigger')?.focus(); // 自分で制御
+        }}
+      >
         {Object.entries(STATUS_LABELS).map(([status, label]) => (
           <Button
             key={status}

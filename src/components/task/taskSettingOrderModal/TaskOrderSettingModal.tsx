@@ -18,7 +18,6 @@ import {
   getGetProgressTasksQueryOptions,
   useDeleteProgressTasksTaskId,
   usePostProgressTaskOrders,
-  usePutProgressTasksTaskId,
 } from '@/api/generated/taskProgressAPI';
 import type {
   Task,
@@ -40,7 +39,7 @@ interface TaskSettingModalProps {
 
 export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) => {
   const qc = useQueryClient();
-  const { tasks, can } = useTasks();
+  const { tasks, can, updateTask } = useTasks();
   const { user } = useUser();
 
   // 並び替え
@@ -61,32 +60,6 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
       },
       onSuccess: () => {
         toast.success('順序を更新しました');
-      },
-      onError: (_e, _v, ctx) => {
-        if (ctx?.prevTasks) {
-          const { queryKey } = getGetProgressTasksQueryOptions();
-          qc.setQueryData(queryKey, ctx.prevTasks as TaskListResponse);
-        }
-      },
-    },
-  });
-
-  // ステータス変更
-  const { mutate: updateTask } = usePutProgressTasksTaskId({
-    mutation: {
-      onMutate: (variables) => {
-        const prevTasks = tasks ?? [];
-        const { taskId, data } = variables;
-        const newTasks = prevTasks.map((t) => (t.id === taskId ? { ...t, ...data } : t));
-
-        const { queryKey } = getGetProgressTasksQueryOptions();
-        qc.setQueryData(queryKey, newTasks as TaskListResponse);
-        return { prevTasks };
-      },
-      onSuccess: () => {
-        toast.success('タスクを更新しました');
-        const { queryKey } = getGetProgressTasksQueryOptions();
-        qc.invalidateQueries({ queryKey });
       },
       onError: (_e, _v, ctx) => {
         if (ctx?.prevTasks) {
@@ -126,7 +99,7 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
     const payload = {
       status: status,
     };
-    updateTask({ taskId: task_id, data: payload });
+    updateTask(task_id, payload);
   };
 
   const handleRender = (items: Task[]) => {

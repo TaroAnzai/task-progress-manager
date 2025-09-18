@@ -1,21 +1,14 @@
 // src/components/task/TaskHeader.tsx
 import { useEffect, useState } from 'react';
 
-import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { toast } from 'sonner';
 
-import {
-  getGetProgressTasksTaskIdQueryOptions,
-  usePutProgressTasksTaskId,
-} from '@/api/generated/taskProgressAPI';
 import type {
   Task,
   TaskUpdateStatus as TaskUpdateStatusType,
 } from '@/api/generated/taskProgressAPI.schemas';
 
-import { useAlertDialog } from '@/context/useAlertDialog';
 import { useTasks } from '@/context/useTasks';
 
 import { StatusBadgeCell } from './StatusBadgeCell';
@@ -26,49 +19,11 @@ interface TaskHeaderProps {
 }
 
 export const TaskHeader = ({ task }: TaskHeaderProps) => {
-  const qc = useQueryClient();
-  const { openAlertDialog } = useAlertDialog();
-  const { can } = useTasks();
+  const { can, updateTask } = useTasks();
   const [isUpdateTask, setIsUpdateTask] = useState(false);
 
-  const { mutate: updateTask } = usePutProgressTasksTaskId({
-    mutation: {
-      onMutate: async (variables) => {
-        await qc.cancelQueries({ queryKey: ['task', task.id] });
-        const prevTask = qc.getQueryData<Task>(['task', task.id]);
-
-        // 楽観的更新
-        qc.setQueryData<Task>(['task', task.id], {
-          ...task,
-          ...variables.data,
-        });
-
-        return { prevTask };
-      },
-      onError: (_err, _vars, context) => {
-        if (context?.prevTask) {
-          qc.setQueryData(['task', task.id], context.prevTask);
-        }
-        openAlertDialog({
-          title: 'Error',
-          description: 'タスク更新に失敗しました',
-          confirmText: '閉じる',
-          showCancel: false,
-        });
-      },
-      onSuccess: () => {
-        toast.success('ステータスを更新しました');
-      },
-      onSettled: () => {
-        const { queryKey } = getGetProgressTasksTaskIdQueryOptions(task.id);
-        qc.invalidateQueries({ queryKey });
-        qc.invalidateQueries({ queryKey: ['tasks'] });
-      },
-    },
-  });
-
   const handleUpdateTaskStatus = (status: TaskUpdateStatusType) => {
-    updateTask({ taskId: task.id, data: { status } });
+    updateTask(task.id, { status: status });
   };
 
   const dueDateStr = task.due_date
