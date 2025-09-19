@@ -204,7 +204,7 @@ export const ObjectiveRow = ({ taskId, objective, onUpdate }: ObjectiveRowProps)
           handleAssinedUserSave(newUserId.id);
         }}
       />
-      {objective && (
+      {isProgressListModalOpen && (
         <ProgressListModal
           open={isProgressListModalOpen}
           objective={objective}
@@ -216,7 +216,7 @@ export const ObjectiveRow = ({ taskId, objective, onUpdate }: ObjectiveRowProps)
           }}
         />
       )}
-      {objective && (
+      {isRemainderSettingModalOpen && (
         <ReminderSettingModal
           open={isRemainderSettingModalOpen}
           objective_id={objective.id}

@@ -68,6 +68,8 @@ export const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
       due_date: dueDate || undefined,
     };
     createTask(payload);
+    clearForm();
+    onClose();
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
