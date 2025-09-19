@@ -1,8 +1,5 @@
 //src\components\task\taskSettingOrderModal\TaskOrderSettingModal.tsx
 
-import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,16 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { TableCell } from '@/components/ui/table';
 
-import {
-  getGetProgressTasksQueryOptions,
-  useDeleteProgressTasksTaskId,
-  usePostProgressTaskOrders,
-} from '@/api/generated/taskProgressAPI';
-import type {
-  Task,
-  TaskListResponse,
-  TaskUpdateStatus,
-} from '@/api/generated/taskProgressAPI.schemas';
+import type { Task, TaskUpdateStatus } from '@/api/generated/taskProgressAPI.schemas';
 
 import { DraggableRow, DraggableTable, DraggableTableBody } from '@/components/DraggableTable';
 
@@ -38,62 +26,8 @@ interface TaskSettingModalProps {
 }
 
 export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) => {
-  const qc = useQueryClient();
-  const { tasks, can, updateTask } = useTasks();
+  const { tasks, can, updateTask, deleteTask, updateTaskOrder } = useTasks();
   const { user } = useUser();
-
-  // 並び替え
-  const { mutate: postProgressTaskOrders } = usePostProgressTaskOrders({
-    mutation: {
-      onMutate: (variables) => {
-        const prevTasks = tasks ?? [];
-        if (variables.data.task_ids) {
-          const newOrder = variables.data.task_ids;
-          const newTasks = prevTasks
-            .slice()
-            .sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
-
-          const { queryKey } = getGetProgressTasksQueryOptions();
-          qc.setQueryData(queryKey, newTasks as TaskListResponse);
-        }
-        return { prevTasks };
-      },
-      onSuccess: () => {
-        toast.success('順序を更新しました');
-      },
-      onError: (_e, _v, ctx) => {
-        if (ctx?.prevTasks) {
-          const { queryKey } = getGetProgressTasksQueryOptions();
-          qc.setQueryData(queryKey, ctx.prevTasks as TaskListResponse);
-        }
-      },
-    },
-  });
-
-  // 削除
-  const { mutate: deleteProgressTasksTaskId } = useDeleteProgressTasksTaskId({
-    mutation: {
-      onMutate: (variables) => {
-        const prevTasks = tasks ?? [];
-        const newTasks = prevTasks.filter((t) => t.id !== variables.taskId);
-
-        const { queryKey } = getGetProgressTasksQueryOptions();
-        qc.setQueryData(queryKey, newTasks as TaskListResponse);
-        return { prevTasks };
-      },
-      onSuccess: () => {
-        toast.success('タスクを削除しました');
-        const { queryKey } = getGetProgressTasksQueryOptions();
-        qc.invalidateQueries({ queryKey });
-      },
-      onError: (_e, _v, ctx) => {
-        if (ctx?.prevTasks) {
-          const { queryKey } = getGetProgressTasksQueryOptions();
-          qc.setQueryData(queryKey, ctx.prevTasks as TaskListResponse);
-        }
-      },
-    },
-  });
 
   const handleUpdateTaskStatus = (task_id: number, status: TaskUpdateStatus) => {
     const payload = {
@@ -105,11 +39,11 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
   const handleRender = (items: Task[]) => {
     if (!user) return;
     const newTasksArray = items.map((task) => task.id);
-    postProgressTaskOrders({ data: { task_ids: newTasksArray, user_id: user.id } });
+    updateTaskOrder(newTasksArray);
   };
 
   const handleDerete = (id: number) => {
-    deleteProgressTasksTaskId({ taskId: id });
+    deleteTask(id);
   };
 
   return (

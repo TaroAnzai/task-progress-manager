@@ -14,7 +14,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
-import { usePostProgressObjectives,usePostProgressTasks } from '@/api/generated/taskProgressAPI';
+import { usePostProgressObjectives } from '@/api/generated/taskProgressAPI';
 import type { ObjectiveItem } from '@/api/generated/taskProgressAPI.schemas';
 
 import { extractErrorMessage } from '@/utils/errorHandler';
@@ -29,27 +29,13 @@ interface TaskSettingModalProps {
 }
 
 export const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
-  const { refetch } = useTasks();
+  const { createTask, createTaskAsync } = useTasks();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [openAiSuggestModal, setOpenAiSuggestModal] = useState(false);
 
-  const { mutate: createTask, mutateAsync: createTaskAsync } = usePostProgressTasks({
-    mutation: {
-      onSuccess: () => {
-        toast('作成完了', { description: '新しいタスクを作成しました' });
-        refetch();
-        clearForm();
-        onClose();
-      },
-      onError: (err) => {
-        console.error('タスク保存失敗', err);
-        toast('保存失敗', { description: 'タスクの保存に失敗しました' });
-      },
-    },
-  });
   //新規登録関数
   const { mutate: postObjective } = usePostProgressObjectives({
     mutation: {
@@ -81,7 +67,7 @@ export const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
       description: description.trim(),
       due_date: dueDate || undefined,
     };
-    createTask({ data: payload });
+    createTask(payload);
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -95,7 +81,7 @@ export const NewTaskModal = ({ open, onClose }: TaskSettingModalProps) => {
       description: description.trim(),
       due_date: dueDate || undefined,
     };
-    const response = await createTaskAsync({ data: payload });
+    const response = await createTaskAsync(payload);
     const taskId = response.task?.id;
     if (taskId) {
       objectives.map((objective) => postObjective({ data: { ...objective, task_id: taskId } }));
