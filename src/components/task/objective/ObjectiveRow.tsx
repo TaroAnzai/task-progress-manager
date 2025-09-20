@@ -1,4 +1,5 @@
 // src/components/task/ObjectiveRow.tsx
+
 import { useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
@@ -10,12 +11,10 @@ import { TableCell } from '@/components/ui/table';
 import {
   getGetProgressUpdatesObjectiveIdQueryOptions,
   useDeleteProgressUpdatesProgressId,
-  useGetProgressUpdatesObjectiveIdLatestProgress,
   usePostProgressUpdatesObjectiveId,
 } from '@/api/generated/taskProgressAPI';
 import type {
   Objective,
-  ObjectiveInput,
   ObjectiveUpdate,
   ObjectiveUpdateStatus as updateStatusType,
   ProgressInput,
@@ -35,7 +34,6 @@ import { ProgressListModal } from './ProgressListModal';
 interface ObjectiveRowProps {
   taskId: number;
   objective: Objective | null;
-  onSaveNew: (obj: ObjectiveInput) => Promise<void>;
   onUpdate: (objId: number, updates: ObjectiveUpdate) => Promise<void>;
 }
 
@@ -46,16 +44,12 @@ export const ObjectiveRow = ({ taskId, objective, onUpdate }: ObjectiveRowProps)
   const [isProgressListModalOpen, setIsProgressListModalOpen] = useState(false);
   const [isRemainderSettingModalOpen, setIsRemainderSettingModalOpen] = useState(false);
   const { openAlertDialog } = useAlertDialog();
-  const { data, refetch: refetchLatestProgress } = useGetProgressUpdatesObjectiveIdLatestProgress(
-    objective?.id ?? 0,
-    { query: { enabled: !!objective } }
-  );
+  console.log('objectiveRow data', objective);
 
   const { mutate: postProgressMutation } = usePostProgressUpdatesObjectiveId({
     mutation: {
       onSuccess: (_data, variables) => {
         toast.success('進捗を更新しました');
-        refetchLatestProgress();
         const { queryKey } = getGetProgressUpdatesObjectiveIdQueryOptions(
           variables.objectiveId,
           {}
@@ -76,7 +70,6 @@ export const ObjectiveRow = ({ taskId, objective, onUpdate }: ObjectiveRowProps)
     mutation: {
       onSuccess: () => {
         toast.success('進捗を削除しました');
-        refetchLatestProgress();
         if (objective) {
           const { queryKey } = getGetProgressUpdatesObjectiveIdQueryOptions(objective.id, {});
           qc.invalidateQueries({ queryKey });
@@ -131,8 +124,8 @@ export const ObjectiveRow = ({ taskId, objective, onUpdate }: ObjectiveRowProps)
   };
 
   if (!objective) return null;
-  const latest_progress = data?.detail ?? '';
-  const latest_report_date = data?.report_date ?? '';
+  const latest_progress = objective.latest_progress ?? '';
+  const latest_report_date = objective.latest_report_date;
   const isCanUpdate = can('objective.update', objective);
   const isCanEditProgress = can('progress.update', objective);
 

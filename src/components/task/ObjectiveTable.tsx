@@ -231,12 +231,7 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
                 id={obj.id}
                 disabled={!can('objective.update', { taskId: taskId })}
               >
-                <ObjectiveRow
-                  taskId={taskId}
-                  objective={obj}
-                  onSaveNew={handleSaveNew}
-                  onUpdate={handleUpdate}
-                />
+                <ObjectiveRow taskId={taskId} objective={obj} onUpdate={handleUpdate} />
               </DraggableRow>
             ))}
 
