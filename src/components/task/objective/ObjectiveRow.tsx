@@ -9,12 +9,14 @@ import { toast } from 'sonner';
 import { TableCell } from '@/components/ui/table';
 
 import {
+  getGetProgressObjectivesTasksTaskIdQueryKey,
   getGetProgressUpdatesObjectiveIdQueryOptions,
   useDeleteProgressUpdatesProgressId,
   usePostProgressUpdatesObjectiveId,
 } from '@/api/generated/taskProgressAPI';
 import type {
   Objective,
+  ObjectivesList,
   ObjectiveUpdate,
   ObjectiveUpdateStatus as updateStatusType,
   ProgressInput,
@@ -44,24 +46,43 @@ export const ObjectiveRow = ({ taskId, objective, onUpdate }: ObjectiveRowProps)
   const [isProgressListModalOpen, setIsProgressListModalOpen] = useState(false);
   const [isRemainderSettingModalOpen, setIsRemainderSettingModalOpen] = useState(false);
   const { openAlertDialog } = useAlertDialog();
-  console.log('objectiveRow data', objective);
 
   const { mutate: postProgressMutation } = usePostProgressUpdatesObjectiveId({
     mutation: {
-      onSuccess: (_data, variables) => {
-        toast.success('進捗を更新しました');
-        const { queryKey } = getGetProgressUpdatesObjectiveIdQueryOptions(
-          variables.objectiveId,
-          {}
-        );
-        qc.invalidateQueries({ queryKey });
+      onMutate: async (variables) => {
+        if (!objective) return;
+        const queryKey = getGetProgressObjectivesTasksTaskIdQueryKey(taskId);
+        const prevData = qc.getQueryData(queryKey);
+        const updatedData = {
+          latest_progress: variables.data.detail,
+          latest_report_date: '',
+        };
+
+        qc.setQueryData<ObjectivesList | undefined>(queryKey, (old) => {
+          if (!old || !old.objectives) return;
+          return {
+            ...old,
+            objectives: old.objectives.map((o) =>
+              o.id === objective.id ? { ...o, ...updatedData } : o
+            ),
+          };
+        });
+        return { prevData };
       },
-      onError: (err) => {
+      onSuccess: () => {
+        toast.success('進捗を更新しました');
+      },
+      onError: (err, _vars, context) => {
+        const queryKey = getGetProgressObjectivesTasksTaskIdQueryKey(taskId);
+        qc.setQueryData(queryKey, context?.prevData);
         openAlertDialog({
           title: '進捗登録失敗',
           description: err,
           showCancel: false,
         });
+      },
+      onSettled: () => {
+        qc.invalidateQueries({ queryKey: getGetProgressObjectivesTasksTaskIdQueryKey(taskId) });
       },
     },
   });
