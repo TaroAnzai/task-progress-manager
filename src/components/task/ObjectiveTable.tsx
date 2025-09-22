@@ -1,5 +1,7 @@
 // src/components/task/ObjectiveTable.tsx
 
+import { useEffect, useState } from 'react';
+
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -39,6 +41,7 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
   const qc = useQueryClient();
   const { user } = useUser();
   const { can } = useTasks();
+  const [loalObjectives, setLocalObjectives] = useState<Objective[]>([]);
   const {
     data,
     isLoading,
@@ -159,6 +162,11 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
       },
     },
   });
+  useEffect(() => {
+    if (data?.objectives) {
+      setLocalObjectives(data.objectives);
+    }
+  }, [data?.objectives]);
 
   //早期リターン
   if (!user) return;
@@ -198,13 +206,15 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
   // ドロップ時の並べ替え
   const handleRender = (newObj: Objective[]) => {
     const newObjectives = newObj.map((o) => o.id);
+    setLocalObjectives(newObj);
     postObjectivesOrderMutation({ taskId: taskId, data: { order: newObjectives } });
   };
+
   if (!data?.objectives) return null;
   return (
     <div className="overflow-x-auto">
       <DraggableTable
-        items={data.objectives}
+        items={loalObjectives}
         getId={(item) => item.id}
         useGrabHandle={true}
         onReorder={handleRender}
@@ -223,7 +233,7 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
           </TableRow>
         </TableHeader>
         <DraggableTableBody>
-          {data.objectives
+          {loalObjectives
             .filter((task) => task.status !== ObjectiveStatus.SAVED)
             .map((obj) => (
               <DraggableRow

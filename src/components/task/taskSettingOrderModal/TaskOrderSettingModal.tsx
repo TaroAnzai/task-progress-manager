@@ -1,5 +1,7 @@
 //src\components\task\taskSettingOrderModal\TaskOrderSettingModal.tsx
 
+import { useEffect, useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -28,6 +30,11 @@ interface TaskSettingModalProps {
 export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) => {
   const { tasks, can, updateTask, deleteTask, updateTaskOrder } = useTasks();
   const { user } = useUser();
+  const [lolalTasks, setLocalTasks] = useState<Task[]>(tasks);
+
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks, setLocalTasks]);
 
   const handleUpdateTaskStatus = (task_id: number, status: TaskUpdateStatus) => {
     const payload = {
@@ -39,6 +46,7 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
   const handleRender = (items: Task[]) => {
     if (!user) return;
     const newTasksArray = items.map((task) => task.id);
+    setLocalTasks(items);
     updateTaskOrder(newTasksArray);
   };
 
@@ -55,7 +63,7 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
         </DialogHeader>
 
         <DraggableTable
-          items={tasks ?? []}
+          items={lolalTasks ?? []}
           getId={(item) => item.id}
           useGrabHandle={true}
           onReorder={(newItems) => {
@@ -64,7 +72,7 @@ export const TaskOrderSettingModal = ({ open, onClose }: TaskSettingModalProps) 
           }}
         >
           <DraggableTableBody>
-            {tasks?.map((task) => (
+            {lolalTasks?.map((task) => (
               <DraggableRow key={task.id} id={task.id}>
                 <TableCell className="max-w-xs truncate">{task.title}</TableCell>
                 <TableCell>{task.create_user_name}</TableCell>
