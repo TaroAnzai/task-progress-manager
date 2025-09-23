@@ -20,6 +20,7 @@ interface TaskControlPanelProps {
   onAllCollapse: () => void;
   viewMode: Record<FilterAccessLevel, boolean>;
   onChangeViewMode: (newValue: Record<FilterAccessLevel, boolean>) => void;
+  onSelectUser: (userId: number | null) => void;
 }
 
 export const TaskControlPanel = ({

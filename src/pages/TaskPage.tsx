@@ -19,25 +19,33 @@ const DEFAULT_FILTER: Record<FilterAccessLevel, boolean> = {
   OWNER: true,
   ASSIGNED: true,
 };
+
+const loadFromLocalStorage = (): Record<FilterAccessLevel, boolean> => {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      return parsed;
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
+      return DEFAULT_FILTER;
+    }
+  }
+  return DEFAULT_FILTER;
+};
 const TaskPageContent = () => {
   const { user, loading: userLoading, getUserRole } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
   const [filterLevels, setFilterLevels] = useState(DEFAULT_FILTER);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [isObjExpand, setIsObjExpand] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setFilterLevels(parsed);
-      } catch {
-        setFilterLevels(DEFAULT_FILTER);
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    }
+    const savedFilterLevels = loadFromLocalStorage();
+    setFilterLevels(savedFilterLevels);
   }, []);
+
   useEffect(() => {
     if (userLoading) return;
     if (!user) {
@@ -54,7 +62,17 @@ const TaskPageContent = () => {
 
   const handleChangeViewMode = (newValue: Record<FilterAccessLevel, boolean>) => {
     setFilterLevels(newValue);
+    setSelectedUserId(null);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newValue));
+  };
+  const handleSelectUser = (userId: number | null) => {
+    setSelectedUserId(userId);
+    const savedFilterLevels = loadFromLocalStorage();
+    if (userId === null) {
+      setFilterLevels(savedFilterLevels);
+    } else {
+      setFilterLevels(DEFAULT_FILTER);
+    }
   };
 
   if (userLoading) return <p className="text-gray-500">読み込み中...</p>;
@@ -70,8 +88,13 @@ const TaskPageContent = () => {
         onAllCollapse={onAllCollapse}
         viewMode={filterLevels}
         onChangeViewMode={handleChangeViewMode}
+        onSelectUser={handleSelectUser}
       />
-      <TaskList isExpandParent={isObjExpand} viewMode={filterLevels} />
+      <TaskList
+        isExpandParent={isObjExpand}
+        viewMode={filterLevels}
+        selectedUserId={selectedUserId}
+      />
     </>
   );
 };
