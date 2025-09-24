@@ -1,5 +1,4 @@
 // components/DraggableTable.tsx
-/* eslint-disable func-style */
 
 import {
   Children,
@@ -47,11 +46,11 @@ type DraggableTableContextType<T> = {
 const DraggableTableContext = createContext<unknown>(null);
 
 // 型安全にcontextを取得するフック
-function useDraggableTableContext<T>(): DraggableTableContextType<T> {
+const useDraggableTableContext = <T,>(): DraggableTableContextType<T> => {
   const ctx = useContext(DraggableTableContext);
   if (!ctx) throw new Error('DraggableTableは親で定義してください');
   return ctx as DraggableTableContextType<T>;
-}
+};
 
 // -------------------- DraggableTable --------------------
 
@@ -64,16 +63,21 @@ type DraggableTableProps<T> = {
   className?: string;
 };
 
-export function DraggableTable<T>({
+export const DraggableTable = <T,>({
   items,
   getId,
   onReorder,
   children,
   useGrabHandle = false,
   className,
-}: DraggableTableProps<T>) {
+}: DraggableTableProps<T>) => {
   const ids = useMemo(() => items.map(getId), [items, getId]);
+  const [localItems, setLocalItems] = useState(items);
   const [dragging, setDragging] = useState(false);
+
+  useEffect(() => {
+    setLocalItems(items);
+  }, [items]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -89,10 +93,11 @@ export function DraggableTable<T>({
     const oldIndex = ids.indexOf(active.id);
     const newIndex = ids.indexOf(over.id);
     const newItems = arrayMove(items, oldIndex, newIndex);
+    setLocalItems(newItems);
     onReorder(newItems);
   };
   // TableRowにドラッグハンドルを追加するヘルパー関数
-  function addDragHandleToTableRow(row: ReactNode) {
+  const addDragHandleToTableRow = (row: ReactNode) => {
     const tableRow = row as React.ReactElement<{ children: ReactNode }>;
     // TableRowコンポーネントでない場合はそのまま返す
     if (!isValidElement(tableRow) || tableRow.type !== TableRow) {
@@ -105,10 +110,17 @@ export function DraggableTable<T>({
     return cloneElement(tableRow, {
       children: [dragHandle, ...Children.toArray(tableRow.props.children)],
     });
-  }
+  };
   return (
     <DraggableTableContext.Provider
-      value={{ items, getId, onReorder, useGrabHandle } satisfies DraggableTableContextType<T>}
+      value={
+        {
+          items: localItems,
+          getId,
+          onReorder,
+          useGrabHandle,
+        } satisfies DraggableTableContextType<T>
+      }
     >
       <DndContext
         collisionDetection={closestCenter}
@@ -138,7 +150,7 @@ export function DraggableTable<T>({
       </DndContext>
     </DraggableTableContext.Provider>
   );
-}
+};
 
 // -------------------- DraggableTableBody --------------------
 
@@ -147,7 +159,7 @@ type DraggableTableBodyProps = {
   className?: string;
 };
 
-export function DraggableTableBody({ children, className }: DraggableTableBodyProps) {
+export const DraggableTableBody = ({ children, className }: DraggableTableBodyProps) => {
   const ids = Children.toArray(children)
     .filter(isValidElement)
     .map((child) => {
@@ -160,7 +172,7 @@ export function DraggableTableBody({ children, className }: DraggableTableBodyPr
       <TableBody className={className}>{children}</TableBody>
     </SortableContext>
   );
-}
+};
 
 // -------------------- DraggableRow --------------------
 
@@ -171,7 +183,7 @@ type DraggableRowProps = {
   disabled?: boolean;
 };
 
-export function DraggableRow({ id, children, className, disabled = false }: DraggableRowProps) {
+export const DraggableRow = ({ id, children, className, disabled = false }: DraggableRowProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   });
@@ -211,4 +223,4 @@ export function DraggableRow({ id, children, className, disabled = false }: Drag
       {children}
     </TableRow>
   );
-}
+};

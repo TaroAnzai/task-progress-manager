@@ -1,6 +1,6 @@
 // src/components/layout/Header.tsx
 
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { useDeleteProgressSessionsCurrent } from '@/api/generated/taskProgressAPI';
 
@@ -9,6 +9,8 @@ import { useUser } from '@/context/useUser';
 export const Header = () => {
   const { user, refetchUser } = useUser();
   const isLoggedIn = !!user?.id;
+  const location = useLocation();
+  const isLoginPage = location.pathname === '/login';
   const deleteSessionMutation = useDeleteProgressSessionsCurrent();
   const handleLogout = async () => {
     try {
@@ -34,9 +36,11 @@ export const Header = () => {
             ログアウト
           </button>
         ) : (
-          <Link to="login" className="hover:underline">
-            ログイン
-          </Link>
+          !isLoginPage && (
+            <Link to="login" className="hover:underline">
+              ログイン
+            </Link>
+          )
         )}
       </nav>
     </header>

@@ -102,10 +102,18 @@ const InputField = ({ label, type, value, onChange, required = false }: InputFie
   const [show, setShow] = useState(false);
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <label
+        htmlFor={type === 'password' ? (show ? 'text' : 'password') : type}
+        className="block text-sm font-medium text-gray-700"
+      >
+        {label}
+      </label>
       <div className="relative">
         <input
+          id={type === 'password' ? (show ? 'text' : 'password') : type}
+          name={type === 'password' ? (show ? 'text' : 'password') : type}
           type={type === 'password' ? (show ? 'text' : 'password') : type}
+          autoComplete={type === 'password' ? 'current-password' : 'username'}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-200 focus:border-blue-400"
