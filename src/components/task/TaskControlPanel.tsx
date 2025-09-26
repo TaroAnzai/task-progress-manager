@@ -72,6 +72,7 @@ export const TaskControlPanel = ({
               setNewTaskModalOpen(true);
             }}
             className="flex items-center gap-1"
+            disabled={selectedUser !== null}
           >
             <FilePlus size={16} />
             タスク新規作成
@@ -83,6 +84,7 @@ export const TaskControlPanel = ({
             }}
             variant="outline"
             className="flex items-center gap-1"
+            disabled={selectedUser !== null}
           >
             <PencilIcon size={16} />
             表示順変更・削除
@@ -95,6 +97,7 @@ export const TaskControlPanel = ({
             variant="secondary"
             id="view-selecter-btn"
             className="flex items-center gap-1"
+            disabled={selectedUser !== null}
           >
             {isFetching ? (
               <>'Excel出力中...'</>
