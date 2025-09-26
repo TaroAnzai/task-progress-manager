@@ -28,7 +28,6 @@ export const TaskList = ({ isExpandParent, viewMode, selectedUser }: TaskListPro
       query: { enabled: !!selectedUser },
     }
   );
-  console.log('taskOrder', taskOrder);
 
   // Filter out tasks with status SAVED
   const tasks = taskList ? (taskList as Task[]) : [];

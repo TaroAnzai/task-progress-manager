@@ -74,7 +74,6 @@ const TaskPageContent = () => {
     } else {
       setFilterLevels(DEFAULT_FILTER);
     }
-    console.log('selectedUserId', user, filterLevels);
   };
 
   if (userLoading) return <p className="text-gray-500">読み込み中...</p>;

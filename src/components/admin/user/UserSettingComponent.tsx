@@ -63,7 +63,6 @@ export const UserSettingComponent = ({
           setPassword('');
           setPassword2('');
         }
-        console.log('success');
       },
       onError: (err) => {
         console.error(err);

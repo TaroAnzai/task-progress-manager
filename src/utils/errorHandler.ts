@@ -22,7 +22,6 @@ const firstStringDeep = (v: unknown): string | null => {
 export const extractErrorMessage = (error: unknown): string => {
   // axios 風: { response: { data: ... } } を構造で判定
   if (isObject(error) && 'response' in error) {
-    console.log('response', error.response);
     const resp = (error as Record<string, unknown>).response;
     if (isObject(resp) && 'data' in resp) {
       const data = (resp as Record<string, unknown>).data;
