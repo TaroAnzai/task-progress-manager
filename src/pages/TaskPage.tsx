@@ -7,6 +7,7 @@ import { type TaskUserAccessLevel } from '@/api/generated/taskProgressAPI.schema
 
 import { TaskControlPanel } from '@/components/task/TaskControlPanel';
 import { TaskList } from '@/components/task/TaskList';
+import type { PickedUser } from '@/components/task/ViewUserSelectModal/ViewUserSelectModal';
 
 import { useUser } from '@/context/useUser';
 
@@ -38,7 +39,7 @@ const TaskPageContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [filterLevels, setFilterLevels] = useState(DEFAULT_FILTER);
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUser, setSelectedUser] = useState<PickedUser | null>(null);
   const [isObjExpand, setIsObjExpand] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
@@ -62,17 +63,18 @@ const TaskPageContent = () => {
 
   const handleChangeViewMode = (newValue: Record<FilterAccessLevel, boolean>) => {
     setFilterLevels(newValue);
-    setSelectedUserId(null);
+    setSelectedUser(null);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newValue));
   };
-  const handleSelectUser = (userId: number | null) => {
-    setSelectedUserId(userId);
+  const handleSelectUser = (user: PickedUser | null) => {
+    setSelectedUser(user);
     const savedFilterLevels = loadFromLocalStorage();
-    if (userId === null) {
+    if (user === null) {
       setFilterLevels(savedFilterLevels);
     } else {
       setFilterLevels(DEFAULT_FILTER);
     }
+    console.log('selectedUserId', user, filterLevels);
   };
 
   if (userLoading) return <p className="text-gray-500">読み込み中...</p>;
@@ -90,11 +92,7 @@ const TaskPageContent = () => {
         onChangeViewMode={handleChangeViewMode}
         onSelectUser={handleSelectUser}
       />
-      <TaskList
-        isExpandParent={isObjExpand}
-        viewMode={filterLevels}
-        selectedUserId={selectedUserId}
-      />
+      <TaskList isExpandParent={isObjExpand} viewMode={filterLevels} selectedUser={selectedUser} />
     </>
   );
 };

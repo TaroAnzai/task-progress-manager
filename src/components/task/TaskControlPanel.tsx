@@ -10,17 +10,17 @@ import { useGetProgressExportsExcel } from '@/api/generated/taskProgressAPI';
 
 import { NewTaskModal } from '@/components/task/newTaskModal/NewTaskModal';
 import { TaskOrderSettingModal } from '@/components/task/taskSettingOrderModal/TaskOrderSettingModal';
-import { TestModal } from '@/components/TestModal';
 
 import type { FilterAccessLevel } from '@/pages/TaskPage';
 
 import { ViewSelectorPopup } from './ViewSelectorPopup';
+import { type PickedUser, ViewUserSelectModal } from './ViewUserSelectModal/ViewUserSelectModal';
 interface TaskControlPanelProps {
   onAllExpand: () => void;
   onAllCollapse: () => void;
   viewMode: Record<FilterAccessLevel, boolean>;
   onChangeViewMode: (newValue: Record<FilterAccessLevel, boolean>) => void;
-  onSelectUser: (userId: number | null) => void;
+  onSelectUser: (user: PickedUser | null) => void;
 }
 
 export const TaskControlPanel = ({
@@ -28,10 +28,12 @@ export const TaskControlPanel = ({
   onAllCollapse,
   viewMode,
   onChangeViewMode,
+  onSelectUser,
 }: TaskControlPanelProps) => {
   const [newTaskModalOpen, setNewTaskModalOpen] = useState(false);
   const [taskOrderModalOpen, setTaskOrderModalOpen] = useState(false);
-  const [testModalOpen, setTestModalOpen] = useState(false);
+  const [viewUserSelectModalOpen, setViewUserSelectModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<PickedUser | null>(null);
   // ① 自動実行は無効化（ボタン押下で refetch）
   const { refetch: downloadFile, isFetching } = useGetProgressExportsExcel({
     query: { enabled: false, refetchOnWindowFocus: false },
@@ -57,7 +59,10 @@ export const TaskControlPanel = ({
       console.error(e);
     }
   };
-
+  const handleSelectUser = (user: PickedUser | null) => {
+    setSelectedUser(user);
+    onSelectUser(user);
+  };
   return (
     <>
       <div className="flex justify-between gap-2 mb-4" id="task-controls-box">
@@ -103,6 +108,9 @@ export const TaskControlPanel = ({
         </div>
 
         <div className="flex gap-2">
+          <Button onClick={() => setViewUserSelectModalOpen(true)}>
+            {selectedUser ? selectedUser.name : '表示ユーザー選択'}
+          </Button>
           <ViewSelectorPopup viewMode={viewMode} onChange={onChangeViewMode} />
           <Button className="" onClick={onAllExpand}>
             <Plus />
@@ -123,13 +131,13 @@ export const TaskControlPanel = ({
           }}
         />
       )}
-
-      <TestModal
-        open={testModalOpen}
-        onClose={() => {
-          setTestModalOpen(false);
-        }}
-      />
+      {viewUserSelectModalOpen && (
+        <ViewUserSelectModal
+          open={viewUserSelectModalOpen}
+          onClose={() => setViewUserSelectModalOpen(false)}
+          onSelectUser={handleSelectUser}
+        />
+      )}
     </>
   );
 };

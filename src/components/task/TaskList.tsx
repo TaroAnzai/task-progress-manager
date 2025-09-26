@@ -2,6 +2,7 @@
 
 import { ClipLoader } from 'react-spinners';
 
+import { useGetProgressTaskOrders } from '@/api/generated/taskProgressAPI';
 import { type Task, TaskStatus } from '@/api/generated/taskProgressAPI.schemas';
 
 import { useTasks } from '@/context/useTasks';
@@ -9,18 +10,33 @@ import { useUser } from '@/context/useUser';
 import type { FilterAccessLevel } from '@/pages/TaskPage';
 
 import { TaskCard } from './TaskCard';
+import type { PickedUser } from './ViewUserSelectModal/ViewUserSelectModal';
 
 interface TaskListProps {
   isExpandParent?: boolean;
   viewMode: Record<FilterAccessLevel, boolean>;
+  selectedUser: PickedUser | null;
 }
 
-export const TaskList = ({ isExpandParent, viewMode }: TaskListProps) => {
+export const TaskList = ({ isExpandParent, viewMode, selectedUser }: TaskListProps) => {
   const { tasks: taskList, isLoading } = useTasks();
   const { user } = useUser();
+
+  const { data: taskOrder } = useGetProgressTaskOrders(
+    { user_id: selectedUser?.id ?? 0 },
+    {
+      query: { enabled: !!selectedUser },
+    }
+  );
+  console.log('taskOrder', taskOrder);
+
   // Filter out tasks with status SAVED
   const tasks = taskList ? (taskList as Task[]) : [];
-  const notSavedTasks = tasks?.filter((task) => task.status !== TaskStatus.SAVED);
+  const notSavedTasks = taskOrder
+    ? taskOrder
+        .map((task) => tasks.find((t) => t.id === task.task_id))
+        .filter((task): task is Task => !!task && task.status !== TaskStatus.SAVED)
+    : tasks.filter((task) => task.status !== TaskStatus.SAVED);
 
   // Further filter tasks based on user access level
   const filteredTasks = notSavedTasks.filter(
