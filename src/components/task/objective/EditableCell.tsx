@@ -44,8 +44,19 @@ export const EditableCell = ({ value, onSave, className, disabled }: EditableCel
       onChange={(e) => setInputValue(e.target.value)}
       onBlur={handleSave}
       onKeyDown={handleKeyDown}
-      className="h-[40px] min-h-0"
+      className="min-h-[40px] resize-none overflow-hidden" // h-[40px]を削除
       autoFocus
+      rows={1}
+      style={{
+        height: 'auto',
+        minHeight: '40px',
+      }}
+      ref={(textarea) => {
+        if (textarea) {
+          textarea.style.height = 'auto';
+          textarea.style.height = textarea.scrollHeight + 'px';
+        }
+      }}
     />
   ) : disabled ? (
     <div
