@@ -21,7 +21,12 @@ import type {
 } from '@/api/generated/taskProgressAPI.schemas';
 import { ObjectiveStatus } from '@/api/generated/taskProgressAPI.schemas';
 
-import { DraggableRow, DraggableTable, DraggableTableBody } from '@/components/DraggableTable';
+import {
+  DraggableRow,
+  DraggableTable,
+  DraggableTableBody,
+  DraggableTableHead,
+} from '@/components/DraggableTable';
 
 import { extractErrorMessage } from '@/utils/errorHandler';
 
@@ -212,11 +217,21 @@ export const ObjectiveTable = ({ taskId }: ObjectiveTableProps) => {
       >
         <TableHeader className="bg-gray-100">
           <TableRow>
-            <TableHead className="w-[400px] px-3 py-2">オブジェクティブ</TableHead>
-            <TableHead className="w-[120px] px-3 py-2">期限</TableHead>
-            <TableHead className="w-[120px] px-3 py-2">ステータス</TableHead>
-            <TableHead className="w-[120px] px-3 py-2">担当者</TableHead>
-            <TableHead className="px-3 py-2">進捗</TableHead>
+            <DraggableTableHead id="objective" className="w-[400px] px-3 py-2">
+              オブジェクティブ
+            </DraggableTableHead>
+            <DraggableTableHead id="due_date" className="w-[120px] px-3 py-2">
+              期限
+            </DraggableTableHead>
+            <DraggableTableHead id="status" className="w-[120px] px-3 py-2">
+              ステータス
+            </DraggableTableHead>
+            <DraggableTableHead id="assigned_user" className="w-[120px] px-3 py-2">
+              担当者
+            </DraggableTableHead>
+            <DraggableTableHead id="progress" className="px-3 py-2">
+              進捗
+            </DraggableTableHead>
             <TableHead className="w-[100px] px-3 py-2">報告日</TableHead>
             <TableHead className="w-[60px] px-3 py-2">履歴</TableHead>
             <TableHead className="w-[60px] px-3 py-2">Mail</TableHead>

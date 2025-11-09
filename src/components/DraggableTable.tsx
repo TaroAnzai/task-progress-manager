@@ -40,6 +40,8 @@ type DraggableTableContextType<T> = {
   getId: (item: T) => string | number;
   onReorder: (items: T[]) => void;
   useGrabHandle?: boolean;
+  columnWidths: ColumnWidths;
+  startResizing: (id: string, e: React.MouseEvent) => void;
 };
 
 // unknownベースでcreateContext（anyは使わない）
@@ -53,6 +55,7 @@ const useDraggableTableContext = <T,>(): DraggableTableContextType<T> => {
 };
 
 // -------------------- DraggableTable --------------------
+type ColumnWidths = Record<string, number>;
 
 type DraggableTableProps<T> = {
   items: T[];
@@ -74,6 +77,7 @@ export const DraggableTable = <T,>({
   const ids = useMemo(() => items.map(getId), [items, getId]);
   const [localItems, setLocalItems] = useState(items);
   const [dragging, setDragging] = useState(false);
+  const [columnWidths, setColumnWidths] = useState<ColumnWidths>({});
 
   useEffect(() => {
     setLocalItems(items);
@@ -111,6 +115,23 @@ export const DraggableTable = <T,>({
       children: [dragHandle, ...Children.toArray(tableRow.props.children)],
     });
   };
+  const startResizing = (key: string, e: React.MouseEvent) => {
+    const startX = e.clientX;
+    const startWidth = columnWidths[key] ?? e.currentTarget.parentElement?.clientWidth ?? 120;
+
+    const onMouseMove = (ev: MouseEvent) => {
+      const newWidth = Math.max(startWidth + (ev.clientX - startX), 60);
+      setColumnWidths((prev) => ({ ...prev, [key]: newWidth }));
+    };
+
+    const stop = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', stop);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', stop);
+  };
   return (
     <DraggableTableContext.Provider
       value={
@@ -119,6 +140,8 @@ export const DraggableTable = <T,>({
           getId,
           onReorder,
           useGrabHandle,
+          columnWidths,
+          startResizing,
         } satisfies DraggableTableContextType<T>
       }
     >
@@ -222,5 +245,59 @@ export const DraggableRow = ({ id, children, className, disabled = false }: Drag
       )}
       {children}
     </TableRow>
+  );
+};
+
+// -------------------- DraggableTableHead --------------------
+type DraggableTableHeadProps = {
+  id: string;
+  children: React.ReactNode;
+  resizable?: boolean;
+  className?: string;
+};
+
+export const DraggableTableHead = ({
+  id,
+  children,
+  resizable = true,
+  className,
+}: DraggableTableHeadProps) => {
+  const { columnWidths, startResizing } = useDraggableTableContext() as {
+    columnWidths: Record<string, number>;
+    startResizing: (id: string, e: React.MouseEvent) => void;
+  };
+
+  const width = columnWidths[id] ?? undefined;
+
+  return (
+    <TableHead key={id} style={{ width }} className={`relative select-none ${className ?? ''}`}>
+      <div className="flex items-center justify-between">
+        <span className="truncate">{children}</span>
+        {resizable && (
+          <>
+            {/* 右端のボーダーライン */}
+            <div
+              className={`
+                absolute right-0 top-0 h-full w-[2px]
+                bg-border transition-colors duration-150
+                group-hover:bg-gray-400
+              `}
+            ></div>
+
+            {/* ドラッグバー（マウス操作領域） */}
+            <div
+              onMouseDown={(e) => startResizing(id, e)}
+              className={`
+                absolute right-[-2px] top-0 h-full w-[6px]
+                cursor-col-resize
+                bg-transparent
+                hover:bg-gray-300
+                active:bg-gray-500
+              `}
+            />
+          </>
+        )}
+      </div>
+    </TableHead>
   );
 };
