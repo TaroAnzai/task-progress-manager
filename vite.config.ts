@@ -7,7 +7,7 @@ import { defineConfig } from 'vite';
 export default defineConfig(({ command }) => {
   const isDev = command === 'serve'; // npm run dev の場合
 
-  let serverConfig = {
+  const serverConfig = {
     host: 'localhost',
     port: 5173,
     https: {}, // HTTPS設定
