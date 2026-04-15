@@ -1,5 +1,5 @@
 // src/components/task/TaskHeader.tsx
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
@@ -20,7 +20,7 @@ interface TaskHeaderProps {
 
 export const TaskHeader = ({ task }: TaskHeaderProps) => {
   const { can, updateTask } = useTasks();
-  const [isUpdateTask, setIsUpdateTask] = useState(false);
+  const isUpdateTask = useMemo(() => can('task.update', task), [can, task]);
 
   const handleUpdateTaskStatus = (status: TaskUpdateStatusType) => {
     updateTask(task.id, { status: status });
@@ -29,10 +29,6 @@ export const TaskHeader = ({ task }: TaskHeaderProps) => {
   const dueDateStr = task.due_date
     ? format(new Date(task.due_date), 'yyyy年M月d日', { locale: ja })
     : '期限未設定';
-
-  useEffect(() => {
-    setIsUpdateTask(can('task.update', task));
-  }, [can, task]);
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 w-full">

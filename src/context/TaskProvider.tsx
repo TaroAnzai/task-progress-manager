@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useCallback, useMemo } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -32,7 +32,12 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   const qc = useQueryClient();
   const { user } = useUser();
   const currentUserId = user?.id;
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
+  // // ローディング
+  // useEffect(() => {
+  //   setIsLoading(loading || isFetching || !user?.id);
+  // }, [loading, isFetching, user?.id]);
+
   const { openAlertDialog } = useAlertDialog();
   const {
     data,
@@ -43,6 +48,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     query: { enabled: !!user?.id }, // ログイン後に実行
   });
   const tasks = useMemo(() => data?.tasks ?? [], [data]);
+  const isLoading = loading || isFetching || !user?.id;
   //----------------------CREATE TASK----------------------
   const createTask = (data: TaskInput) => _createTask({ data: data });
 
@@ -209,11 +215,6 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
       onSettled: () => {},
     },
   });
-
-  // ローディング
-  useEffect(() => {
-    setIsLoading(loading || isFetching || !user?.id);
-  }, [loading, isFetching, user?.id]);
 
   // ユーザーのアクセスレベル用
   const accessMap = useMemo(() => {
